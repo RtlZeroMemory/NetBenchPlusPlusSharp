@@ -1,0 +1,362 @@
+{
+  "started_utc": "2026-09-29T10:41:59.468611+00:00",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+  "arguments": {
+    "matrix": "bench\\matrices\\diagnostics.json",
+    "output": "results\\diagnostics-fairness-20260929",
+    "only": "['fairness']",
+    "repetitions": "None",
+    "duration": "None",
+    "warmup": "None",
+    "cooldown": "2.0",
+    "resume": "False"
+  },
+  "masks": {
+    "physical_core_masks": [
+      3,
+      12,
+      48,
+      192,
+      768,
+      3072,
+      12288,
+      49152
+    ],
+    "spare": 1,
+    "server": 340,
+    "client": 21504,
+    "server_cores": 4
+  },
+  "matrix": {
+    "name": "diagnostics",
+    "purpose": "Controlled single-variable diagnostics for the first-pass anomalies and for client headroom. Not headline evidence.",
+    "seed": 7,
+    "server_cores": 4,
+    "corpora": {
+      "mixed1m": {
+        "profile": "mixed",
+        "bytes": 268435456,
+        "frame_bytes": 1048576,
+        "seed": 42
+      },
+      "easy64k": {
+        "profile": "easy",
+        "bytes": 536870912,
+        "frame_bytes": 65536,
+        "seed": 101
+      }
+    },
+    "defaults": {
+      "duration": 10,
+      "warmup": 3,
+      "connections": 1,
+      "window": 1,
+      "group": "Diagnostics"
+    },
+    "phases": [
+      {
+        "name": "tcp-stall",
+        "repetitions": 1,
+        "cells": [
+          {
+            "name": "stall-w1-256k",
+            "title": "1 MiB transport + 2 ms pause, window 1, 256 KiB buffers",
+            "corpus": "mixed1m",
+            "mode": "transport",
+            "pause_every": 1,
+            "pause_ms": 2,
+            "window": 1,
+            "socket_buffer": 262144
+          },
+          {
+            "name": "stall-w2-256k",
+            "title": "... window 2, 256 KiB",
+            "corpus": "mixed1m",
+            "mode": "transport",
+            "pause_every": 1,
+            "pause_ms": 2,
+            "window": 2,
+            "socket_buffer": 262144,
+            "servers": [
+              "cpp"
+            ]
+          },
+          {
+            "name": "stall-w64-256k",
+            "title": "... window 64, 256 KiB",
+            "corpus": "mixed1m",
+            "mode": "transport",
+            "pause_every": 1,
+            "pause_ms": 2,
+            "window": 64,
+            "socket_buffer": 262144
+          },
+          {
+            "name": "stall-w1-1m",
+            "title": "... window 1, 1 MiB",
+            "corpus": "mixed1m",
+            "mode": "transport",
+            "pause_every": 1,
+            "pause_ms": 2,
+            "window": 1,
+            "socket_buffer": 1048576,
+            "servers": [
+              "cpp"
+            ]
+          },
+          {
+            "name": "stall-w64-1m",
+            "title": "... window 64, 1 MiB",
+            "corpus": "mixed1m",
+            "mode": "transport",
+            "pause_every": 1,
+            "pause_ms": 2,
+            "window": 64,
+            "socket_buffer": 1048576,
+            "servers": [
+              "cpp"
+            ]
+          },
+          {
+            "name": "stall-w1-4m",
+            "title": "... window 1, 4 MiB",
+            "corpus": "mixed1m",
+            "mode": "transport",
+            "pause_every": 1,
+            "pause_ms": 2,
+            "window": 1,
+            "socket_buffer": 4194304,
+            "servers": [
+              "cpp"
+            ]
+          },
+          {
+            "name": "stall-w64-4m",
+            "title": "... window 64, 4 MiB",
+            "corpus": "mixed1m",
+            "mode": "transport",
+            "pause_every": 1,
+            "pause_ms": 2,
+            "window": 64,
+            "socket_buffer": 4194304
+          },
+          {
+            "name": "stall-w1-os",
+            "title": "... window 1, OS autotuning",
+            "corpus": "mixed1m",
+            "mode": "transport",
+            "pause_every": 1,
+            "pause_ms": 2,
+            "window": 1,
+            "socket_buffer": 0,
+            "servers": [
+              "cpp"
+            ]
+          },
+          {
+            "name": "stall-w64-os",
+            "title": "... window 64, OS autotuning",
+            "corpus": "mixed1m",
+            "mode": "transport",
+            "pause_every": 1,
+            "pause_ms": 2,
+            "window": 64,
+            "socket_buffer": 0
+          },
+          {
+            "name": "nostall-w64-256k",
+            "title": "1 MiB transport, no pause, window 64, 256 KiB",
+            "corpus": "mixed1m",
+            "mode": "transport",
+            "window": 64,
+            "socket_buffer": 262144,
+            "servers": [
+              "cpp"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "large-json",
+        "repetitions": 1,
+        "cells": [
+          {
+            "name": "json1m-w1-256k",
+            "title": "1 MiB JSON aggregate, window 1, 256 KiB",
+            "corpus": "mixed1m",
+            "mode": "aggregate",
+            "window": 1,
+            "socket_buffer": 262144
+          },
+          {
+            "name": "json1m-w64-256k",
+            "title": "1 MiB JSON aggregate, window 64, 256 KiB",
+            "corpus": "mixed1m",
+            "mode": "aggregate",
+            "window": 64,
+            "socket_buffer": 262144
+          },
+          {
+            "name": "json1m-w1-os",
+            "title": "1 MiB JSON aggregate, window 1, OS autotuning",
+            "corpus": "mixed1m",
+            "mode": "aggregate",
+            "window": 1,
+            "socket_buffer": 0
+          },
+          {
+            "name": "json1m-w64-os",
+            "title": "1 MiB JSON aggregate, window 64, OS autotuning",
+            "corpus": "mixed1m",
+            "mode": "aggregate",
+            "window": 64,
+            "socket_buffer": 0
+          }
+        ]
+      },
+      {
+        "name": "fairness",
+        "repetitions": 2,
+        "cells": [
+          {
+            "name": "easy-aggregate-yield-4m",
+            "title": "EASY aggregate after per-frame yield, 4 MiB buffers",
+            "corpus": "easy64k",
+            "mode": "aggregate",
+            "connections": 16,
+            "window": 64,
+            "duration": 20,
+            "warmup": 10,
+            "socket_buffer": 4194304
+          },
+          {
+            "name": "easy-transport-yield-4m",
+            "title": "EASY transport after per-frame yield, 4 MiB buffers",
+            "corpus": "easy64k",
+            "mode": "transport",
+            "connections": 16,
+            "window": 64,
+            "duration": 20,
+            "warmup": 10,
+            "socket_buffer": 4194304
+          }
+        ]
+      },
+      {
+        "name": "headroom",
+        "repetitions": 1,
+        "cells": [
+          {
+            "name": "easy-transport-3c",
+            "title": "EASY transport, 3 client cores",
+            "corpus": "easy64k",
+            "mode": "transport",
+            "connections": 16,
+            "window": 64,
+            "duration": 20,
+            "warmup": 10
+          },
+          {
+            "name": "easy-transport-4c",
+            "title": "EASY transport, 4 client cores",
+            "corpus": "easy64k",
+            "mode": "transport",
+            "connections": 16,
+            "window": 64,
+            "duration": 20,
+            "warmup": 10,
+            "client_cores": "client+spare"
+          },
+          {
+            "name": "easy-aggregate-3c",
+            "title": "EASY aggregate, 3 client cores",
+            "corpus": "easy64k",
+            "mode": "aggregate",
+            "connections": 16,
+            "window": 64,
+            "duration": 20,
+            "warmup": 10
+          },
+          {
+            "name": "easy-aggregate-4c",
+            "title": "EASY aggregate, 4 client cores",
+            "corpus": "easy64k",
+            "mode": "aggregate",
+            "connections": 16,
+            "window": 64,
+            "duration": 20,
+            "warmup": 10,
+            "client_cores": "client+spare"
+          }
+        ]
+      }
+    ]
+  },
+  "overrides": {},
+  "corpora": {
+    "mixed1m": {
+      "format": "TCPBCH01",
+      "frames": 257,
+      "payload_bytes": 269455668,
+      "records": 1462786,
+      "sha256": "4ce704eb669d4e865c8bbbd668b85ae71c42fe91c56489a2af71e71dc907831e",
+      "profile": "mixed",
+      "bytes": 268435456,
+      "frame_bytes": 1048576,
+      "seed": 42,
+      "max_frame_bytes": 1048574,
+      "name": "mixed1m",
+      "path": "F:\\SocketServerClient\\data\\mixed1m-mixed-268435456-1048576-42.bin"
+    },
+    "easy64k": {
+      "format": "TCPBCH01",
+      "frames": 8203,
+      "payload_bytes": 536920774,
+      "records": 3278313,
+      "sha256": "7961bae3e7cb78ae8a3b5e1bae272f874aded6619490c19068235760282e8cd3",
+      "profile": "easy",
+      "bytes": 536870912,
+      "frame_bytes": 65536,
+      "seed": 101,
+      "max_frame_bytes": 65536,
+      "name": "easy64k",
+      "path": "F:\\SocketServerClient\\data\\easy64k-easy-536870912-65536-101.bin"
+    }
+  },
+  "binaries": {
+    "cpp": {
+      "path": "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+      "sha256": "409f70f91c39d85512ff4ef5f56768017d31f18d58f7cd7102d169210a6bbb1c"
+    },
+    "csharp": {
+      "path": "F:\\SocketServerClient\\src\\dotnet\\bin\\Release\\net11.0\\Bench.dll",
+      "sha256": "c506be83ba9aabe0e3e8401755aaa11a9404aa8ae1018c4b24407160b43419cb"
+    }
+  },
+  "sources": {
+    "src\\dotnet\\Client.cs": "c5802364c4ea192ffbbf5ef1df23f4255cf57ac1b72f742cba1342399ab10f60",
+    "src\\dotnet\\Corpus.cs": "013bba4a104c66473bc4aac9d6edb39a7765251b1b351a7679e39e26b0d4edff",
+    "src\\dotnet\\Processing.cs": "9cb54716b147577e70306538d0168f93654a42baa77d634fa157a1bcf53c7b18",
+    "src\\dotnet\\Program.cs": "4ed854d0c009fd5a408af9112eb45c4dfdf5c19966450211f92097aa33584d9d",
+    "src\\dotnet\\Report.cs": "51a13d9d5067264934ee1139083ec0cbb258589237918511c93eccee7cf89c25",
+    "src\\dotnet\\SelfTest.cs": "f829c58de944668be8f8f934fc268f2e977f79421953010f1dcef2c8e3488888",
+    "src\\dotnet\\Server.cs": "bea19f57cdf4b8ddb12eea78bf6eeb2f590056a9334c1cb75ba2ca22f4593f22",
+    "src\\dotnet\\Bench.csproj": "e6ec1e80c7842f185fea04c1ec01a3cf21a4a753e8b1187619a3b1b5f592e023",
+    "src\\cpp\\client.cpp": "c730727182be7ff80bdd89443faecfd4486162aede77fb87942771fce8f129b9",
+    "src\\cpp\\main.cpp": "8896cf3cad5ba8672c66dad6c49129870b7be410c035158060f1fd34eb53ade8",
+    "src\\cpp\\processing.cpp": "f3205399bfedea40bcd84e47557c7d522f6f5cb3d43a5240d56d9eac3c39468c",
+    "src\\cpp\\server.cpp": "fb8eb29e1025b0381943beeee785e3b4ea53e65225530514214ce692af2ef7a4",
+    "src\\cpp\\bench.hpp": "4236b9b7323473f6c475697e0a4949d8cd2d9e5c5c666104ad011c01578a92de",
+    "src\\cpp\\CMakeLists.txt": "8d2dcfa9fe780594eadd1146d7f0b4b431bf22904cd3dd75c95531f45aa0e80d",
+    "bench\\report.py": "af40fbc482e6942d8b3a73e0c1b3afdf4aa323b8a0fe8270fe5792984fb3883d",
+    "bench\\run.py": "9c1f214461480f9e4487df8466e9219165435bf80b67f064c03f8fdb46232a07",
+    "tools\\corpus.py": "3bc3a9d594d8967761bc5ee5e19ebd67b59ccf86302702ca3e4dea1fc5c54e29",
+    "global.json": "96f9b8fc4932f60c65c01ba2bf9a8c689a58bac189ac39c3a4ffa24bb1948189"
+  },
+  "tools": {
+    "dotnet": "dotnet\\sdk-manifests\\11.0.100-preview.6\\microsoft.net.sdk.maccatalyst\\26.5.11720-net11-p6\\WorkloadManifest.json\n   Install Type:              Msi\n\n [ios]\n   Installation Source: VS 17.13.35818.85, VS 18.10.12217.157\n   Manifest Version:    26.5.11720-net11-p6/11.0.100-preview.6\n   Manifest Path:       C:\\Program Files\\dotnet\\sdk-manifests\\11.0.100-preview.6\\microsoft.net.sdk.ios\\26.5.11720-net11-p6\\WorkloadManifest.json\n   Install Type:              Msi\n\n [android]\n   Installation Source: VS 17.13.35818.85, VS 18.10.12217.157\n   Manifest Version:    37.0.0-preview.6.59/11.0.100-preview.6\n   Manifest Path:       C:\\Program Files\\dotnet\\sdk-manifests\\11.0.100-preview.6\\microsoft.net.sdk.android\\37.0.0-preview.6.59\\WorkloadManifest.json\n   Install Type:              Msi\n\nConfigured to use workload sets when installing new manifests.\nNo workload sets are installed. Run \"dotnet workload restore\" to install a workload set.\n\nHost:\n  Version:      11.0.0-preview.7.26381.103\n  Architecture: x64\n  Commit:       e2c1e00b3d\n\n.NET SDKs installed:\n  8.0.425 [C:\\Program Files\\dotnet\\sdk]\n  9.0.121 [C:\\Program Files\\dotnet\\sdk]\n  9.0.200 [C:\\Program Files\\dotnet\\sdk]\n  10.0.112 [C:\\Program Files\\dotnet\\sdk]\n  10.0.303 [C:\\Program Files\\dotnet\\sdk]\n  10.0.401 [C:\\Program Files\\dotnet\\sdk]\n  11.0.100-preview.7.26381.103 [C:\\Program Files\\dotnet\\sdk]\n\n.NET runtimes installed:\n  Microsoft.AspNetCore.App 6.0.36 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 8.0.13 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 8.0.31 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 9.0.2 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 9.0.20 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 10.0.11 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 10.0.12 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 11.0.0-preview.7.26381.103 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\n  Microsoft.NETCore.App 6.0.36 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\n  Microsoft.NETCore.App 8.0.13 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\n  Microsoft.NETCore.App 8.0.31 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\n  Microsoft.NETCore.App 9.0.2 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\n  Microsoft.NETCore.App 9.0.20 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\n  Microsoft.NETCore.App 10.0.11 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\n  Microsoft.NETCore.App 10.0.12 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\n  Microsoft.NETCore.App 11.0.0-preview.7.26381.103 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\n  Microsoft.WindowsDesktop.App 6.0.36 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\n  Microsoft.WindowsDesktop.App 8.0.13 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\n  Microsoft.WindowsDesktop.App 8.0.31 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\n  Microsoft.WindowsDesktop.App 9.0.2 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\n  Microsoft.WindowsDesktop.App 9.0.20 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\n  Microsoft.WindowsDesktop.App 10.0.11 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\n  Microsoft.WindowsDesktop.App 10.0.12 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\n  Microsoft.WindowsDesktop.App 11.0.0-preview.7.26381.103 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\n\nOther architectures found:\n  x86   [C:\\Program Files (x86)\\dotnet]\n    registered at [HKLM\\SOFTWARE\\dotnet\\Setup\\InstalledVersions\\x86\\InstallLocation]\n\nEnvironment variables:\n  Not set\n\nglobal.json file:\n  F:\\SocketServerClient\\global.json\n\nLearn more:\n  https://aka.ms/dotnet/info\n\nDownload .NET:\n  https://aka.ms/dotnet/download\n",
+    "cmake": "cmake version 4.2.3\n\nCMake suite maintained and supported by Kitware (kitware.com/cmake).\n",
+    "power_plan": "Power Scheme GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c  (High performance)"
+  }
+}

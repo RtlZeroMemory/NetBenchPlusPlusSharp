@@ -1,0 +1,10 @@
+F:\SocketServerClient\reviews\csharp-measurement\obj\Debug\net11.0\.NETCoreApp,Version=v11.0.AssemblyAttributes.cs(4,12): error CS0579: Duplicate 'global::System.Runtime.Versioning.TargetFrameworkAttribute' attribute [F:\SocketServerClient\reviews\csharp-measurement\Probe.csproj]
+F:\SocketServerClient\reviews\csharp-measurement\obj\Debug\net11.0\Probe.AssemblyInfo.cs(14,12): error CS0579: Duplicate 'System.Reflection.AssemblyCompanyAttribute' attribute [F:\SocketServerClient\reviews\csharp-measurement\Probe.csproj]
+F:\SocketServerClient\reviews\csharp-measurement\obj\Debug\net11.0\Probe.AssemblyInfo.cs(15,12): error CS0579: Duplicate 'System.Reflection.AssemblyConfigurationAttribute' attribute [F:\SocketServerClient\reviews\csharp-measurement\Probe.csproj]
+F:\SocketServerClient\reviews\csharp-measurement\obj\Debug\net11.0\Probe.AssemblyInfo.cs(16,12): error CS0579: Duplicate 'System.Reflection.AssemblyFileVersionAttribute' attribute [F:\SocketServerClient\reviews\csharp-measurement\Probe.csproj]
+F:\SocketServerClient\reviews\csharp-measurement\obj\Debug\net11.0\Probe.AssemblyInfo.cs(17,12): error CS0579: Duplicate 'System.Reflection.AssemblyInformationalVersionAttribute' attribute [F:\SocketServerClient\reviews\csharp-measurement\Probe.csproj]
+F:\SocketServerClient\reviews\csharp-measurement\obj\Debug\net11.0\Probe.AssemblyInfo.cs(18,12): error CS0579: Duplicate 'System.Reflection.AssemblyProductAttribute' attribute [F:\SocketServerClient\reviews\csharp-measurement\Probe.csproj]
+F:\SocketServerClient\reviews\csharp-measurement\obj\Debug\net11.0\Probe.AssemblyInfo.cs(19,12): error CS0579: Duplicate 'System.Reflection.AssemblyTitleAttribute' attribute [F:\SocketServerClient\reviews\csharp-measurement\Probe.csproj]
+F:\SocketServerClient\reviews\csharp-measurement\obj\Debug\net11.0\Probe.AssemblyInfo.cs(20,12): error CS0579: Duplicate 'System.Reflection.AssemblyVersionAttribute' attribute [F:\SocketServerClient\reviews\csharp-measurement\Probe.csproj]
+
+The build failed. Fix the build errors and run again.

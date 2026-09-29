@@ -1,0 +1,27 @@
+{
+  "name": "large-frames",
+  "purpose": "Integration: 1 MiB and 16 MiB frames in every mode, both cross-language directions, Poisson and a full burst cycle. Correctness only.",
+  "seed": 8675309,
+  "server_cores": 4,
+  "corpora": {
+    "one-mib": {"profile": "hard", "bytes": 4194304, "frame_bytes": 1048576, "seed": 3},
+    "sixteen-mib": {"profile": "mixed", "bytes": 1, "frame_bytes": 16777216, "seed": 8675309},
+    "small": {"profile": "hard", "bytes": 262144, "frame_bytes": 16384, "seed": 4}
+  },
+  "defaults": {"duration": 0.5, "warmup": 0.1, "connections": 4, "window": 8, "drain": 10, "socket_buffer": 4194304, "group": "Large frames"},
+  "phases": [
+    {"name": "frames", "repetitions": 1, "cells": [
+      {"name": "1m-aggregate-cs-client", "corpus": "one-mib", "mode": "aggregate", "client": "csharp"},
+      {"name": "1m-reuse", "corpus": "one-mib", "mode": "retain-reuse"},
+      {"name": "1m-allocate-cs-client", "corpus": "one-mib", "mode": "retain-allocate", "client": "csharp"},
+      {"name": "16m-aggregate", "corpus": "sixteen-mib", "mode": "aggregate", "inflight_bytes": 134217728},
+      {"name": "16m-reuse-cs-client", "corpus": "sixteen-mib", "mode": "retain-reuse", "client": "csharp", "inflight_bytes": 134217728},
+      {"name": "16m-allocate", "corpus": "sixteen-mib", "mode": "retain-allocate", "inflight_bytes": 134217728},
+      {"name": "16m-transport-cs-client", "corpus": "sixteen-mib", "mode": "transport", "client": "csharp", "inflight_bytes": 134217728}
+    ]},
+    {"name": "arrivals", "repetitions": 1, "cells": [
+      {"name": "poisson", "corpus": "small", "mode": "aggregate", "arrival": "poisson", "rate": 500, "duration": 1},
+      {"name": "burst-cs-client", "corpus": "small", "mode": "retain-reuse", "arrival": "burst", "rate": 200, "duration": 6.2, "client": "csharp"}
+    ]}
+  ]
+}

@@ -1,0 +1,309 @@
+{
+  "status": "passed",
+  "binary_sha256": "60899c2ca28565d3a85b4b7609a1eefd0f57a49684929c897c1eefe69b3ba8c7",
+  "checks": 30,
+  "rejected_corrupt_category_cases": 24,
+  "valid_control_cases": 6,
+  "results": [
+    {
+      "mode": "aggregate",
+      "warmup": 0,
+      "phase": "measurement",
+      "case": "original-wrong-bucket",
+      "exit": 2,
+      "valid": false,
+      "error": "process_oracle",
+      "log": "aggregate-measurement-original-wrong-bucket.log"
+    },
+    {
+      "mode": "aggregate",
+      "warmup": 0,
+      "phase": "measurement",
+      "case": "wrong-counts-only",
+      "exit": 2,
+      "valid": false,
+      "error": "process_oracle",
+      "log": "aggregate-measurement-wrong-counts-only.log"
+    },
+    {
+      "mode": "aggregate",
+      "warmup": 0,
+      "phase": "measurement",
+      "case": "wrong-sums-only",
+      "exit": 2,
+      "valid": false,
+      "error": "process_oracle",
+      "log": "aggregate-measurement-wrong-sums-only.log"
+    },
+    {
+      "mode": "aggregate",
+      "warmup": 0,
+      "phase": "measurement",
+      "case": "late-wrong-sums",
+      "exit": 2,
+      "valid": false,
+      "error": "process_oracle",
+      "log": "aggregate-measurement-late-wrong-sums.log"
+    },
+    {
+      "mode": "aggregate",
+      "warmup": 0,
+      "phase": "measurement",
+      "case": "valid-mixed-empty-retention",
+      "exit": 0,
+      "valid": true,
+      "error": null,
+      "log": "aggregate-measurement-valid-mixed-empty-retention.log"
+    },
+    {
+      "mode": "aggregate",
+      "warmup": 0.02,
+      "phase": "warmup",
+      "case": "original-wrong-bucket",
+      "exit": 2,
+      "valid": false,
+      "error": "process_oracle",
+      "log": "aggregate-warmup-original-wrong-bucket.log"
+    },
+    {
+      "mode": "aggregate",
+      "warmup": 0.02,
+      "phase": "warmup",
+      "case": "wrong-counts-only",
+      "exit": 2,
+      "valid": false,
+      "error": "process_oracle",
+      "log": "aggregate-warmup-wrong-counts-only.log"
+    },
+    {
+      "mode": "aggregate",
+      "warmup": 0.02,
+      "phase": "warmup",
+      "case": "wrong-sums-only",
+      "exit": 2,
+      "valid": false,
+      "error": "process_oracle",
+      "log": "aggregate-warmup-wrong-sums-only.log"
+    },
+    {
+      "mode": "aggregate",
+      "warmup": 0.02,
+      "phase": "warmup",
+      "case": "late-wrong-sums",
+      "exit": 2,
+      "valid": false,
+      "error": "process_oracle",
+      "log": "aggregate-warmup-late-wrong-sums.log"
+    },
+    {
+      "mode": "aggregate",
+      "warmup": 0.02,
+      "phase": "warmup",
+      "case": "valid-mixed-empty-retention",
+      "exit": 0,
+      "valid": true,
+      "error": null,
+      "log": "aggregate-warmup-valid-mixed-empty-retention.log"
+    },
+    {
+      "mode": "retain-reuse",
+      "warmup": 0,
+      "phase": "measurement",
+      "case": "original-wrong-bucket",
+      "exit": 2,
+      "valid": false,
+      "error": "process_oracle",
+      "log": "retain-reuse-measurement-original-wrong-bucket.log"
+    },
+    {
+      "mode": "retain-reuse",
+      "warmup": 0,
+      "phase": "measurement",
+      "case": "wrong-counts-only",
+      "exit": 2,
+      "valid": false,
+      "error": "process_oracle",
+      "log": "retain-reuse-measurement-wrong-counts-only.log"
+    },
+    {
+      "mode": "retain-reuse",
+      "warmup": 0,
+      "phase": "measurement",
+      "case": "wrong-sums-only",
+      "exit": 2,
+      "valid": false,
+      "error": "process_oracle",
+      "log": "retain-reuse-measurement-wrong-sums-only.log"
+    },
+    {
+      "mode": "retain-reuse",
+      "warmup": 0,
+      "phase": "measurement",
+      "case": "late-wrong-sums",
+      "exit": 2,
+      "valid": false,
+      "error": "process_oracle",
+      "log": "retain-reuse-measurement-late-wrong-sums.log"
+    },
+    {
+      "mode": "retain-reuse",
+      "warmup": 0,
+      "phase": "measurement",
+      "case": "valid-mixed-empty-retention",
+      "exit": 0,
+      "valid": true,
+      "error": null,
+      "log": "retain-reuse-measurement-valid-mixed-empty-retention.log"
+    },
+    {
+      "mode": "retain-reuse",
+      "warmup": 0.02,
+      "phase": "warmup",
+      "case": "original-wrong-bucket",
+      "exit": 2,
+      "valid": false,
+      "error": "process_oracle",
+      "log": "retain-reuse-warmup-original-wrong-bucket.log"
+    },
+    {
+      "mode": "retain-reuse",
+      "warmup": 0.02,
+      "phase": "warmup",
+      "case": "wrong-counts-only",
+      "exit": 2,
+      "valid": false,
+      "error": "process_oracle",
+      "log": "retain-reuse-warmup-wrong-counts-only.log"
+    },
+    {
+      "mode": "retain-reuse",
+      "warmup": 0.02,
+      "phase": "warmup",
+      "case": "wrong-sums-only",
+      "exit": 2,
+      "valid": false,
+      "error": "process_oracle",
+      "log": "retain-reuse-warmup-wrong-sums-only.log"
+    },
+    {
+      "mode": "retain-reuse",
+      "warmup": 0.02,
+      "phase": "warmup",
+      "case": "late-wrong-sums",
+      "exit": 2,
+      "valid": false,
+      "error": "process_oracle",
+      "log": "retain-reuse-warmup-late-wrong-sums.log"
+    },
+    {
+      "mode": "retain-reuse",
+      "warmup": 0.02,
+      "phase": "warmup",
+      "case": "valid-mixed-empty-retention",
+      "exit": 0,
+      "valid": true,
+      "error": null,
+      "log": "retain-reuse-warmup-valid-mixed-empty-retention.log"
+    },
+    {
+      "mode": "retain-allocate",
+      "warmup": 0,
+      "phase": "measurement",
+      "case": "original-wrong-bucket",
+      "exit": 2,
+      "valid": false,
+      "error": "process_oracle",
+      "log": "retain-allocate-measurement-original-wrong-bucket.log"
+    },
+    {
+      "mode": "retain-allocate",
+      "warmup": 0,
+      "phase": "measurement",
+      "case": "wrong-counts-only",
+      "exit": 2,
+      "valid": false,
+      "error": "process_oracle",
+      "log": "retain-allocate-measurement-wrong-counts-only.log"
+    },
+    {
+      "mode": "retain-allocate",
+      "warmup": 0,
+      "phase": "measurement",
+      "case": "wrong-sums-only",
+      "exit": 2,
+      "valid": false,
+      "error": "process_oracle",
+      "log": "retain-allocate-measurement-wrong-sums-only.log"
+    },
+    {
+      "mode": "retain-allocate",
+      "warmup": 0,
+      "phase": "measurement",
+      "case": "late-wrong-sums",
+      "exit": 2,
+      "valid": false,
+      "error": "process_oracle",
+      "log": "retain-allocate-measurement-late-wrong-sums.log"
+    },
+    {
+      "mode": "retain-allocate",
+      "warmup": 0,
+      "phase": "measurement",
+      "case": "valid-mixed-empty-retention",
+      "exit": 0,
+      "valid": true,
+      "error": null,
+      "log": "retain-allocate-measurement-valid-mixed-empty-retention.log"
+    },
+    {
+      "mode": "retain-allocate",
+      "warmup": 0.02,
+      "phase": "warmup",
+      "case": "original-wrong-bucket",
+      "exit": 2,
+      "valid": false,
+      "error": "process_oracle",
+      "log": "retain-allocate-warmup-original-wrong-bucket.log"
+    },
+    {
+      "mode": "retain-allocate",
+      "warmup": 0.02,
+      "phase": "warmup",
+      "case": "wrong-counts-only",
+      "exit": 2,
+      "valid": false,
+      "error": "process_oracle",
+      "log": "retain-allocate-warmup-wrong-counts-only.log"
+    },
+    {
+      "mode": "retain-allocate",
+      "warmup": 0.02,
+      "phase": "warmup",
+      "case": "wrong-sums-only",
+      "exit": 2,
+      "valid": false,
+      "error": "process_oracle",
+      "log": "retain-allocate-warmup-wrong-sums-only.log"
+    },
+    {
+      "mode": "retain-allocate",
+      "warmup": 0.02,
+      "phase": "warmup",
+      "case": "late-wrong-sums",
+      "exit": 2,
+      "valid": false,
+      "error": "process_oracle",
+      "log": "retain-allocate-warmup-late-wrong-sums.log"
+    },
+    {
+      "mode": "retain-allocate",
+      "warmup": 0.02,
+      "phase": "warmup",
+      "case": "valid-mixed-empty-retention",
+      "exit": 0,
+      "valid": true,
+      "error": null,
+      "log": "retain-allocate-warmup-valid-mixed-empty-retention.log"
+    }
+  ]
+}

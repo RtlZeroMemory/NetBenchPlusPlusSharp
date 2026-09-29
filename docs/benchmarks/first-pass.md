@@ -1,4 +1,6 @@
-# First sustained benchmark pass — 29 September 2026
+# First benchmark pass (29 September 2026)
+
+> **Superseded, kept as historical evidence.** A later audit found that the common native client was CPU-saturated, closed-loop tails measured client queueing and connection starvation, and the 1 MiB anomaly was TCP flow control. See the [methodology](methodology.md) and the [final results](results.md). Nothing below has been changed or reclassified.
 
 All **54 trials** reconciled successfully with zero failed or unresolved requests. The measured windows processed **8.96 billion JSON records** and transferred **1.66 TiB of payload**, including transport controls. There are **36 comparison-eligible closed-loop/control trials**. All **18 scheduled-load trials** failed the predeclared generator-timing gate and are retained as diagnostics, not latency/SLO comparisons.
 

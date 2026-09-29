@@ -1,0 +1,6 @@
+abl-cs-tokens 1112.8 MiB/s {'seconds': 10.1226703, 'records_per_second': 0, 'payload_mib_per_second': 1112.8123256609854}
+abl-cs-tokens 1249.2 MiB/s {'seconds': 10.2475117, 'records_per_second': 0, 'payload_mib_per_second': 1249.153830995868}
+abl-cs-tokens-strings 675.9 MiB/s {'seconds': 10.6050571, 'records_per_second': 0, 'payload_mib_per_second': 675.9418918177055}
+abl-cs-tokens-strings 684.5 MiB/s {'seconds': 10.4728308, 'records_per_second': 0, 'payload_mib_per_second': 684.4760978100389}
+v3-chunked 508.7 MiB/s {'seconds': 10.0656102, 'records_per_second': 696243.9296526703, 'payload_mib_per_second': 508.6912067479021}
+v3-chunked 502.4 MiB/s {'seconds': 10.1923026, 'records_per_second': 687589.4756107418, 'payload_mib_per_second': 502.3680713023564}

@@ -1,0 +1,154 @@
+{
+  "base": [
+    {
+      "records_per_second": 1732744.3333333333,
+      "p99_ms": 21.757951,
+      "server_cores_used": 3.682769129778037,
+      "gc_gen0": 1115,
+      "gc_gen1": 630,
+      "gc_gen2": 583,
+      "gc_pause_ms": 821.219,
+      "allocated_bytes_per_record": 1286.6524566933801,
+      "server_peak_working_set_mib": 425.93359375,
+      "exclusion": ""
+    },
+    {
+      "records_per_second": 1824811.9,
+      "p99_ms": 19.988479,
+      "server_cores_used": 3.7425882826574695,
+      "gc_gen0": 1178,
+      "gc_gen1": 667,
+      "gc_gen2": 618,
+      "gc_pause_ms": 846.544,
+      "allocated_bytes_per_record": 1291.8412829267706,
+      "server_peak_working_set_mib": 414.11328125,
+      "exclusion": ""
+    },
+    {
+      "records_per_second": 1774951.6333333333,
+      "p99_ms": 21.299199,
+      "server_cores_used": 3.6950178652484773,
+      "gc_gen0": 1145,
+      "gc_gen1": 647,
+      "gc_gen2": 599,
+      "gc_pause_ms": 855.659,
+      "allocated_bytes_per_record": 1326.6708585194854,
+      "server_peak_working_set_mib": 393.30859375,
+      "exclusion": ""
+    }
+  ],
+  "v2": [
+    {
+      "records_per_second": 1781153.9666666666,
+      "p99_ms": 21.823487,
+      "server_cores_used": 3.6813858585548895,
+      "gc_gen0": 1150,
+      "gc_gen1": 647,
+      "gc_gen2": 600,
+      "gc_pause_ms": 846.6519999999999,
+      "allocated_bytes_per_record": 1326.6446877857165,
+      "server_peak_working_set_mib": 409.17578125,
+      "exclusion": ""
+    },
+    {
+      "records_per_second": 1824402.2666666666,
+      "p99_ms": 20.905983,
+      "server_cores_used": 3.7105663535094706,
+      "gc_gen0": 1174,
+      "gc_gen1": 663,
+      "gc_gen2": 615,
+      "gc_pause_ms": 836.982,
+      "allocated_bytes_per_record": 1255.7021145636843,
+      "server_peak_working_set_mib": 405.34375,
+      "exclusion": ""
+    },
+    {
+      "records_per_second": 1747454.5333333334,
+      "p99_ms": 22.937599,
+      "server_cores_used": 3.660777316342521,
+      "gc_gen0": 1127,
+      "gc_gen1": 636,
+      "gc_gen2": 589,
+      "gc_pause_ms": 865.658,
+      "allocated_bytes_per_record": 1326.698724232677,
+      "server_peak_working_set_mib": 407.06640625,
+      "exclusion": ""
+    }
+  ],
+  "v3": [
+    {
+      "records_per_second": 1699287.6,
+      "p99_ms": 19.529727,
+      "server_cores_used": 3.734859807143862,
+      "gc_gen0": 435,
+      "gc_gen1": 203,
+      "gc_gen2": 70,
+      "gc_pause_ms": 1612.231,
+      "allocated_bytes_per_record": 829.5808382223739,
+      "server_peak_working_set_mib": 1292.94921875,
+      "exclusion": ""
+    },
+    {
+      "records_per_second": 1673847.7666666666,
+      "p99_ms": 20.512767,
+      "server_cores_used": 3.557367234813062,
+      "gc_gen0": 771,
+      "gc_gen1": 193,
+      "gc_gen2": 87,
+      "gc_pause_ms": 1810.526,
+      "allocated_bytes_per_record": 829.5653894344775,
+      "server_peak_working_set_mib": 1240.25390625,
+      "exclusion": ""
+    },
+    {
+      "records_per_second": 1748589.4333333333,
+      "p99_ms": 19.005439,
+      "server_cores_used": 3.8676356047369906,
+      "gc_gen0": 425,
+      "gc_gen1": 189,
+      "gc_gen2": 56,
+      "gc_pause_ms": 1738.1740000000002,
+      "allocated_bytes_per_record": 551.1768070937466,
+      "server_peak_working_set_mib": 1182.4296875,
+      "exclusion": ""
+    }
+  ],
+  "v3-datas-off": [
+    {
+      "records_per_second": 1891705.0666666667,
+      "p99_ms": 16.121855,
+      "server_cores_used": 3.8486582673636947,
+      "gc_gen0": 57,
+      "gc_gen1": 57,
+      "gc_gen2": 0,
+      "gc_pause_ms": 406.914,
+      "allocated_bytes_per_record": 829.584504174525,
+      "server_peak_working_set_mib": 1017.03515625,
+      "exclusion": ""
+    },
+    {
+      "records_per_second": 1881128.2666666666,
+      "p99_ms": 15.695871,
+      "server_cores_used": 3.86489945572548,
+      "gc_gen0": 56,
+      "gc_gen1": 56,
+      "gc_gen2": 0,
+      "gc_pause_ms": 395.246,
+      "allocated_bytes_per_record": 829.6076685213495,
+      "server_peak_working_set_mib": 1020.33984375,
+      "exclusion": ""
+    },
+    {
+      "records_per_second": 1791891.2,
+      "p99_ms": 17.235967,
+      "server_cores_used": 3.7588005111367866,
+      "gc_gen0": 54,
+      "gc_gen1": 54,
+      "gc_gen2": 0,
+      "gc_pause_ms": 404.258,
+      "allocated_bytes_per_record": 829.4825470242483,
+      "server_peak_working_set_mib": 1020.3203125,
+      "exclusion": ""
+    }
+  ]
+}

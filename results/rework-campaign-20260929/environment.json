@@ -1,0 +1,595 @@
+{
+  "started_utc": "2026-09-29T12:24:44.837350+00:00",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+  "arguments": {
+    "matrix": "bench\\matrices\\campaign.json",
+    "output": "results\\rework-campaign-20260929",
+    "only": "None",
+    "repetitions": "None",
+    "duration": "None",
+    "warmup": "None",
+    "cooldown": "2.0",
+    "resume": "False"
+  },
+  "masks": {
+    "physical_core_masks": [
+      3,
+      12,
+      48,
+      192,
+      768,
+      3072,
+      12288,
+      49152
+    ],
+    "spare": 1,
+    "server": 340,
+    "client": 21504,
+    "server_cores": 4
+  },
+  "matrix": {
+    "name": "rework-campaign",
+    "purpose": "Declared EASY/HARD matrix with controlled comparisons and controls. See docs/benchmarks/methodology.md.",
+    "seed": 20260929,
+    "server_cores": 4,
+    "corpora": {
+      "easy64k": {
+        "profile": "easy",
+        "bytes": 536870912,
+        "frame_bytes": 65536,
+        "seed": 101
+      },
+      "hard64k": {
+        "profile": "hard",
+        "bytes": 536870912,
+        "frame_bytes": 65536,
+        "seed": 203
+      },
+      "hardmix": {
+        "profile": "hard",
+        "bytes": 1073741824,
+        "frame_bytes": 1048576,
+        "min_frame_bytes": 4096,
+        "seed": 202
+      },
+      "mixed64k": {
+        "profile": "mixed",
+        "bytes": 268435456,
+        "frame_bytes": 65536,
+        "seed": 42
+      }
+    },
+    "defaults": {
+      "connections": 16,
+      "window": 64,
+      "socket_buffer": 4194304,
+      "drain": 30,
+      "inflight_bytes": 67108864
+    },
+    "phases": [
+      {
+        "name": "processing-controls",
+        "repetitions": 3,
+        "cells": [
+          {
+            "name": "proc-easy-aggregate",
+            "group": "Processing-only controls (one core, no sockets)",
+            "title": "EASY aggregate",
+            "kind": "process",
+            "corpus": "easy64k",
+            "mode": "aggregate",
+            "duration": 10,
+            "warmup": 5
+          },
+          {
+            "name": "proc-easy-reuse",
+            "group": "Processing-only controls (one core, no sockets)",
+            "title": "EASY retain-reuse",
+            "kind": "process",
+            "corpus": "easy64k",
+            "mode": "retain-reuse",
+            "duration": 10,
+            "warmup": 5
+          },
+          {
+            "name": "proc-hard64k-aggregate",
+            "group": "Processing-only controls (one core, no sockets)",
+            "title": "HARD content, 64 KiB frames, aggregate",
+            "kind": "process",
+            "corpus": "hard64k",
+            "mode": "aggregate",
+            "duration": 10,
+            "warmup": 5
+          },
+          {
+            "name": "proc-hardmix-aggregate",
+            "group": "Processing-only controls (one core, no sockets)",
+            "title": "HARD mixed frames, aggregate",
+            "kind": "process",
+            "corpus": "hardmix",
+            "mode": "aggregate",
+            "duration": 10,
+            "warmup": 5
+          },
+          {
+            "name": "proc-hardmix-reuse",
+            "group": "Processing-only controls (one core, no sockets)",
+            "title": "HARD mixed frames, retain-reuse",
+            "kind": "process",
+            "corpus": "hardmix",
+            "mode": "retain-reuse",
+            "duration": 10,
+            "warmup": 5,
+            "retain_batches": 64,
+            "retain_bytes": 16777216
+          },
+          {
+            "name": "proc-hardmix-allocate",
+            "group": "Processing-only controls (one core, no sockets)",
+            "title": "HARD mixed frames, retain-allocate",
+            "kind": "process",
+            "corpus": "hardmix",
+            "mode": "retain-allocate",
+            "duration": 10,
+            "warmup": 5,
+            "retain_batches": 64,
+            "retain_bytes": 16777216
+          }
+        ]
+      },
+      {
+        "name": "easy-saturation",
+        "repetitions": 7,
+        "cells": [
+          {
+            "name": "easy-aggregate-sat",
+            "group": "EASY \u2014 closed-loop saturation (16 connections \u00d7 4 outstanding)",
+            "title": "EASY aggregate",
+            "corpus": "easy64k",
+            "mode": "aggregate",
+            "duration": 30,
+            "warmup": 15
+          },
+          {
+            "name": "easy-reuse-sat",
+            "group": "EASY \u2014 closed-loop saturation (16 connections \u00d7 4 outstanding)",
+            "title": "EASY retain-reuse",
+            "corpus": "easy64k",
+            "mode": "retain-reuse",
+            "duration": 30,
+            "warmup": 15
+          }
+        ]
+      },
+      {
+        "name": "hard-saturation",
+        "repetitions": 5,
+        "cells": [
+          {
+            "name": "hard-aggregate-sat",
+            "group": "HARD \u2014 closed-loop saturation (16 \u00d7 4, 4 KiB\u20131 MiB frames)",
+            "title": "HARD aggregate",
+            "corpus": "hardmix",
+            "mode": "aggregate",
+            "duration": 60,
+            "warmup": 20,
+            "retain_batches": 64,
+            "retain_bytes": 16777216
+          },
+          {
+            "name": "hard-reuse-sat",
+            "group": "HARD \u2014 closed-loop saturation (16 \u00d7 4, 4 KiB\u20131 MiB frames)",
+            "title": "HARD retain-reuse, 64 batches",
+            "corpus": "hardmix",
+            "mode": "retain-reuse",
+            "duration": 60,
+            "warmup": 20,
+            "retain_batches": 64,
+            "retain_bytes": 16777216
+          },
+          {
+            "name": "hard-allocate-sat",
+            "group": "HARD \u2014 closed-loop saturation (16 \u00d7 4, 4 KiB\u20131 MiB frames)",
+            "title": "HARD retain-allocate, 64 batches",
+            "corpus": "hardmix",
+            "mode": "retain-allocate",
+            "duration": 60,
+            "warmup": 20,
+            "retain_batches": 64,
+            "retain_bytes": 16777216
+          }
+        ]
+      },
+      {
+        "name": "controlled-comparisons",
+        "repetitions": 5,
+        "cells": [
+          {
+            "name": "ctl-hard64k-aggregate",
+            "group": "Controlled comparisons (one variable changed from EASY or HARD)",
+            "title": "HARD content at EASY settings: aggregate",
+            "corpus": "hard64k",
+            "mode": "aggregate",
+            "duration": 30,
+            "warmup": 15
+          },
+          {
+            "name": "ctl-hard64k-reuse",
+            "group": "Controlled comparisons (one variable changed from EASY or HARD)",
+            "title": "HARD content at EASY settings: retain-reuse",
+            "corpus": "hard64k",
+            "mode": "retain-reuse",
+            "duration": 30,
+            "warmup": 15
+          },
+          {
+            "name": "ctl-hardmix-allocate-8",
+            "group": "Controlled comparisons (one variable changed from EASY or HARD)",
+            "title": "HARD retain-allocate, 8 batches retained",
+            "corpus": "hardmix",
+            "mode": "retain-allocate",
+            "duration": 60,
+            "warmup": 20,
+            "retain_batches": 8,
+            "retain_bytes": 16777216
+          }
+        ]
+      },
+      {
+        "name": "easy-paced",
+        "repetitions": 7,
+        "cells": [
+          {
+            "name": "easy-aggregate-paced",
+            "group": "EASY \u2014 steady arrivals at 50% of the slower server's capacity",
+            "title": "EASY aggregate",
+            "corpus": "easy64k",
+            "mode": "aggregate",
+            "duration": 30,
+            "warmup": 15,
+            "rate": {
+              "of": "easy-aggregate-sat",
+              "fraction": 0.5
+            }
+          },
+          {
+            "name": "easy-reuse-paced",
+            "group": "EASY \u2014 steady arrivals at 50% of the slower server's capacity",
+            "title": "EASY retain-reuse",
+            "corpus": "easy64k",
+            "mode": "retain-reuse",
+            "duration": 30,
+            "warmup": 15,
+            "rate": {
+              "of": "easy-reuse-sat",
+              "fraction": 0.5
+            }
+          }
+        ]
+      },
+      {
+        "name": "hard-sustained",
+        "repetitions": 5,
+        "cells": [
+          {
+            "name": "hard-reuse-poisson",
+            "group": "HARD \u2014 Poisson arrivals at 70% of the slower server's capacity",
+            "title": "HARD retain-reuse",
+            "corpus": "hardmix",
+            "mode": "retain-reuse",
+            "arrival": "poisson",
+            "duration": 60,
+            "warmup": 20,
+            "retain_batches": 64,
+            "retain_bytes": 16777216,
+            "rate": {
+              "of": "hard-reuse-sat",
+              "fraction": 0.7
+            }
+          },
+          {
+            "name": "hard-allocate-poisson",
+            "group": "HARD \u2014 Poisson arrivals at 70% of the slower server's capacity",
+            "title": "HARD retain-allocate",
+            "corpus": "hardmix",
+            "mode": "retain-allocate",
+            "arrival": "poisson",
+            "duration": 60,
+            "warmup": 20,
+            "retain_batches": 64,
+            "retain_bytes": 16777216,
+            "rate": {
+              "of": "hard-allocate-sat",
+              "fraction": 0.7
+            }
+          }
+        ]
+      },
+      {
+        "name": "hard-burst",
+        "repetitions": 5,
+        "cells": [
+          {
+            "name": "hard-reuse-burst",
+            "group": "HARD \u2014 bursts: 5 s at 60%, 1 s at 150% of the slower server's capacity",
+            "title": "HARD retain-reuse",
+            "corpus": "hardmix",
+            "mode": "retain-reuse",
+            "arrival": "burst",
+            "duration": 60,
+            "warmup": 20,
+            "retain_batches": 64,
+            "retain_bytes": 16777216,
+            "rate": {
+              "of": "hard-reuse-sat",
+              "fraction": 1.0
+            }
+          },
+          {
+            "name": "hard-allocate-burst",
+            "group": "HARD \u2014 bursts: 5 s at 60%, 1 s at 150% of the slower server's capacity",
+            "title": "HARD retain-allocate",
+            "corpus": "hardmix",
+            "mode": "retain-allocate",
+            "arrival": "burst",
+            "duration": 60,
+            "warmup": 20,
+            "retain_batches": 64,
+            "retain_bytes": 16777216,
+            "rate": {
+              "of": "hard-allocate-sat",
+              "fraction": 1.0
+            }
+          }
+        ]
+      },
+      {
+        "name": "hard-overload",
+        "repetitions": 3,
+        "cells": [
+          {
+            "name": "hard-allocate-overload",
+            "group": "HARD \u2014 steady overload at 120% of the slower server's capacity",
+            "title": "HARD retain-allocate",
+            "corpus": "hardmix",
+            "mode": "retain-allocate",
+            "duration": 30,
+            "warmup": 20,
+            "retain_batches": 64,
+            "retain_bytes": 16777216,
+            "rate": {
+              "of": "hard-allocate-sat",
+              "fraction": 1.2
+            }
+          }
+        ]
+      },
+      {
+        "name": "transport-controls",
+        "repetitions": 3,
+        "cells": [
+          {
+            "name": "transport-easy",
+            "group": "Transport-only controls (no JSON)",
+            "title": "EASY frames, 64 KiB",
+            "corpus": "easy64k",
+            "mode": "transport",
+            "duration": 30,
+            "warmup": 15
+          },
+          {
+            "name": "transport-hardmix",
+            "group": "Transport-only controls (no JSON)",
+            "title": "HARD frames, 4 KiB\u20131 MiB",
+            "corpus": "hardmix",
+            "mode": "transport",
+            "duration": 30,
+            "warmup": 15
+          }
+        ]
+      },
+      {
+        "name": "client-headroom",
+        "repetitions": 3,
+        "cells": [
+          {
+            "name": "headroom-easy-aggregate",
+            "group": "Client headroom: same cells with a fourth client core",
+            "title": "EASY aggregate, 4 client cores",
+            "corpus": "easy64k",
+            "mode": "aggregate",
+            "duration": 30,
+            "warmup": 15,
+            "client_cores": "client+spare"
+          },
+          {
+            "name": "headroom-hard-reuse",
+            "group": "Client headroom: same cells with a fourth client core",
+            "title": "HARD retain-reuse, 4 client cores",
+            "corpus": "hardmix",
+            "mode": "retain-reuse",
+            "duration": 60,
+            "warmup": 20,
+            "retain_batches": 64,
+            "retain_bytes": 16777216,
+            "client_cores": "client+spare"
+          }
+        ]
+      },
+      {
+        "name": "alternate-client",
+        "repetitions": 3,
+        "cells": [
+          {
+            "name": "alt-easy-aggregate",
+            "group": "Alternate (C#) client sensitivity",
+            "title": "EASY aggregate, C# client",
+            "corpus": "easy64k",
+            "mode": "aggregate",
+            "duration": 30,
+            "warmup": 15,
+            "client": "csharp"
+          },
+          {
+            "name": "alt-hard-reuse",
+            "group": "Alternate (C#) client sensitivity",
+            "title": "HARD retain-reuse, C# client",
+            "corpus": "hardmix",
+            "mode": "retain-reuse",
+            "duration": 60,
+            "warmup": 20,
+            "retain_batches": 64,
+            "retain_bytes": 16777216,
+            "client": "csharp"
+          }
+        ]
+      },
+      {
+        "name": "first-pass-bridge",
+        "repetitions": 3,
+        "cells": [
+          {
+            "name": "bridge-aggregate",
+            "group": "First-pass bridge: first-pass corpus and retention, rework binaries",
+            "title": "Mixed 64 KiB aggregate",
+            "corpus": "mixed64k",
+            "mode": "aggregate",
+            "duration": 30,
+            "warmup": 15
+          },
+          {
+            "name": "bridge-reuse",
+            "group": "First-pass bridge: first-pass corpus and retention, rework binaries",
+            "title": "Mixed 64 KiB retain-reuse",
+            "corpus": "mixed64k",
+            "mode": "retain-reuse",
+            "duration": 30,
+            "warmup": 15
+          },
+          {
+            "name": "bridge-allocate",
+            "group": "First-pass bridge: first-pass corpus and retention, rework binaries",
+            "title": "Mixed 64 KiB retain-allocate",
+            "corpus": "mixed64k",
+            "mode": "retain-allocate",
+            "duration": 30,
+            "warmup": 15
+          }
+        ]
+      },
+      {
+        "name": "stress",
+        "repetitions": 3,
+        "cells": [
+          {
+            "name": "stress-fragmented",
+            "group": "Stress (not ordinary valid-traffic performance)",
+            "title": "EASY aggregate, every socket operation capped at 4 KiB",
+            "corpus": "easy64k",
+            "mode": "aggregate",
+            "duration": 30,
+            "warmup": 15,
+            "io_cap": 4096
+          }
+        ]
+      }
+    ]
+  },
+  "overrides": {},
+  "corpora": {
+    "easy64k": {
+      "format": "TCPBCH01",
+      "frames": 8203,
+      "payload_bytes": 536920774,
+      "records": 3278313,
+      "sha256": "7961bae3e7cb78ae8a3b5e1bae272f874aded6619490c19068235760282e8cd3",
+      "profile": "easy",
+      "bytes": 536870912,
+      "frame_bytes": 65536,
+      "seed": 101,
+      "max_frame_bytes": 65536,
+      "name": "easy64k",
+      "path": "F:\\SocketServerClient\\data\\easy64k-easy-536870912-65536-101.bin"
+    },
+    "hard64k": {
+      "format": "TCPBCH01",
+      "frames": 8342,
+      "payload_bytes": 536901048,
+      "max_frame_bytes": 65536,
+      "records": 700812,
+      "sha256": "cd0f0b05fb1cee11e7ceb3baae341befe99211368b1da7fec4248c49bb4cd55f",
+      "profile": "hard",
+      "bytes": 536870912,
+      "frame_bytes": 65536,
+      "seed": 203,
+      "name": "hard64k",
+      "path": "F:\\SocketServerClient\\data\\hard64k-hard-536870912-65536-203.bin"
+    },
+    "hardmix": {
+      "format": "TCPBCH01",
+      "frames": 5774,
+      "payload_bytes": 1073780946,
+      "max_frame_bytes": 1047999,
+      "records": 1401120,
+      "sha256": "31d60f2c6f365406482d59f246cc1b97bb577c029a2c328fcffc0d7499d33b06",
+      "profile": "hard",
+      "bytes": 1073741824,
+      "frame_bytes": 1048576,
+      "min_frame_bytes": 4096,
+      "seed": 202,
+      "name": "hardmix",
+      "path": "F:\\SocketServerClient\\data\\hardmix-hard-1073741824-1048576-202.bin"
+    },
+    "mixed64k": {
+      "format": "TCPBCH01",
+      "frames": 4103,
+      "payload_bytes": 268447342,
+      "max_frame_bytes": 65536,
+      "records": 1457346,
+      "sha256": "8df54a8807036b77e5ccad234169a0a8749534089d1d81d5a24da18c93c4a6f8",
+      "profile": "mixed",
+      "bytes": 268435456,
+      "frame_bytes": 65536,
+      "seed": 42,
+      "name": "mixed64k",
+      "path": "F:\\SocketServerClient\\data\\mixed64k-mixed-268435456-65536-42.bin"
+    }
+  },
+  "binaries": {
+    "cpp": {
+      "path": "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+      "sha256": "37338867390e2af7b43a99b2206f023cb50ae63424aeadd6fcca668f3e763057"
+    },
+    "csharp": {
+      "path": "F:\\SocketServerClient\\src\\dotnet\\bin\\Release\\net11.0\\Bench.dll",
+      "sha256": "9baa04d7e578106cc752214408607c2ac6ce5bf81b4dbeae642cf60eedac603b"
+    }
+  },
+  "runtime_environment": {},
+  "sources": {
+    "src\\dotnet\\Client.cs": "2a0284b4ce49c5d561e836c002a9067fa4174fd2e0fb446f11a1273cad3fa117",
+    "src\\dotnet\\Corpus.cs": "3e050c419f28be9ced916ae0da4c544dde69e1af478b79aaebe6e7cd43fe1791",
+    "src\\dotnet\\Processing.cs": "f205f55ba08b485f9c5859c2de963ad8feba8198fac04e3b3c6180c1f723fc09",
+    "src\\dotnet\\Program.cs": "4d951a20f606cfc330bf727fec12d67d608a0735bd4a15fa47cb6aa55c273489",
+    "src\\dotnet\\Report.cs": "51a13d9d5067264934ee1139083ec0cbb258589237918511c93eccee7cf89c25",
+    "src\\dotnet\\SelfTest.cs": "6caad83bd37574f6dc1a5a962f2498faea98a819256ae26bb42f829a1d2147ce",
+    "src\\dotnet\\Server.cs": "40f893b3b0b6cfa9fab408c7d68a5038e36243826180beb65928c01bda358701",
+    "src\\dotnet\\Bench.csproj": "e6ec1e80c7842f185fea04c1ec01a3cf21a4a753e8b1187619a3b1b5f592e023",
+    "src\\cpp\\client.cpp": "c3f84f9a7dd6ebd163ff725601b4a4cb022562310ad1fde20f8f1daac93a6872",
+    "src\\cpp\\main.cpp": "2c58ae647480e03b2159fafabc55d21236dda0167eb888477ec9b537e996ed94",
+    "src\\cpp\\processing.cpp": "c1c141dbaf48dc03563e0c015c2048f4e911e9122757580333b50ee502b886d2",
+    "src\\cpp\\server.cpp": "4c319665741bde601c5ba273fa51e5f93f94225e509594b3922017b80568bb52",
+    "src\\cpp\\bench.hpp": "27e1c48884e3bf022f250522392279d7f447fee7fbca77aff989750358ef225a",
+    "src\\cpp\\CMakeLists.txt": "0a397cc9330d3659104802166bcb9761797f9e989b2ac0749522ded3af6a4501",
+    "bench\\report.py": "905f1aea8a75f825774bf5ac1abc9e09d5392245d436c842b71bee5d2b36b4b8",
+    "bench\\run.py": "c8545a5a67c5bd0fe48a2134c74690981aac870238cc05b00d9c0290b99f1e48",
+    "tools\\corpus.py": "a42bb6170522c01721fa9373d8b0854cdca8e40dabe592bf62afb7bfeabb4057",
+    "global.json": "96f9b8fc4932f60c65c01ba2bf9a8c689a58bac189ac39c3a4ffa24bb1948189"
+  },
+  "tools": {
+    "dotnet": "dotnet\\sdk-manifests\\11.0.100-preview.6\\microsoft.net.sdk.maccatalyst\\26.5.11720-net11-p6\\WorkloadManifest.json\n   Install Type:              Msi\n\n [ios]\n   Installation Source: VS 17.13.35818.85, VS 18.10.12217.157\n   Manifest Version:    26.5.11720-net11-p6/11.0.100-preview.6\n   Manifest Path:       C:\\Program Files\\dotnet\\sdk-manifests\\11.0.100-preview.6\\microsoft.net.sdk.ios\\26.5.11720-net11-p6\\WorkloadManifest.json\n   Install Type:              Msi\n\n [android]\n   Installation Source: VS 17.13.35818.85, VS 18.10.12217.157\n   Manifest Version:    37.0.0-preview.6.59/11.0.100-preview.6\n   Manifest Path:       C:\\Program Files\\dotnet\\sdk-manifests\\11.0.100-preview.6\\microsoft.net.sdk.android\\37.0.0-preview.6.59\\WorkloadManifest.json\n   Install Type:              Msi\n\nConfigured to use workload sets when installing new manifests.\nNo workload sets are installed. Run \"dotnet workload restore\" to install a workload set.\n\nHost:\n  Version:      11.0.0-preview.7.26381.103\n  Architecture: x64\n  Commit:       e2c1e00b3d\n\n.NET SDKs installed:\n  8.0.425 [C:\\Program Files\\dotnet\\sdk]\n  9.0.121 [C:\\Program Files\\dotnet\\sdk]\n  9.0.200 [C:\\Program Files\\dotnet\\sdk]\n  10.0.112 [C:\\Program Files\\dotnet\\sdk]\n  10.0.303 [C:\\Program Files\\dotnet\\sdk]\n  10.0.401 [C:\\Program Files\\dotnet\\sdk]\n  11.0.100-preview.7.26381.103 [C:\\Program Files\\dotnet\\sdk]\n\n.NET runtimes installed:\n  Microsoft.AspNetCore.App 6.0.36 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 8.0.13 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 8.0.31 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 9.0.2 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 9.0.20 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 10.0.11 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 10.0.12 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 11.0.0-preview.7.26381.103 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\n  Microsoft.NETCore.App 6.0.36 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\n  Microsoft.NETCore.App 8.0.13 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\n  Microsoft.NETCore.App 8.0.31 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\n  Microsoft.NETCore.App 9.0.2 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\n  Microsoft.NETCore.App 9.0.20 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\n  Microsoft.NETCore.App 10.0.11 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\n  Microsoft.NETCore.App 10.0.12 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\n  Microsoft.NETCore.App 11.0.0-preview.7.26381.103 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\n  Microsoft.WindowsDesktop.App 6.0.36 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\n  Microsoft.WindowsDesktop.App 8.0.13 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\n  Microsoft.WindowsDesktop.App 8.0.31 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\n  Microsoft.WindowsDesktop.App 9.0.2 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\n  Microsoft.WindowsDesktop.App 9.0.20 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\n  Microsoft.WindowsDesktop.App 10.0.11 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\n  Microsoft.WindowsDesktop.App 10.0.12 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\n  Microsoft.WindowsDesktop.App 11.0.0-preview.7.26381.103 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\n\nOther architectures found:\n  x86   [C:\\Program Files (x86)\\dotnet]\n    registered at [HKLM\\SOFTWARE\\dotnet\\Setup\\InstalledVersions\\x86\\InstallLocation]\n\nEnvironment variables:\n  Not set\n\nglobal.json file:\n  F:\\SocketServerClient\\global.json\n\nLearn more:\n  https://aka.ms/dotnet/info\n\nDownload .NET:\n  https://aka.ms/dotnet/download\n",
+    "cmake": "cmake version 4.2.3\n\nCMake suite maintained and supported by Kitware (kitware.com/cmake).\n",
+    "power_plan": "Power Scheme GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c  (High performance)"
+  }
+}

@@ -1,0 +1,93 @@
+== ASAN selftest
+{"event":"selftest","valid":true,"checks":211,"canonical_digest":3660725836179230917}
+== ASAN protocol
+{"server": "src\\cpp\\build-asan\\RelWithDebInfo\\tcpbench.exe", "mode": "aggregate", "passed": 63}
+{"server": "src\\cpp\\build-asan\\RelWithDebInfo\\tcpbench.exe", "mode": "retain-reuse", "passed": 63}
+{"server": "src\\cpp\\build-asan\\RelWithDebInfo\\tcpbench.exe", "mode": "retain-allocate", "passed": 63}
+{"total_checks": 236, "status": "passed"}
+== ASAN server regression
+{"server": "tcpbench.exe", "case": "processing_deadline_and_independent_progress", "status": "passed"}
+{"server": "tcpbench.exe", "case": "stage_sampling_offset_reset_and_gates", "status": "passed"}
+{"server": "tcpbench.exe", "case": "cpu_budget", "status": "passed"}
+{"server": "tcpbench.exe", "case": "expiry_releases_slot", "status": "passed"}
+{"server": "tcpbench.exe", "case": "shutdown_during_pause", "status": "passed"}
+{"server": "tcpbench.exe", "case": "owned_peak_and_quiet_eof", "status": "passed"}
+== ASAN measurement client
+{"fault": "none", "exit_code": 0, "status": "passed"}
+{"fault": "closed", "exit_code": 0, "status": "passed"}
+{"fault": "pause", "exit_code": 0, "status": "passed"}
+{"fault": "overload", "exit_code": 0, "status": "passed"}
+{"fault": "drop", "exit_code": 1, "status": "passed"}
+{"fault": "withhold", "exit_code": 1, "status": "passed"}
+{"fault": "withhold-short-drain", "exit_code": 1, "status": "passed"}
+{"fault": "corrupt", "exit_code": 1, "status": "passed"}
+{"fault": "wrong-sequence", "exit_code": 1, "status": "passed"}
+{"fault": "oversized-response", "exit_code": 1, "status": "passed"}
+{"fault": "wrong-summary", "exit_code": 1, "status": "passed"}
+{"fault": "ack-inside-drain", "exit_code": 0, "status": "passed"}
+== ASAN interop
+{"mode": "aggregate", "load": "closed", "server": "cpp", "client": "cpp", "frames": 34066, "status": "passed"}
+{"mode": "aggregate", "load": "closed", "server": "cpp", "client": "csharp", "frames": 32681, "status": "passed"}
+{"mode": "aggregate", "load": "closed", "server": "csharp", "client": "cpp", "frames": 79714, "status": "passed"}
+{"mode": "aggregate", "load": "closed", "server": "csharp", "client": "csharp", "frames": 72802, "status": "passed"}
+{"mode": "aggregate", "load": "capped-io", "server": "cpp", "client": "cpp", "frames": 2082, "status": "passed"}
+{"mode": "aggregate", "load": "capped-io", "server": "cpp", "client": "csharp", "frames": 2058, "status": "passed"}
+{"mode": "aggregate", "load": "capped-io", "server": "csharp", "client": "cpp", "frames": 1835, "status": "passed"}
+{"mode": "aggregate", "load": "capped-io", "server": "csharp", "client": "csharp", "frames": 1864, "status": "passed"}
+{"mode": "aggregate", "load": "steady", "server": "cpp", "client": "cpp", "frames": 800, "status": "passed"}
+{"mode": "aggregate", "load": "steady", "server": "cpp", "client": "csharp", "frames": 800, "status": "passed"}
+{"mode": "aggregate", "load": "steady", "server": "csharp", "client": "cpp", "frames": 800, "status": "passed"}
+{"mode": "aggregate", "load": "steady", "server": "csharp", "client": "csharp", "frames": 800, "status": "passed"}
+{"mode": "aggregate", "load": "poisson", "server": "cpp", "client": "cpp", "frames": 767, "status": "passed"}
+{"mode": "aggregate", "load": "poisson", "server": "cpp", "client": "csharp", "frames": 767, "status": "passed"}
+{"mode": "aggregate", "load": "poisson", "server": "csharp", "client": "cpp", "frames": 767, "status": "passed"}
+{"mode": "aggregate", "load": "poisson", "server": "csharp", "client": "csharp", "frames": 767, "status": "passed"}
+{"mode": "retain-reuse", "load": "closed", "server": "cpp", "client": "cpp", "frames": 31481, "status": "passed"}
+{"mode": "retain-reuse", "load": "closed", "server": "cpp", "client": "csharp", "frames": 31142, "status": "passed"}
+{"mode": "retain-reuse", "load": "closed", "server": "csharp", "client": "cpp", "frames": 76004, "status": "passed"}
+{"mode": "retain-reuse", "load": "closed", "server": "csharp", "client": "csharp", "frames": 71239, "status": "passed"}
+{"mode": "retain-reuse", "load": "capped-io", "server": "cpp", "client": "cpp", "frames": 2109, "status": "passed"}
+{"mode": "retain-reuse", "load": "capped-io", "server": "cpp", "client": "csharp", "frames": 2046, "status": "passed"}
+{"mode": "retain-reuse", "load": "capped-io", "server": "csharp", "client": "cpp", "frames": 1875, "status": "passed"}
+{"mode": "retain-reuse", "load": "capped-io", "server": "csharp", "client": "csharp", "frames": 1863, "status": "passed"}
+{"mode": "retain-reuse", "load": "steady", "server": "cpp", "client": "cpp", "frames": 800, "status": "passed"}
+{"mode": "retain-reuse", "load": "steady", "server": "cpp", "client": "csharp", "frames": 800, "status": "passed"}
+{"mode": "retain-reuse", "load": "steady", "server": "csharp", "client": "cpp", "frames": 800, "status": "passed"}
+{"mode": "retain-reuse", "load": "steady", "server": "csharp", "client": "csharp", "frames": 800, "status": "passed"}
+{"mode": "retain-reuse", "load": "poisson", "server": "cpp", "client": "cpp", "frames": 767, "status": "passed"}
+{"mode": "retain-reuse", "load": "poisson", "server": "cpp", "client": "csharp", "frames": 767, "status": "passed"}
+{"mode": "retain-reuse", "load": "poisson", "server": "csharp", "client": "cpp", "frames": 767, "status": "passed"}
+{"mode": "retain-reuse", "load": "poisson", "server": "csharp", "client": "csharp", "frames": 767, "status": "passed"}
+{"mode": "retain-allocate", "load": "closed", "server": "cpp", "client": "cpp", "frames": 27685, "status": "passed"}
+{"mode": "retain-allocate", "load": "closed", "server": "cpp", "client": "csharp", "frames": 27817, "status": "passed"}
+{"mode": "retain-allocate", "load": "closed", "server": "csharp", "client": "cpp", "frames": 72912, "status": "passed"}
+{"mode": "retain-allocate", "load": "closed", "server": "csharp", "client": "csharp", "frames": 67651, "status": "passed"}
+{"mode": "retain-allocate", "load": "capped-io", "server": "cpp", "client": "cpp", "frames": 2108, "status": "passed"}
+{"mode": "retain-allocate", "load": "capped-io", "server": "cpp", "client": "csharp", "frames": 2102, "status": "passed"}
+{"mode": "retain-allocate", "load": "capped-io", "server": "csharp", "client": "cpp", "frames": 1854, "status": "passed"}
+{"mode": "retain-allocate", "load": "capped-io", "server": "csharp", "client": "csharp", "frames": 1827, "status": "passed"}
+{"mode": "retain-allocate", "load": "steady", "server": "cpp", "client": "cpp", "frames": 800, "status": "passed"}
+{"mode": "retain-allocate", "load": "steady", "server": "cpp", "client": "csharp", "frames": 800, "status": "passed"}
+{"mode": "retain-allocate", "load": "steady", "server": "csharp", "client": "cpp", "frames": 800, "status": "passed"}
+{"mode": "retain-allocate", "load": "steady", "server": "csharp", "client": "csharp", "frames": 800, "status": "passed"}
+{"mode": "retain-allocate", "load": "poisson", "server": "cpp", "client": "cpp", "frames": 767, "status": "passed"}
+{"mode": "retain-allocate", "load": "poisson", "server": "cpp", "client": "csharp", "frames": 767, "status": "passed"}
+{"mode": "retain-allocate", "load": "poisson", "server": "csharp", "client": "cpp", "frames": 767, "status": "passed"}
+{"mode": "retain-allocate", "load": "poisson", "server": "csharp", "client": "csharp", "frames": 767, "status": "passed"}
+{"mode": "transport", "load": "closed", "server": "cpp", "client": "cpp", "frames": 61507, "status": "passed"}
+{"mode": "transport", "load": "closed", "server": "cpp", "client": "csharp", "frames": 61260, "status": "passed"}
+{"mode": "transport", "load": "closed", "server": "csharp", "client": "cpp", "frames": 86214, "status": "passed"}
+{"mode": "transport", "load": "closed", "server": "csharp", "client": "csharp", "frames": 79879, "status": "passed"}
+{"mode": "transport", "load": "capped-io", "server": "cpp", "client": "cpp", "frames": 2081, "status": "passed"}
+{"mode": "transport", "load": "capped-io", "server": "cpp", "client": "csharp", "frames": 2078, "status": "passed"}
+{"mode": "transport", "load": "capped-io", "server": "csharp", "client": "cpp", "frames": 1835, "status": "passed"}
+{"mode": "transport", "load": "capped-io", "server": "csharp", "client": "csharp", "frames": 1817, "status": "passed"}
+{"mode": "transport", "load": "steady", "server": "cpp", "client": "cpp", "frames": 800, "status": "passed"}
+{"mode": "transport", "load": "steady", "server": "cpp", "client": "csharp", "frames": 800, "status": "passed"}
+{"mode": "transport", "load": "steady", "server": "csharp", "client": "cpp", "frames": 800, "status": "passed"}
+{"mode": "transport", "load": "steady", "server": "csharp", "client": "csharp", "frames": 800, "status": "passed"}
+{"mode": "transport", "load": "poisson", "server": "cpp", "client": "cpp", "frames": 767, "status": "passed"}
+{"mode": "transport", "load": "poisson", "server": "cpp", "client": "csharp", "frames": 767, "status": "passed"}
+{"mode": "transport", "load": "poisson", "server": "csharp", "client": "cpp", "frames": 767, "status": "passed"}
+{"mode": "transport", "load": "poisson", "server": "csharp", "client": "csharp", "frames": 767, "status": "passed"}
+== all passed

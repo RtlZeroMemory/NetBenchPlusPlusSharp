@@ -1,0 +1,2 @@
+{"regression": "processing-deadline-and-independent-progress", "passed": true}
+{"regression": "stage-pause-offset-reset-and-tail-gates", "passed": true}

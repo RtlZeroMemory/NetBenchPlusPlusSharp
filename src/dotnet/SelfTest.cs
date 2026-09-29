@@ -1,316 +1,283 @@
-using System.Buffers.Binary;
 using System.Diagnostics;
-using System.Reflection;
 using System.Text;
 using System.Text.Json;
 
 namespace TcpBench;
 
+// Mirrors the native selftest case for case; the golden digest is shared by both languages.
 static class SelfTest
 {
+    const string EscapedTimestamp = "\"\\u0074\\u0069\\u006d\\u0065\\u0073\\u0074\\u0061\\u006d\\u0070\\u005f\\u006e\\u0073\"";
+    const string Good = """[{"id":18446744073709551615,"timestamp_ns":0,"source":4294967295,"kind":"kind15","value_milli":-0,"flags":3,"message":"a\u0000\uD83D\uDE00"}]""";
+    const ulong GoldenDigest = 3660725836179230917UL;
+
+    // The failure reason, or null when the action completes.
+    static string? ErrorOf(Action action)
+    {
+        try
+        {
+            action();
+            return null;
+        }
+        catch (Exception e) when (e is BenchException or JsonException)
+        {
+            return e.Message;
+        }
+    }
+
     public static int Run(Options options)
     {
         int checks = 0;
-        void Check(bool value, string label)
+        void Check(bool ok, string what)
         {
             checks++;
-            if (!value)
+            if (!ok)
             {
-                throw new InvalidDataException("selftest: " + label);
+                throw new BenchException("selftest: " + what);
             }
         }
 
-        const string valid = "[{\"id\":1,\"timestamp_ns\":2,\"source\":3,\"kind\":\"kind04\",\"value_milli\":-5,\"flags\":6,\"message\":\"\"}]";
-        foreach (string mode in new[]
+        var reference = new Result();
+        reference.Add(new Row { Id = ulong.MaxValue, Source = uint.MaxValue, Kind = 15, Flags = 3 }, "a\0😀"u8);
+        Check(reference.Hash == GoldenDigest, "cross-language golden digest");
+        bool Same(Result r) => r.Matches(reference.Records, reference.Hash, reference.Counts, reference.Sums);
+        foreach (Mode mode in new[] { Mode.Aggregate, Mode.RetainReuse, Mode.RetainAllocate })
         {
-            "aggregate",
-            "retain-reuse",
-            "retain-allocate"
-        }
-
-        )
-        {
-            var p = new Processor(mode, 2, 8192);
-            byte[] input = Encoding.UTF8.GetBytes(valid);
-            Check(p.Process(input, 1) == (1UL, 16660929537651884513UL), mode + " golden digest");
-            Check(p.Epoch.Counts[18] == 1 && p.Epoch.Sums[18] == -5, "category");
-            Array.Fill(input, (byte)0);
-            p.VerifyRetained();
-            checks++;
-            var escaped = Encoding.UTF8.GetBytes(valid.Replace("\"id\"", "\"\\u0069d\""));
-            Check(p.Process(escaped, 2).Hash == 16660929537651884513UL, "escaped property");
-            for (int i = 0; i < 5; i++)
+            var p = new Processor(mode, 2, 67108864);
+            Result Run(string json, Budget budget = default)
             {
-                p.Process(Encoding.UTF8.GetBytes(valid), (ulong)(i + 3));
+                byte[] input = Encoding.UTF8.GetBytes(json);
+                Result r = p.Process(input, p.Epoch.Batches + 1, budget);
+                Array.Fill(input, (byte)0xcd); // retained data must not alias input
+                return r;
+            }
+
+            byte[] Snapshot()
+            {
+                byte[] b = new byte[1056];
+                p.Epoch.Write(b);
+                return b;
+            }
+
+            Check(Same(Run(Good)), "canonical digest");
+            long first = p.OwnedCapacity();
+            Check(Same(Run(Good)) && Same(Run(Good)), "repeated batches");
+            Check(mode == Mode.Aggregate || p.PeakOwned >= first * 2, "scratch counted with retained data");
+            using var stopped = new CancellationTokenSource();
+            stopped.Cancel();
+            var stoppedBudget = new Budget(0, stopped.Token);
+            foreach (Budget budget in new[] { stoppedBudget, new Budget(Stopwatch.GetTimestamp() - 1, default) })
+            {
+                byte[] before = Snapshot();
+                long retained = p.Retained;
+                string reason = budget.Equals(stoppedBudget) ? "shutdown" : "frame_timeout";
+                Check(ErrorOf(() => Run(Good, budget)) == reason && ErrorOf(() => p.VerifyRetained(budget)) == reason &&
+                      p.Epoch.Matches(before) && p.Retained == retained, "expired budget leaves state unchanged");
                 p.VerifyRetained();
-                checks++;
             }
 
-            string[] invalid = [
-"",
-" ",
-"{}",
-"[] []",
-"[{}]",
-valid + "x",
-valid.Replace("\"id\":1", "\"id\":-0"),
-valid.Replace("\"source\":3", "\"source\":4294967296"),
-valid.Replace("\"id\":1", "\"id\":18446744073709551616"),
-valid.Replace("\"id\":1", "\"id\":1.0"),
-valid.Replace("\"id\":1", "\"id\":1e0"),
-valid.Replace("\"message\":\"\"", "\"message\":\"\\uD800\""),
-valid.Replace("\"message\":\"\"", "\"message\":\"\\uDC00\""),
-valid.Replace("\"message\":\"\"", "\"message\":\"\\uD800\\u0041\""),
-valid.Replace("\"message\":\"\"", "\"message\":\"" + new string('x', 4097) + "\""),
-valid.Replace("\"flags\":6", "\"flags\":6,\"\\u0069d\":1"),
-valid.Replace("\"id\":1", "\"other\":1"),
-valid.Replace("kind04", "kind16"),
-valid.Replace("\"flags\":6", "\"flags\":-0"),
-valid.Replace("\"flags\":6", "\"flags\":[]")
-];
-            foreach (string bad in invalid)
+            string record = Good[1..^1];
+            var bad = new List<byte[]>();
+            foreach (string s in new[] { "", " ", "{}", "[] []", "[],", "[[]]", "[{}]", Good + "x", "\uFEFF" + Good, "[" + record + "," + record + "," + record + ",{}]" })
             {
-                byte[] before = new byte[1056];
-                p.Epoch.Write(before);
-                bool failed = false;
-                try
-                {
-                    p.Process(Encoding.UTF8.GetBytes(bad), 99);
-                }
-                catch (Exception e) when (e is InvalidDataException or System.Text.Json.JsonException or InvalidOperationException or ArgumentException)
-                {
-                    failed = true;
-                }
-
-                Check(failed, "reject invalid JSON " + bad[..Math.Min(24, bad.Length)]);
-                p.Epoch.Verify(before);
-                p.VerifyRetained();
-                checks++;
+                bad.Add(Encoding.UTF8.GetBytes(s));
             }
 
-            var unicode = new Processor(mode, 2, 8192);
-            ulong raw = unicode.Process(Encoding.UTF8.GetBytes(valid.Replace("\"message\":\"\"", "\"message\":\"😀é\"")), 1).Hash;
-            Check(unicode.Process(Encoding.UTF8.GetBytes(valid.Replace("\"message\":\"\"", "\"message\":\"\\ud83d\\ude00\\u00e9\"")), 2).Hash == raw, "Unicode equivalence");
-            var signedZero = new Processor(mode, 2, 8192);
-            Check(signedZero.Process(Encoding.UTF8.GetBytes(valid.Replace("-5", "-0")), 1).Hash == signedZero.Process(Encoding.UTF8.GetBytes(valid.Replace("-5", "0")), 2).Hash, "signed zero");
-            Check(p.Process("[]"u8, 100) == (0UL, Digest.Offset), "empty array");
-            var categoryCounts = new ulong[64];
-            var categorySums = new long[64];
-            categoryCounts[18] = 1;
-            categorySums[18] = -5;
-            var frame = new CorpusFrame(Encoding.UTF8.GetBytes(valid), 1, 16660929537651884513UL, categoryCounts, categorySums);
-            var cycleProcessor = new Processor(mode, 2, 8192);
-            ProcessControl.ProcessCycle(cycleProcessor, [frame], mode);
-            ProcessControl.ProcessCycle(cycleProcessor, [frame], mode);
-            Check(cycleProcessor.Epoch.Counts[18] == 2 && cycleProcessor.Epoch.Sums[18] == -10, "process repeated category validation");
-            cycleProcessor.Epoch.Records = 1_000_000_000;
-            ProcessControl.ProcessCycle(cycleProcessor, [frame], mode);
-            Check(cycleProcessor.Epoch.Records == 1, "process epoch reset");
-            foreach (bool moveBucket in new[]
+            foreach (var (from, to) in new[]
             {
-                false,
-                true
-            }
-
-            )
-            {
-                var badCounts = (ulong[])categoryCounts.Clone();
-                var badSums = (long[])categorySums.Clone();
-                if (moveBucket)
-                {
-                    badCounts[18] = 0;
-                    badSums[18] = 0;
-                    badCounts[0] = 1;
-                    badSums[0] = -5;
-                }
-                else
-                {
-                    badSums[18] = -4;
-                }
-
-                bool failed = false;
-                try
-                {
-                    ProcessControl.ProcessCycle(new Processor(mode, 2, 8192), [frame with { Counts = badCounts, Sums = badSums }], mode);
-                }
-                catch (InvalidDataException)
-                {
-                    failed = true;
-                }
-
-                Check(failed, "process rejects category metadata independently of correct digest");
-            }
-        }
-
-        foreach (string mode in new[] { "aggregate", "retain-reuse", "retain-allocate", "transport" })
-        {
-            var processor = new Processor(mode, 2, 8192);
-            byte[] input = Encoding.UTF8.GetBytes(valid);
-            processor.Process(input, 1);
-            byte[] before = new byte[1056];
-            processor.Epoch.Write(before);
-            long retainedBytes = processor.RetainedBytes;
-            using var cancelled = new CancellationTokenSource();
-            cancelled.Cancel();
-            foreach (ProcessingBudget budget in new[]
-            {
-                new ProcessingBudget(Stopwatch.GetTimestamp() - 1, default),
-                new ProcessingBudget(0, cancelled.Token)
+                ("18446744073709551615", "18446744073709551616"),
+                ("18446744073709551615", "-0"),
+                ("18446744073709551615", "01"),
+                ("4294967295", "4294967296"),
+                ("\"value_milli\":-0", "\"value_milli\":1e0"),
+                ("\"value_milli\":-0", "\"value_milli\":1.0"),
+                ("\"value_milli\":-0", "\"value_milli\":1000001"),
+                ("\"value_milli\":-0", "\"value_milli\":-"),
+                ("\"value_milli\":-0", "\"value_milli\":\"1\""),
+                ("kind15", "kind16"),
+                ("kind15", "kind1"),
+                (@"a\u0000\uD83D\uDE00", @"\uD800"),
+                (@"a\u0000\uD83D\uDE00", @"\uDC00x"),
+                ("\"source\":", "\"id\":"),
+                ("\"source\":", @"""\u0069d"":"),
+                ("\"source\":", "\"unknown\":")
             })
             {
-                bool rejected = false;
-                try
-                {
-                    processor.Process(input, 2, budget: budget);
-                }
-                catch (Exception e) when (e is TimeoutException or OperationCanceledException)
-                {
-                    rejected = true;
-                }
-                Check(rejected, mode + " rejects expired/cancelled processing budget");
-                processor.Epoch.Verify(before);
-                Check(processor.RetainedBytes == retainedBytes, "budget preserves retention");
-                rejected = false;
-                try
-                {
-                    processor.VerifyRetained(budget);
-                }
-                catch (Exception e) when (e is TimeoutException or OperationCanceledException)
-                {
-                    rejected = true;
-                }
-                Check(rejected, "retained visits observe budget");
+                bad.Add(Encoding.UTF8.GetBytes(Good.Replace(from, to)));
             }
-            processor.VerifyRetained();
-        }
-        foreach (string mode in new[] { "retain-reuse", "retain-allocate" })
-        {
-            // Corrupt the second planned eviction: the first must remain retained when validation fails.
-            var processor = new Processor(mode, 2, 200);
-            byte[] small = Encoding.UTF8.GetBytes(valid);
-            byte[] large = Encoding.UTF8.GetBytes(valid.Replace("\"message\":\"\"", "\"message\":\"" + new string('x', 130) + "\""));
-            processor.Process(small, 1);
-            processor.Process(small, 2);
-            var retained = (Queue<Batch>)typeof(Processor).GetField("retained", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(processor)!;
-            Batch[] original = retained.ToArray();
-            original[1].StoredDigest ^= 1;
-            byte[] before = new byte[1056];
-            processor.Epoch.Write(before);
-            bool rejected = false;
-            try
-            {
-                processor.Process(large, 3);
-            }
-            catch (InvalidDataException e) when (e.Message == "retained_integrity")
-            {
-                rejected = true;
-            }
-            Check(rejected && retained.SequenceEqual(original) && processor.RetainedBytes == 76, "eviction validation is atomic");
-            processor.Epoch.Verify(before);
-            original[1].StoredDigest ^= 1;
-            processor.VerifyRetained();
-            Check(processor.PeakOwnedCapacityBytes >= original.Sum(batch => batch.CapacityBytes) + 168, "failed scratch contributes to peak");
-            processor.Process(large, 3);
-            Check(retained.Count == 1 && processor.RetainedBytes == 168, "validated multi-eviction commits");
 
-            var capacity = new Processor(mode, 1, 8192);
-            capacity.Process(small, 1);
-            long firstCapacity = capacity.OwnedCapacityBytes;
-            capacity.Process(small, 2);
-            Check(capacity.PeakOwnedCapacityBytes == firstCapacity * 2, "peak includes simultaneous scratch and retained arrays");
+            // Raw invalid UTF-8 in the message: overlong, encoded surrogate, and 0xFF.
+            byte[] template = Encoding.UTF8.GetBytes(Good.Replace(@"a\u0000\uD83D\uDE00", "@@@"));
+            foreach (byte[] raw in new[] { new byte[] { 0xc0, 0xaf, 0x20 }, [0xed, 0xa0, 0x80], [0xff, 0x20, 0x20] })
+            {
+                byte[] copy = (byte[])template.Clone();
+                raw.CopyTo(copy, Array.IndexOf(template, (byte)'@'));
+                bad.Add(copy);
+            }
+
+            foreach (byte[] input in bad)
+            {
+                byte[] before = Snapshot();
+                Check(ErrorOf(() => p.Process(input, p.Epoch.Batches + 1)) != null && p.Epoch.Matches(before), "invalid batch rejected atomically: " + Encoding.Latin1.GetString(input[..Math.Min(40, input.Length)]));
+                p.VerifyRetained();
+            }
+
+            Check(p.PeakOwned >= p.OwnedCapacity(), "failed scratch counted");
+            for (int i = 0; i < 16; i++)
+            {
+                Check(Same(Run(Good)), "reuse after eviction");
+            }
+
+            Check(Run("[]").Matches(0, Digest.Offset, Summary.NoCounts, Summary.NoSums), "empty array");
+            Check(Same(Run(Good.Replace("\"id\"", "\"\\u0069d\""))), "escaped property name");
+            Check(Same(Run(Good.Replace("\"timestamp_ns\"", EscapedTimestamp).Replace("\"kind15\"", "\"\\u006bind15\""))), "escaped longest name and kind");
+            Check(Same(Run(" \r\n" + Good.Replace("\"flags\":3", "\"flags\" : 3 ") + "\t")), "insignificant whitespace");
+            // A budget that expires mid-parse stops the parse (checked every 1024 records).
+            byte[] many = Encoding.UTF8.GetBytes("[" + string.Join(",", Enumerable.Repeat(record, 100_000)) + "]");
+            var large = new Processor(mode, 8, 1L << 31);
+            Check(ErrorOf(() => large.Process(many, 1, new Budget(Stopwatch.GetTimestamp() + Stopwatch.Frequency / 500, default))) == "frame_timeout" &&
+                  large.Epoch.Batches == 0 && large.Retained == 0, "mid-parse budget expiry");
         }
-        var merged = new PhaseResult();
-        var connectionMetrics = new ConnectionMetrics();
-        connectionMetrics.Sizes[4].Record(1024);
-        merged.Merge(connectionMetrics);
-        Check(merged.Sizes.Length == 5 && merged.Sizes.Sum(histogram => histogram.Count) == 1, "fixed size-class merge preserves empty classes");
-        JsonElement histogramJson = JsonSerializer.SerializeToElement(merged.Sizes[4].Export());
-        foreach (string alias in new[] { "p50", "p90", "p99", "p999", "max" })
+
         {
-            Check(histogramJson.GetProperty(alias).GetInt64() == histogramJson.GetProperty(alias + "_ns").GetInt64(), "histogram aliases agree");
+            // Limits apply to decoded text. CopyString's escaped path rejects an exact fit, so the scratch must
+            // exceed the limit; the first case failed with a 4,096-byte scratch.
+            var p = new Processor(Mode.RetainReuse, 2, 67108864);
+            string With(string message) => Good.Replace("a\\u0000\\uD83D\\uDE00", message);
+            string a4095 = new('A', 4095);
+            foreach (string ok in new[] { "\\u0041" + a4095, string.Concat(Enumerable.Repeat("\\u0001", 4096)), "A" + a4095 })
+            {
+                Check(ErrorOf(() => p.Process(Encoding.UTF8.GetBytes(With(ok)), p.Epoch.Batches + 1)) == null, "4,096 decoded message bytes accepted");
+            }
+
+            foreach (string tooLong in new[] { "\\u0041A" + a4095, string.Concat(Enumerable.Repeat("\\u0001", 4097)), "AA" + a4095 })
+            {
+                Check(ErrorOf(() => p.Process(Encoding.UTF8.GetBytes(With(tooLong)), p.Epoch.Batches + 1)) == "json_message_length", "4,097 decoded message bytes rejected");
+            }
         }
-        var transport = new Processor("transport", 1, 1);
-        Check(transport.Process("not JSON"u8, 1) == (0UL, 8UL), "transport bypass");
-        ulong seed = 0;
-        Check(ArrivalSchedule.SplitMix(ref seed) == 0xe220a8397b1dcdafUL, "SplitMix64 vector");
+
+        foreach (Mode mode in new[] { Mode.RetainReuse, Mode.RetainAllocate })
+        {
+            // Chunked storage: 3,000 records of 3,000-byte messages span 3 row chunks and 143 text chunks
+            // (capacity cross-checked with the native selftest); with one batch retained, the smaller batch lands in
+            // reused multi-chunk storage. 16 or 32 full 4 KiB messages fill chunks exactly before an empty message.
+            static byte[] Records(int n, int length) => Encoding.UTF8.GetBytes("[" + string.Join(",", Enumerable.Range(0, n).Select(i =>
+                $"{{\"id\":{i},\"timestamp_ns\":0,\"source\":0,\"kind\":\"kind01\",\"value_milli\":1,\"flags\":{i},\"message\":\"{new string((char)('a' + i % 26), length)}\"}}")) + "]");
+            static byte[] WithEmpty(int full) => Encoding.UTF8.GetBytes(Encoding.UTF8.GetString(Records(full, 4096))[..^1] +
+                ",{\"id\":0,\"timestamp_ns\":0,\"source\":0,\"kind\":\"kind00\",\"value_milli\":0,\"flags\":0,\"message\":\"\"}]");
+            var p = new Processor(mode, 1, 67108864);
+            byte[][] inputs = [Records(3000, 3000), Records(3000, 3000), Records(1500, 100), WithEmpty(16), WithEmpty(32)];
+            long[] capacity = mode == Mode.RetainReuse ? [9_519_104, 19_038_208, 19_038_208] : [9_519_104, 9_519_104, 294_912];
+            for (int i = 0; i < inputs.Length; i++)
+            {
+                Result expected = new Processor(Mode.Aggregate, 0, 0).Process(inputs[i], 1);
+                Check(new Processor(mode, 1, 67108864).Process(inputs[i], 1).Matches(expected.Records, expected.Hash, expected.Counts, expected.Sums), "fresh chunked batch digest");
+                Check(p.Process(inputs[i], p.Epoch.Batches + 1).Matches(expected.Records, expected.Hash, expected.Counts, expected.Sums), "chunked batch digest");
+                p.VerifyRetained();
+                Check(i >= capacity.Length || p.OwnedCapacity() == capacity[i], "chunked capacity");
+            }
+        }
+
+        foreach (Mode mode in new[] { Mode.RetainReuse, Mode.RetainAllocate })
+        {
+            // A batch larger than the byte limit fails before commit; retained data survives.
+            var p = new Processor(mode, 8, 200);
+            p.Process(Encoding.UTF8.GetBytes(Good), 1);
+            string big = Good.Replace("a\\u0000", new string('x', 170));
+            Check(ErrorOf(() => p.Process(Encoding.UTF8.GetBytes(big), 2)) == "retention_capacity" && p.Retained == 44 && p.Epoch.Batches == 1, "oversized batch is atomic");
+            p.VerifyRetained();
+
+            // Corrupt the second planned eviction: the first must not be evicted either.
+            var q = new Processor(mode, 2, 120);
+            q.Process(Encoding.UTF8.GetBytes(Good), 1);
+            q.Process(Encoding.UTF8.GetBytes(Good), 2);
+            Batch[] live = q.LiveBatches();
+            live[1].Digest ^= 1;
+            byte[] both = Encoding.UTF8.GetBytes(Good.Replace("a\\u0000", new string('y', 40))); // needs both evictions
+            Check(ErrorOf(() => q.Process(both, 3)) == "retained_integrity" && q.LiveBatches().SequenceEqual(live) && q.Epoch.Batches == 2, "eviction verification precedes mutation");
+            live[1].Digest ^= 1;
+            q.VerifyRetained();
+        }
+
         Check(Histogram.Upper(1023) == 1023 && Histogram.Upper(1024) == 1027 && Histogram.Upper(1279) == 2047 && Histogram.Upper(1280) == 2055, "histogram vectors");
-        int[] sizeBounds = [4096, 65536, 262144, 1048576, Wire.HardLimit];
-        for (int i = 0; i < sizeBounds.Length; i++)
+        foreach (long v in new long[] { 0, 1023, 1024, 1027, 2048, 1_000_000, 59_999_999_999 })
         {
-            Check(ConnectionMetrics.SizeClass(sizeBounds[i]) == i, "size class inclusive upper bound");
-            if (i > 0)
+            int i = Histogram.Index(v);
+            Check(Histogram.Upper(i) >= v && (i == 0 || Histogram.Upper(i - 1) < v), "histogram bucket bounds");
+        }
+
+        var h = new Histogram();
+        h.Record(5);
+        h.Record(60_000_000_000);
+        Check(h.Quantile(.5) == 5 && h.Quantile(1) == null && h.Max == 60_000_000_000, "overflow rank has no finite quantile");
+        var stage = new Histogram();
+        for (int i = 1; i <= 1_000_000; i++)
+        {
+            stage.Record(1024);
+            if (i is 9_999 or 10_000 or 999_999 or 1_000_000)
             {
-                Check(ConnectionMetrics.SizeClass(sizeBounds[i - 1] + 1) == i, "size class lower boundary");
+                JsonElement json = JsonSerializer.SerializeToElement(stage.Export(stage: true));
+                Check((json.GetProperty("p99_ns").ValueKind == JsonValueKind.Null) == (i < 10_000), "stage p99 sample gate");
+                Check((json.GetProperty("p999_ns").ValueKind == JsonValueKind.Null) == (i < 1_000_000), "stage p99.9 sample gate");
             }
         }
 
-        var stages = new Histogram();
-        for (int i = 0; i < 1_000_000; i++)
+        ulong seed = 0;
+        Check(Arrivals.SplitMix(ref seed) == 0xe220a8397b1dcdafUL, "SplitMix64 vector");
+        for (int lanes = 1; lanes <= 7; lanes++)
         {
-            stages.Record(1024);
-            if (i + 1 is not (1 or 9999 or 10000 or 999999 or 1000000))
+            for (int frames = 1; frames <= 9; frames++)
             {
-                continue;
+                for (long ordinal = 0; ordinal < 15; ordinal++)
+                {
+                    for (long remaining = 0; remaining < 20; remaining++)
+                    {
+                        for (int lane = 0; lane < lanes; lane++)
+                        {
+                            int want = lane % frames;
+                            for (long i = ordinal; i < ordinal + remaining; i++)
+                            {
+                                want = i % lanes == lane ? (want + lanes) % frames : want;
+                            }
+
+                            Check(Arrivals.AdvanceCursor(lane % frames, lane, ordinal, remaining, lanes, frames) == want, "aborted cursor arithmetic");
+                        }
+                    }
+                }
             }
-
-            using var stageJson = System.Text.Json.JsonDocument.Parse(System.Text.Json.JsonSerializer.Serialize(stages.ExportStages()));
-            Check((stageJson.RootElement.GetProperty("p99_ns").ValueKind == System.Text.Json.JsonValueKind.Null) == (i + 1 < 10_000), "stage p99 sample gate");
-            Check((stageJson.RootElement.GetProperty("p999_ns").ValueKind == System.Text.Json.JsonValueKind.Null) == (i + 1 < 1_000_000), "stage p999 sample gate");
-            using var rawJson = System.Text.Json.JsonDocument.Parse(System.Text.Json.JsonSerializer.Serialize(stages.Export()));
-            Check(rawJson.RootElement.GetProperty("p999_ns").GetInt64() == 1027, "raw client tails unchanged");
         }
 
-        byte[] header = new byte[16];
-        Wire.Header(header, 32, 1, 42);
-        Check(Wire.ParseHeader(header) == (32, (ushort)1, 42UL), "wire header");
-        BinaryPrimitives.WriteUInt32BigEndian(header, uint.MaxValue);
-        bool headerRejected = false;
-        try
+        foreach (double rate in new[] { 0.1, 1.0, 3.0, 10.0, 1000.0 })
         {
-            Wire.ParseHeader(header);
-        }
-        catch (InvalidDataException)
-        {
-            headerRejected = true;
+            foreach (double duration in new[] { 0.001, 0.1, 0.3, 1.0 })
+            {
+                long windowTicks = (long)(duration * Stopwatch.Frequency), want = 0;
+                while ((long)(want / rate * Stopwatch.Frequency) < windowTicks)
+                {
+                    want++;
+                }
+
+                Check(Arrivals.SteadyCount(rate, duration, windowTicks) == want, "steady arrival count");
+            }
         }
 
-        Check(headerRejected, "overlong frame");
         if (options.Corpus.Length > 0)
         {
             var corpus = new Corpus(options.Corpus);
-            foreach (string mode in new[]
+            foreach (Mode mode in new[] { Mode.Aggregate, Mode.RetainReuse, Mode.RetainAllocate })
             {
-                "aggregate",
-                "retain-reuse",
-                "retain-allocate"
-            }
-
-            )
-            {
-                var processor = new Processor(mode, 8, 67108864);
-                var expected = new Summary();
-                ulong sequence = 1;
-                foreach (var frame in corpus.Frames)
+                var p = new Processor(mode, 8, 67108864);
+                ulong sequence = 0;
+                foreach (CorpusFrame f in corpus.Frames)
                 {
-                    Check(processor.Process(frame.Payload, sequence) == (frame.Records, frame.Hash), "corpus oracle");
-                    expected.Add(sequence++, frame.Payload.Length, frame.Records, frame.Hash, frame.Counts, frame.Sums);
-                    byte[] actual = new byte[1056];
-                    processor.Epoch.Write(actual);
-                    expected.Verify(actual);
-                    checks++;
+                    Check(p.Process(f.Payload, ++sequence).Matches(f.Records, f.Hash, f.Counts, f.Sums), "corpus oracle " + mode);
                 }
 
-                processor.VerifyRetained();
+                p.VerifyRetained();
             }
         }
 
-        JsonOutput.Print(new
-        {
-            @event = "selftest",
-            valid = true,
-            checks,
-            build = Metadata.Build()
-        });
+        JsonOutput.Emit("", new { @event = "selftest", valid = true, checks, canonical_digest = reference.Hash });
         return 0;
     }
 }

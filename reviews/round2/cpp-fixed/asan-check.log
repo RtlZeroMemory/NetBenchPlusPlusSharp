@@ -1,0 +1,17 @@
+{"event":"selftest","ok":true,"canonical_digest":3660725836179230917}
+{"mode": "aggregate", "arrival": "steady", "rate": "0", "io_cap": "0", "frames": 7376, "passed": true}
+{"mode": "aggregate", "arrival": "steady", "rate": "100", "io_cap": "3", "frames": 12, "passed": true}
+{"mode": "aggregate", "arrival": "poisson", "rate": "100", "io_cap": "0", "frames": 10, "passed": true}
+{"mode": "aggregate", "arrival": "burst", "rate": "100", "io_cap": "0", "frames": 8, "passed": true}
+{"mode": "retain-reuse", "arrival": "steady", "rate": "0", "io_cap": "0", "frames": 6148, "passed": true}
+{"mode": "retain-reuse", "arrival": "steady", "rate": "100", "io_cap": "3", "frames": 12, "passed": true}
+{"mode": "retain-reuse", "arrival": "poisson", "rate": "100", "io_cap": "0", "frames": 10, "passed": true}
+{"mode": "retain-reuse", "arrival": "burst", "rate": "100", "io_cap": "0", "frames": 8, "passed": true}
+{"mode": "retain-allocate", "arrival": "steady", "rate": "0", "io_cap": "0", "frames": 6287, "passed": true}
+{"mode": "retain-allocate", "arrival": "steady", "rate": "100", "io_cap": "3", "frames": 12, "passed": true}
+{"mode": "retain-allocate", "arrival": "poisson", "rate": "100", "io_cap": "0", "frames": 10, "passed": true}
+{"mode": "retain-allocate", "arrival": "burst", "rate": "100", "io_cap": "0", "frames": 8, "passed": true}
+{"mode": "transport", "arrival": "steady", "rate": "0", "io_cap": "0", "frames": 12566, "passed": true}
+{"mode": "transport", "arrival": "steady", "rate": "100", "io_cap": "3", "frames": 12, "passed": true}
+{"mode": "transport", "arrival": "poisson", "rate": "100", "io_cap": "0", "frames": 10, "passed": true}
+{"mode": "transport", "arrival": "burst", "rate": "100", "io_cap": "0", "frames": 8, "passed": true}

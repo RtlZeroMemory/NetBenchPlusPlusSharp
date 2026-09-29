@@ -11,8 +11,9 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "tools"))
-import corpus
+sys.path[:0] = [str(ROOT / "tools"), str(ROOT / "bench")]
+import corpus  # noqa: E402
+from run import BINARIES, command  # noqa: E402,F401  (one source of binary paths)
 
 WIRE = struct.Struct(">IHHQ")
 ACK = struct.Struct(">QQ")
@@ -32,11 +33,15 @@ def encode(events):
 
 def fixtures():
     base = encode([event()])
+    with_message = lambda raw: encode([event(message='@')]).replace(b'"@"', b'"' + raw + b'"')
     valid = [b"[]", base, encode([event(id=corpus.MASK, timestamp_ns=corpus.MASK,
                                       source=0xffffffff, flags=0xffffffff, message="")]),
              encode([event(message="a" * 4096)]),
              encode([event(message="\0\n\t\"\\😀")]),
              base.replace(b'"id"', b'"\\u0069d"'),
+             base.replace(b'"timestamp_ns"', b'"' + b''.join(b'\\u%04x' % c for c in b'timestamp_ns') + b'"')
+                 .replace(b'"kind03"', b'"\\u006bind03"'),
+             with_message(b'\\u0041' + b'A' * 4095), with_message(b'\\u0001' * 4096),
              base.replace(b'"value_milli":-12345', b'"value_milli":-0'),
              b" \r\n\t" + base + b"\r\n\t ",
              encode([dict(reversed(list(event().items()))), event(kind="kind15", flags=0)])]
@@ -57,6 +62,8 @@ def fixtures():
                encode([event(value_milli=1000001)]), encode([event(value_milli=-1000001)]),
                encode([event(kind="kind16")]), encode([event(kind="Kind03")]),
                encode([event(message=12)]), encode([event(message="x" * 4097)]),
+               with_message(b'\\u0041A' + b'A' * 4095), with_message(b'\\u0001' * 4097),
+               with_message(b'\\n' + b'A' * 30000), base.replace(b'"id":42', b'"id":42,"\\u0069' + b'd' * 20 + b'":1'),
                encode([event(message="x")]).replace(b'"message":"x"', b'"message":"\\ud800"'),
                encode([event(message="x")]).replace(b'"message":"x"', b'"message":"\\udc00"'),
                encode([event(message="x")]).replace(b'"message":"x"', b'"message":"\xff"'),
@@ -107,7 +114,63 @@ def connection(port):
     return sock
 
 
-def run_protocol(port, mode):
+def free_port():
+    with socket.socket() as reserve:
+        reserve.bind(("127.0.0.1", 0))
+        return reserve.getsockname()[1]
+
+
+class Summary:
+    """Expected End summary of one epoch, accumulated from acknowledged batches."""
+
+    def __init__(self):
+        self.batches = self.size = self.records = 0
+        self.digest, self.counts, self.sums = corpus.OFFSET, [0] * 64, [0] * 64
+
+    def add(self, sequence, payload, expected):
+        self.batches += 1
+        self.size += len(payload)
+        self.records += expected["records"]
+        self.digest = corpus.fnv(struct.pack(">QQQ", sequence, expected["records"], expected["digest"]), self.digest)
+        self.counts = [a + b for a, b in zip(self.counts, expected["counts"])]
+        self.sums = [a + b for a, b in zip(self.sums, expected["sums"])]
+
+    def pack(self, extra_batches=0):
+        return TOTAL.pack(self.batches + extra_batches, self.size, self.records, self.digest, *self.counts, *self.sums)
+
+
+class Server:
+    """A server under test, stopped through --control-stdin; stop() returns its final JSON."""
+
+    def __init__(self, binary, *options):
+        self.port = free_port()
+        self.process = subprocess.Popen(command(Path(binary)) + ["server", "--port", str(self.port),
+                                                                "--control-stdin", "1", *options],
+                                        cwd=ROOT, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                        stderr=subprocess.PIPE, text=True)
+        ready = self.process.stdout.readline()
+        assert json.loads(ready)["event"] == "ready", ready
+
+    def connect(self):
+        sock = connection(self.port)
+        begin(sock)
+        return sock
+
+    def stop(self, timeout=10):
+        out, err = self.process.communicate("stop\n", timeout=timeout)
+        assert self.process.returncode == 0, err
+        return json.loads(out.strip().splitlines()[-1])
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_):
+        if self.process.poll() is None:
+            self.process.kill()
+            self.process.communicate()
+
+
+def run_protocol(port):
     valid, invalid = fixtures()
     checks = 0
     for payload in valid:
@@ -119,10 +182,9 @@ def run_protocol(port, mode):
             expected = corpus.process(payload)
             assert ACK.unpack(response(sock, 2, 2)) == (expected["records"], expected["digest"])
             sock.sendall(frame(3, 3))
-            result = TOTAL.unpack(response(sock, 3, 3))
-            digest = corpus.fnv(struct.pack(">QQQ", 2, expected["records"], expected["digest"]))
-            assert result == (1, len(payload), expected["records"], digest,
-                              *expected["counts"], *expected["sums"]), "End summary"
+            summary = Summary()
+            summary.add(2, payload, expected)
+            assert response(sock, 3, 3) == summary.pack(), "End summary"
         checks += 1
 
     # Coalescing, deterministic repeated reuse/eviction, epoch reset, and half-close.
@@ -131,19 +193,13 @@ def run_protocol(port, mode):
         for epoch in range(2):
             begin(sock, sequence)
             sequence += 1
-            expected_digest, expected_bytes, records = corpus.OFFSET, 0, 0
-            counts, sums = [0] * 64, [0] * 64
-            requests, expected_responses = [], []
+            summary, requests, expected_responses = Summary(), [], []
             for i in range(24):
                 payload = encode([event(id=i + epoch * 100, message="reuse" * (i + 1))])
                 expected = corpus.process(payload)
                 requests.append(frame(2, sequence, payload))
                 expected_responses.append((sequence, expected))
-                expected_digest = corpus.fnv(struct.pack(">QQQ", sequence, expected["records"], expected["digest"]), expected_digest)
-                expected_bytes += len(payload)
-                records += expected["records"]
-                counts = [a + b for a, b in zip(counts, expected["counts"])]
-                sums = [a + b for a, b in zip(sums, expected["sums"])]
+                summary.add(sequence, payload, expected)
                 sequence += 1
             requests.append(frame(3, sequence))
             sock.sendall(b"".join(requests))
@@ -151,8 +207,7 @@ def run_protocol(port, mode):
                 sock.shutdown(socket.SHUT_WR)
             for seq, expected in expected_responses:
                 assert ACK.unpack(response(sock, 2, seq)) == (expected["records"], expected["digest"])
-            assert TOTAL.unpack(response(sock, 3, sequence)) == (
-                24, expected_bytes, records, expected_digest, *counts, *sums)
+            assert response(sock, 3, sequence) == summary.pack()
             sequence += 1
         expect_closed(sock)
     checks += 1
@@ -220,65 +275,22 @@ def oracle_checks():
     return len(valid) + len(invalid) + 3
 
 
-def command(binary):
-    return ["dotnet", str(binary)] if binary.suffix == ".dll" else [str(binary)]
-
-
-def start_server(binary, mode, folder):
-    with socket.socket() as temporary:
-        temporary.bind(("127.0.0.1", 0))
-        port = temporary.getsockname()[1]
-    folder.mkdir(parents=True, exist_ok=True)
-    log = (folder / f"{mode}.log").open("w", encoding="utf-8")
-    process = subprocess.Popen(command(binary) + ["server", "--port", str(port), "--mode", mode,
-        "--max-frame", "65536", "--workers", "2", "--idle-timeout-ms", "250",
-        "--frame-timeout-ms", "1500", "--run-seconds", "120"],
-        cwd=ROOT, stdout=log, stderr=subprocess.STDOUT)
-    deadline = time.monotonic() + 20
-    while time.monotonic() < deadline:
-        if process.poll() is not None:
-            log.close()
-            raise AssertionError(f"Server exited {process.returncode}; see {folder}")
-        try:
-            with connection(port):
-                return process, log, port
-        except OSError:
-            time.sleep(0.05)
-    process.kill()
-    process.wait()
-    log.close()
-    raise AssertionError("Server did not become ready")
-
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--server", type=Path)
     parser.add_argument("--modes", nargs="+", default=["aggregate", "retain-reuse", "retain-allocate"])
-    parser.add_argument("--export-fixtures", action="store_true")
+    parser.add_argument("--export-fixtures", action="store_true", help="rewrite tests/fixtures/golden.bin")
     args = parser.parse_args()
     count = oracle_checks()
     if args.export_fixtures:
-        folder = ROOT / "tests" / "fixtures"
-        folder.mkdir(parents=True, exist_ok=True)
-        valid, invalid = fixtures()
-        for group, payloads in [("valid", valid), ("invalid", invalid)]:
-            for index, payload in enumerate(payloads):
-                (folder / f"{group}-{index:02}.json").write_bytes(payload)
-        corpus.write_frames(folder / "golden.bin", valid)
-        (folder / "golden.json").write_text(json.dumps([corpus.process(p) for p in valid], indent=2), encoding="utf-8")
-    if args.server:
-        binary = args.server.resolve()
-        for mode in args.modes:
-            process, log, port = start_server(binary, mode, ROOT / "results" / "conformance" / binary.stem)
-            try:
-                checks = run_protocol(port, mode)
-                count += checks
-                print(json.dumps({"server": str(binary), "mode": mode, "passed": checks}), flush=True)
-            finally:
-                if process.poll() is None:
-                    process.terminate()
-                process.wait(timeout=10)
-                log.close()
+        corpus.write_frames(ROOT / "tests/fixtures/golden.bin", fixtures()[0])
+    for mode in args.modes if args.server else []:
+        with Server(args.server.resolve(), "--mode", mode, "--max-frame", "65536", "--workers", "2",
+                    "--idle-timeout-ms", "250", "--frame-timeout-ms", "1500") as server:
+            checks = run_protocol(server.port)
+            assert server.stop()["valid"]
+        count += checks
+        print(json.dumps({"server": str(args.server), "mode": mode, "passed": checks}), flush=True)
     print(json.dumps({"total_checks": count, "status": "passed"}))
 
 

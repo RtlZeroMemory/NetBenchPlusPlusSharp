@@ -1,0 +1,6 @@
+release suite passed
+asan suite passed
+corpus oracle 10/10
+smoke 18/18, schema ok
+frozen; campaign started 2026-09-29T16:00:06Z
+campaign finished 2026-09-29T20:21:39Z

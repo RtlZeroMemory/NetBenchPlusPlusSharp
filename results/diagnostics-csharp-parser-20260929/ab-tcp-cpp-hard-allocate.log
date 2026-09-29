@@ -1,0 +1,12 @@
+{"trial": 1, "cell": "hard-allocate-cpp-prechunk", "server": "cpp", "error": null, "seconds": 51.6}
+{"label": "cpp-prechunk", "round": 0, "records_per_second": 2505688.3, "p99_ms": 8.912895, "server_cores_used": 3.956331310694934, "gc_gen0": null, "gc_gen1": null, "gc_gen2": null, "gc_pause_ms": null, "allocated_bytes_per_record": 1326.1012093942434, "server_peak_working_set_mib": 240.3359375, "exclusion": ""}
+{"trial": 2, "cell": "hard-allocate-cpp-chunked", "server": "cpp", "error": null, "seconds": 51.6}
+{"label": "cpp-chunked", "round": 0, "records_per_second": 2464050.6666666665, "p99_ms": 9.109503, "server_cores_used": 3.941145129132073, "gc_gen0": null, "gc_gen1": null, "gc_gen2": null, "gc_pause_ms": null, "allocated_bytes_per_record": 828.8351058653129, "server_peak_working_set_mib": 202.4296875, "exclusion": ""}
+{"trial": 3, "cell": "hard-allocate-cpp-chunked", "server": "cpp", "error": null, "seconds": 51.5}
+{"label": "cpp-chunked", "round": 1, "records_per_second": 2435539.3666666667, "p99_ms": 9.175039, "server_cores_used": 3.9411366785148725, "gc_gen0": null, "gc_gen1": null, "gc_gen2": null, "gc_pause_ms": null, "allocated_bytes_per_record": 828.8368879085559, "server_peak_working_set_mib": 198.2265625, "exclusion": ""}
+{"trial": 4, "cell": "hard-allocate-cpp-prechunk", "server": "cpp", "error": null, "seconds": 51.5}
+{"label": "cpp-prechunk", "round": 1, "records_per_second": 2446855.8, "p99_ms": 9.338879, "server_cores_used": 3.924508870616431, "gc_gen0": null, "gc_gen1": null, "gc_gen2": null, "gc_pause_ms": null, "allocated_bytes_per_record": 1326.1379704838375, "server_peak_working_set_mib": 241.69140625, "exclusion": ""}
+{"trial": 5, "cell": "hard-allocate-cpp-prechunk", "server": "cpp", "error": null, "seconds": 51.5}
+{"label": "cpp-prechunk", "round": 2, "records_per_second": 2458724.2333333334, "p99_ms": 9.207807, "server_cores_used": 3.949010207994351, "gc_gen0": null, "gc_gen1": null, "gc_gen2": null, "gc_pause_ms": null, "allocated_bytes_per_record": 1326.1512182976282, "server_peak_working_set_mib": 240.7109375, "exclusion": ""}
+{"trial": 6, "cell": "hard-allocate-cpp-chunked", "server": "cpp", "error": null, "seconds": 51.5}
+{"label": "cpp-chunked", "round": 2, "records_per_second": 2466594.6666666665, "p99_ms": 9.273343, "server_cores_used": 3.932771426842931, "gc_gen0": null, "gc_gen1": null, "gc_gen2": null, "gc_pause_ms": null, "allocated_bytes_per_record": 828.8561019351785, "server_peak_working_set_mib": 198.33203125, "exclusion": ""}

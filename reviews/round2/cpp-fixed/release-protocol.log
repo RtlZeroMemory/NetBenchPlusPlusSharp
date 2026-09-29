@@ -1,0 +1,4 @@
+{"server": "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe", "mode": "aggregate", "passed": 63}
+{"server": "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe", "mode": "retain-reuse", "passed": 63}
+{"server": "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe", "mode": "retain-allocate", "passed": 63}
+{"total_checks": 236, "status": "passed"}

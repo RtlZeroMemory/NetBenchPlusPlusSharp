@@ -1,0 +1,12 @@
+{
+  "format": "TCPBCH01",
+  "frames": 129,
+  "payload_bytes": 8443431,
+  "records": 52182,
+  "sha256": "64843560173c589ad587b50d0fe7e7c72533a3a174d2cddca492fba144c00201",
+  "seed": 20260929,
+  "profile": "easy",
+  "target_frame_bytes": 65536,
+  "min_frame_bytes": null,
+  "generator": "Python stdlib random; exact payloads are authoritative"
+}

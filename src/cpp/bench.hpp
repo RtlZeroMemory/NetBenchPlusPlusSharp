@@ -3,43 +3,28 @@
 
 #include <windows.h>
 
-#include <psapi.h>
 #include <simdjson.h>
 
-#include <algorithm>
 #include <array>
 #include <atomic>
-#include <bit>
-#include <charconv>
-#include <chrono>
-#include <climits>
-#include <cmath>
-#include <condition_variable>
 #include <cstdint>
-#include <cstdio>
-#include <cstring>
-#include <fstream>
-#include <iomanip>
-#include <iostream>
-#include <limits>
-#include <map>
 #include <memory>
-#include <mutex>
-#include <span>
-#include <sstream>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <string_view>
-#include <thread>
-#include <type_traits>
 #include <utility>
 #include <vector>
 
 namespace bench
 {
-constexpr uint64_t offset = 14695981039346656037ull, prime = 1099511628211ull;
-constexpr size_t hard_limit = 16777216, summary_size = 1056;
-using Bytes = std::vector<uint8_t>;
+constexpr uint64_t fnv_offset = 14695981039346656037ull;
+constexpr uint64_t fnv_prime = 1099511628211ull;
+constexpr size_t header_bytes = 16;
+constexpr size_t summary_bytes = 1056;
+constexpr size_t hard_limit = size_t(16) << 20;
+constexpr uint64_t epoch_record_limit = 1000000000;
+constexpr uint64_t stage_sample_every = 1024;
 
 [[noreturn]] inline void fail(std::string_view reason)
 {
@@ -57,112 +42,127 @@ inline void require(bool ok, std::string_view reason)
 inline uint64_t read_be(const uint8_t *p, size_t n)
 {
     uint64_t x = 0;
-    while (n--)
+    for (size_t i = 0; i < n; ++i)
     {
-        x = (x << 8) | *p++;
+        x = (x << 8) | p[i];
     }
     return x;
 }
 
 inline void write_be(uint8_t *p, uint64_t x, size_t n)
 {
-    while (n)
+    for (size_t i = n; i > 0; --i)
     {
-        p[--n] = uint8_t(x);
+        p[i - 1] = uint8_t(x);
         x >>= 8;
     }
 }
 
 inline void hash_byte(uint64_t &h, uint8_t v)
 {
-    h = (h ^ v) * prime;
+    h = (h ^ v) * fnv_prime;
 }
 
+// Big-endian FNV-1a over n bytes of v; n is a compile-time constant at every call site.
 inline void hash_int(uint64_t &h, uint64_t v, size_t n)
 {
-    for (size_t i = n; i; --i)
+    for (size_t i = n; i > 0; --i)
     {
         hash_byte(h, uint8_t(v >> ((i - 1) * 8)));
     }
 }
 
-inline int64_t now()
+// QueryPerformanceCounter ticks: the only benchmark clock.
+int64_t now();
+int64_t frequency();
+uint64_t to_ns(int64_t ticks);
+int64_t to_ticks(double seconds);
+double to_seconds(int64_t ticks);
+
+enum class Mode
 {
-    LARGE_INTEGER v;
-    QueryPerformanceCounter(&v);
-    return v.QuadPart;
+    aggregate,
+    retain_reuse,
+    retain_allocate,
+    transport
+};
+
+inline bool retains(Mode m)
+{
+    return m == Mode::retain_reuse || m == Mode::retain_allocate;
 }
 
-inline int64_t frequency()
-{
-    static auto f = [] {
-        LARGE_INTEGER v;
-        QueryPerformanceFrequency(&v);
-        return v.QuadPart;
-    }();
-    return f;
-}
-
-inline double seconds(int64_t ticks)
-{
-    return double(ticks) / double(frequency());
-}
-
-inline uint64_t nanoseconds(int64_t ticks)
-{
-    return ticks <= 0 ? 0 : uint64_t((long double)ticks * 1000000000.0L / frequency());
-}
-
-inline int64_t ticks(double sec)
-{
-    return int64_t(sec * double(frequency()));
-}
-
-inline std::string escaped(std::string_view s)
-{
-    std::string r = "\"";
-    for (unsigned char c : s)
-    {
-        if (c == '"' || c == '\\')
-        {
-            r += '\\';
-            r += char(c);
-        }
-        else if (c < 32)
-        {
-            char b[7];
-            std::snprintf(b, 7, "\\u%04x", c);
-            r += b;
-        }
-        else
-        {
-            r += char(c);
-        }
-    }
-    return r + '"';
-}
+std::string_view mode_name(Mode m);
 
 struct Options
 {
-    std::string command, mode = "aggregate", corpus, output, arrival = "steady";
+    std::string command, corpus, output, arrival = "steady";
+    Mode mode = Mode::aggregate;
     int port = 9000, max_connections = 32, workers = 4, connections = 4, window = 8;
-    size_t max_frame = 1048576, retain_batches = 8, retain_bytes = 67108864,
-           inflight_bytes = 67108864;
-    int idle_ms = 5000, frame_ms = 30000, socket_buffer = 262144, pause_every = 0, pause_ms = 0,
-        io_cap = 0, control_stdin = 0;
-    double duration = 10, warmup = 2, rate = 0, drain = 30, run_seconds = 0;
+    int idle_ms = 5000, frame_ms = 30000, socket_buffer = 262144, pause_every = 0, pause_ms = 0;
+    int io_cap = 0, control_stdin = 0;
+    size_t max_frame = 1048576, retain_batches = 8, retain_bytes = 67108864;
+    size_t inflight_bytes = 67108864;
+    double duration = 10, warmup = 2, rate = 0, drain = 30;
     uint64_t seed = 42;
     std::array<uint8_t, 32> manifest{};
 };
 
-Options options(int argc, char **argv);
-void emit(const Options &, const std::string &);
-std::string resources();
-std::string build_info();
+Options parse_options(int argc, char **argv);
+
+// Minimal streaming JSON writer: commas and nesting are tracked, values are written as given.
+class Json
+{
+    std::string out;
+    std::vector<bool> first;
+
+    void key(std::string_view k);
+
+  public:
+    Json &open(std::string_view k = {});
+    Json &open_array(std::string_view k = {});
+    Json &close();
+    Json &close_array();
+    Json &raw(std::string_view k, std::string_view json);
+    Json &str(std::string_view k, std::string_view v);
+    Json &num(std::string_view k, uint64_t v);
+    Json &num(std::string_view k, int64_t v);
+
+    Json &num(std::string_view k, int v)
+    {
+        return num(k, int64_t(v));
+    }
+
+    Json &num(std::string_view k, double v);
+    Json &boolean(std::string_view k, bool v);
+    Json &null(std::string_view k);
+    std::string take();
+};
+
+std::string quoted(std::string_view s);
+
+// Shared log-linear histogram: exact ns through 1023, then 256 buckets per power of two up
+// to 2^36 ns. Values of at least 60 s count as overflow and have no finite bucket.
+struct Histogram
+{
+    static constexpr size_t bins = 1024 + 26 * 256;
+    static constexpr uint64_t overflow_ns = 60000000000ull;
+    std::vector<uint64_t> counts = std::vector<uint64_t>(bins);
+    uint64_t count = 0, maximum = 0, overflow = 0;
+
+    static size_t index(uint64_t ns);
+    static uint64_t upper(size_t index);
+    void add(uint64_t ns);
+    void merge(const Histogram &other);
+    void clear();
+    std::optional<uint64_t> quantile(double q) const;
+    // Stage histograms suppress p99 below 10,000 and p99.9 below 1,000,000 samples.
+    void write(Json &json, std::string_view key, bool stage = false) const;
+};
 
 struct Result
 {
-    uint64_t records = 0, digest = offset;
+    uint64_t records = 0, digest = fnv_offset;
     std::array<uint64_t, 64> counts{};
     std::array<int64_t, 64> sums{};
     bool operator==(const Result &) const = default;
@@ -170,14 +170,15 @@ struct Result
 
 struct Epoch
 {
-    uint64_t batches = 0, bytes = 0, records = 0, digest = offset;
+    uint64_t batches = 0, bytes = 0, records = 0, digest = fnv_offset;
     std::array<uint64_t, 64> counts{};
     std::array<int64_t, 64> sums{};
-    void check(const Result &, size_t) const;
-    void add(const Result &, size_t, uint64_t);
-    std::array<uint8_t, summary_size> encode() const;
+    void check(const Result &r) const;
+    void add(const Result &r, size_t payload, uint64_t sequence);
+    std::array<uint8_t, summary_bytes> encode() const;
 };
 
+// Owned, canonical record. `begin`/`length` index the batch's own text storage.
 struct Row
 {
     uint64_t id = 0, timestamp = 0;
@@ -185,173 +186,99 @@ struct Row
     int64_t value = 0;
     uint8_t kind = 0;
 };
+static_assert(sizeof(Row) == 48, "owned-capacity accounting assumes 48-byte rows in both implementations");
 
+// Chunked like the managed side, so no single block grows large: the first chunk grows geometrically
+// from 16 rows / 256 bytes, later chunks are allocated full (1,024 rows, 64 KiB of text). A message
+// (at most 4 KiB) never straddles chunks; Row::begin is chunk * 65,536 + position.
 struct Batch
 {
-    std::vector<Row> rows;
-    Bytes text;
-    uint64_t canonical = 0, digest = offset;
-
+    static constexpr size_t row_chunk = 1024, text_chunk = 65536;
+    std::vector<std::vector<Row>> rows;
+    std::vector<std::vector<uint8_t>> text;
+    size_t count = 0, current = 0; // records; text chunk being filled
+    uint64_t canonical = 0, digest = fnv_offset;
     void clear()
     {
-        rows.clear();
-        text.clear();
+        for (auto &r : rows)
+            r.clear();
+        for (auto &t : text)
+            t.clear();
+        count = current = 0;
         canonical = 0;
-        digest = offset;
     }
 };
 
-// A missing deadline permits processing-only work and quiet-connection EOF verification.
-// Server work also observes shutdown. Checks allocate only when they throw.
-struct ProcessingBudget
+// Cooperative processing budget: shutdown plus the earlier of frame/idle deadlines.
+struct Budget
 {
-    const std::atomic<bool> *stopping = nullptr;
+    const std::atomic<bool> *stop = nullptr;
     int64_t deadline = 0;
-    std::string_view timeout = "frame_timeout";
-
-    std::string_view expired(int64_t stamp) const
-    {
-        if (stopping && stopping->load(std::memory_order_relaxed))
-        {
-            return "shutdown";
-        }
-        return deadline && stamp >= deadline ? timeout : std::string_view{};
-    }
-
-    void check() const
-    {
-        auto reason = expired(deadline ? now() : 0);
-        require(reason.empty(), reason);
-    }
+    std::string_view reason = "frame_timeout";
+    void check() const;
 };
 
 class Processor
 {
+    Mode mode;
+    size_t retain_batches;
+    uint64_t retain_bytes;
     simdjson::ondemand::parser parser;
-    std::string mode;
-    size_t cap_bytes, cap_batches, scratch = 0;
-    std::vector<Batch> slots;
-    std::vector<size_t> live;
-    Result parse(const uint8_t *data,
-                 size_t length,
-                 size_t capacity,
-                 bool sample,
-                 const ProcessingBudget &budget);
-    Result visit(const Batch &batch, const ProcessingBudget &budget) const;
+    std::vector<Batch> pool;   // retain_batches + 1 slots in retained modes
+    std::vector<size_t> live;  // committed slots, oldest first
+    std::vector<size_t> spare; // uncommitted slots; back() is the next scratch
+    Result parse(
+        const uint8_t *data, size_t length, size_t capacity, Batch *batch, const Budget &budget);
+    Result visit(const Batch &batch, const Budget &budget) const;
+    void observe_owned();
 
   public:
-    uint64_t retained = 0, peak_retained = 0;
-    size_t peak_owned = 0;
-    uint64_t last_decode_ns = 0, last_visit_ns = 0;
-    Processor(const Options &options);
+    uint64_t retained = 0, peak_retained = 0, peak_owned = 0;
+    uint64_t last_decode_ticks = 0, last_visit_ticks = 0;
+    Processor(Mode mode, size_t max_frame, size_t retain_batches, uint64_t retain_bytes);
+    // Validates, processes and commits one batch, or throws with no committed change.
     Result apply(const uint8_t *data,
                  size_t length,
                  size_t capacity,
                  Epoch &epoch,
                  uint64_t sequence,
-                 bool sample = false,
-                 const ProcessingBudget &budget = {});
-    void verify(const ProcessingBudget &budget = {}) const;
-    size_t owned_capacity() const;
+                 const Budget &budget = {},
+                 bool sample = false);
+    void verify(const Budget &budget = {}) const;
+    uint64_t owned_capacity() const;
+
+    Batch &live_batch(size_t i) // selftest hook
+    {
+        return pool[live.at(i)];
+    }
 };
 
 struct Frame
 {
-    Bytes payload;
+    std::vector<uint8_t> payload; // length + SIMDJSON_PADDING bytes
     size_t length = 0;
     Result expected;
 };
 
-std::vector<Frame> load_corpus(const std::string &);
-void selftest();
-void load_selftest();
-int server(const Options &);
-int client(const Options &);
-int process(const Options &);
-
-struct Histogram
+struct Corpus
 {
-    // Exact ns through 1023; 256 sub-buckets per power of two, with explicit >=60s overflow.
-    static constexpr size_t slots = 1024 + 54 * 256;
-    std::array<uint64_t, slots> buckets{};
-    uint64_t count = 0, maximum = 0, overflow = 0;
-
-    void clear()
-    {
-        buckets.fill(0);
-        count = maximum = overflow = 0;
-    }
-
-    void merge(const Histogram &h)
-    {
-        for (size_t i = 0; i < slots; ++i)
-        {
-            buckets[i] += h.buckets[i];
-        }
-        count += h.count;
-        maximum = std::max(maximum, h.maximum);
-        overflow += h.overflow;
-    }
-
-    static size_t index(uint64_t v)
-    {
-        if (v < 1024)
-        {
-            return size_t(v);
-        }
-        unsigned e = std::bit_width(v) - 1;
-        return 1024 + (e - 10) * 256 + size_t((v >> (e - 8)) - 256);
-    }
-
-    static uint64_t upper(size_t i)
-    {
-        if (i < 1024)
-        {
-            return i;
-        }
-        size_t n = i - 1024;
-        unsigned shift = unsigned(n / 256) + 2;
-        uint64_t a = 257 + n % 256;
-        if (shift >= 64 || a > (UINT64_MAX >> shift))
-        {
-            return UINT64_MAX;
-        }
-        return (a << shift) - 1;
-    }
-
-    void add(uint64_t v)
-    {
-        ++count;
-        maximum = std::max(maximum, v);
-        if (v >= 60000000000ull)
-        {
-            ++overflow;
-        }
-        else
-        {
-            ++buckets[index(v)];
-        }
-    }
-
-    std::string quantile(double q) const
-    {
-        if (!count)
-        {
-            return "null";
-        }
-        uint64_t target = uint64_t(std::ceil(q * double(count))), n = 0;
-        for (size_t i = 0; i < slots; ++i)
-        {
-            if ((n += buckets[i]) >= target)
-            {
-                return std::to_string(upper(i));
-            }
-        }
-        return "null";
-    }
-
-    std::string json(bool stage = false) const;
+    std::vector<Frame> frames;
+    uint64_t payload_bytes = 0, max_frame = 0;
 };
+
+Corpus load_corpus(const std::string &path);
+Result transport_result(size_t length);
+
+// Timestamped process snapshot; `new_calls`/`new_bytes` count global operator new.
+struct Resources
+{
+    int64_t at = 0;
+    double cpu_seconds = 0;
+    uint64_t peak_working_set = 0, new_calls = 0, new_bytes = 0;
+    static Resources sample();
+};
+
+void write_build(Json &json);
 
 struct Socket
 {
@@ -362,24 +289,22 @@ struct Socket
 
     Socket(const Socket &) = delete;
     Socket &operator=(const Socket &) = delete;
-
-    Socket(Socket &&s) noexcept : value(std::exchange(s.value, INVALID_SOCKET)) {}
-
-    ~Socket()
-    {
-        if (value != INVALID_SOCKET)
-        {
-            closesocket(value);
-        }
-    }
+    ~Socket();
 };
 
-void socket_options(SOCKET socket, const Options &options);
-void socket_buffers(SOCKET socket, int &send, int &receive);
-extern std::atomic<uint64_t> blocking_sends, blocking_receives, blocking_sent_bytes,
-    blocking_received_bytes;
-void send_exact(SOCKET socket, const uint8_t *data, size_t length, int cap, int64_t deadline);
-void receive_exact(SOCKET socket, uint8_t *data, size_t length, int cap, int64_t deadline);
-std::array<uint8_t, 16> header(uint16_t type, uint64_t sequence, size_t length);
-void check_response(const uint8_t *data, uint16_t type, uint64_t sequence, size_t length);
+// TCP_NODELAY always; buffer sizes only when positive (0 keeps Windows autotuning).
+void configure_socket(SOCKET s, int buffer);
+std::pair<int, int> socket_buffers(SOCKET s); // effective SO_SNDBUF, SO_RCVBUF
+sockaddr_in loopback(int port);
+std::array<uint8_t, header_bytes> make_header(uint16_t type, uint64_t sequence, size_t length);
+
+// Diagnostic delay: a budget-checked busy spin, so sub-millisecond pauses are honoured.
+void spin_pause(int milliseconds, const Budget &budget);
+
+int run_server(const Options &o);
+int run_client(const Options &o);
+int run_process(const Options &o);
+int run_selftest(const std::string &corpus);
+void client_selftest();
+void emit(const Options &o, const std::string &json);
 } // namespace bench

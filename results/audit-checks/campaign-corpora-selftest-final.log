@@ -1,0 +1,42 @@
+8fb2ec5dbe23e2da4226514292d610290abf7b22e4b617c1f8bf7d559a090eb9 *src/cpp/build/Release/tcpbench.exe
+9baa04d7e578106cc752214408607c2ac6ce5bf81b4dbeae642cf60eedac603b *src/dotnet/bin/Release/net11.0/Bench.dll
+== easy64k-easy-536870912-65536-101
+{"event":"selftest","valid":true,"checks":24802,"canonical_digest":3660725836179230917}
+
+{"event":"selftest","valid":true,"checks":100426,"canonical_digest":3660725836179230917}
+
+== hard64k-hard-536870912-65536-203
+{"event":"selftest","valid":true,"checks":25219,"canonical_digest":3660725836179230917}
+
+{"event":"selftest","valid":true,"checks":100843,"canonical_digest":3660725836179230917}
+
+== hardmix-hard-1073741824-1048576-202
+{"event":"selftest","valid":true,"checks":17515,"canonical_digest":3660725836179230917}
+
+{"event":"selftest","valid":true,"checks":93139,"canonical_digest":3660725836179230917}
+
+== mixed64k-mixed-268435456-65536-42
+{"event":"selftest","valid":true,"checks":12502,"canonical_digest":3660725836179230917}
+
+{"event":"selftest","valid":true,"checks":88126,"canonical_digest":3660725836179230917}
+
+== mixed1m-mixed-268435456-1048576-42
+{"event":"selftest","valid":true,"checks":964,"canonical_digest":3660725836179230917}
+
+{"event":"selftest","valid":true,"checks":76588,"canonical_digest":3660725836179230917}
+
+== easy64k-easy-536870912-65536-101
+{"event":"selftest","valid":true,"checks":24802,"canonical_digest":3660725836179230917}
+
+== hard64k-hard-536870912-65536-203
+{"event":"selftest","valid":true,"checks":25219,"canonical_digest":3660725836179230917}
+
+== hardmix-hard-1073741824-1048576-202
+{"event":"selftest","valid":true,"checks":17515,"canonical_digest":3660725836179230917}
+
+== mixed64k-mixed-268435456-65536-42
+{"event":"selftest","valid":true,"checks":12502,"canonical_digest":3660725836179230917}
+
+== mixed1m-mixed-268435456-1048576-42
+{"event":"selftest","valid":true,"checks":964,"canonical_digest":3660725836179230917}
+

@@ -1,0 +1,10 @@
+transport server.json only C++: [] only C#: ['measured.gc.gen0', 'measured.gc.gen1', 'measured.gc.gen2', 'measured.gc.pause_seconds']
+hard-reuse server.json only C++: [] only C#: ['measured.gc.gen0', 'measured.gc.gen1', 'measured.gc.gen2', 'measured.gc.pause_seconds']
+hard-allocate server.json only C++: [] only C#: ['measured.gc.gen0', 'measured.gc.gen1', 'measured.gc.gen2', 'measured.gc.pause_seconds']
+easy-aggregate-csclient server.json only C++: [] only C#: ['measured.gc.gen0', 'measured.gc.gen1', 'measured.gc.gen2', 'measured.gc.pause_seconds']
+easy-aggregate server.json only C++: [] only C#: ['measured.gc.gen0', 'measured.gc.gen1', 'measured.gc.gen2', 'measured.gc.pause_seconds']
+easy-aggregate-paced server.json only C++: [] only C#: ['measured.gc.gen0', 'measured.gc.gen1', 'measured.gc.gen2', 'measured.gc.pause_seconds']
+hard-poisson server.json only C++: [] only C#: ['measured.gc.gen0', 'measured.gc.gen1', 'measured.gc.gen2', 'measured.gc.pause_seconds']
+hard-burst server.json only C++: [] only C#: ['measured.gc.gen0', 'measured.gc.gen1', 'measured.gc.gen2', 'measured.gc.pause_seconds']
+process-hard server.json only C++: [] only C#: ['resources.gc.gen0', 'resources.gc.gen1', 'resources.gc.gen2', 'resources.gc.pause_seconds']
+schema differences: 9

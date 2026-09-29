@@ -1,0 +1,21 @@
+{
+  "binary_sha256": "60899c2ca28565d3a85b4b7609a1eefd0f57a49684929c897c1eefe69b3ba8c7",
+  "stage_probe_command": "dotnet run --project reviews/csharp-measurement/binary-postfix/probe/PostfixProbe.csproj --configuration Release -- src/dotnet/bin/Release/net11.0/Bench.dll",
+  "stage_probe_exit_code": 0,
+  "stage_checkpoints": [
+    {"count": 1, "p99": null, "p999": null},
+    {"count": 9999, "p99": null, "p999": null},
+    {"count": 10000, "p99": 1027, "p999": null},
+    {"count": 999999, "p99": 1027, "p999": null},
+    {"count": 1000000, "p99": 1027, "p999": 1027}
+  ],
+  "size_boundary_payload_bytes": [1, 4096, 4097, 65536, 65537, 262144, 262145, 1048576, 1048577, 16777216],
+  "size_boundary_expected_classes": [0, 0, 1, 1, 2, 2, 3, 3, 4, 4],
+  "all_five_empty_classes_preserved": true,
+  "raw_client_percentiles_unchanged": true,
+  "raw_stage_bucket_counts_preserved": true,
+  "histogram_probe_command": "dotnet reviews/csharp-measurement/bin/Release/net11.0/Probe.dll src/dotnet/bin/Release/net11.0/Bench.dll",
+  "histogram_probe_exit_code": 0,
+  "histogram_samples": 100091,
+  "status": "passed"
+}

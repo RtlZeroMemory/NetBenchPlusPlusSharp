@@ -1,0 +1,60 @@
+{
+  "binary_sha256": "cb2e213e9089d240236fcfa52dede69c8ef1bd4fe064d65592123c237f570fdd",
+  "cases": [
+    {
+      "case": "aggregate-partial",
+      "seconds": 0.1047041000056197,
+      "status": "passed"
+    },
+    {
+      "case": "aggregate-pause",
+      "seconds": 0.10949760000221431,
+      "status": "passed"
+    },
+    {
+      "case": "aggregate-cpu",
+      "seconds": 0.1039325999954599,
+      "status": "passed"
+    },
+    {
+      "case": "retain-reuse-pause",
+      "seconds": 0.10275510000064969,
+      "status": "passed"
+    },
+    {
+      "case": "retain-reuse-cpu",
+      "seconds": 0.10351200000150129,
+      "status": "passed"
+    },
+    {
+      "case": "retain-allocate-pause",
+      "seconds": 0.11244309999892721,
+      "status": "passed"
+    },
+    {
+      "case": "retain-allocate-cpu",
+      "seconds": 0.10397530000045663,
+      "status": "passed"
+    },
+    {
+      "case": "transport-idle",
+      "seconds": 0.11702800000057323,
+      "status": "passed"
+    },
+    {
+      "case": "shutdown-pause",
+      "seconds": 0.03696969999873545,
+      "status": "passed"
+    },
+    {
+      "case": "retain-reuse-capacity-quiet-eof",
+      "owned_peak": 3536,
+      "status": "passed"
+    },
+    {
+      "case": "retain-allocate-capacity-quiet-eof",
+      "owned_peak": 3536,
+      "status": "passed"
+    }
+  ]
+}

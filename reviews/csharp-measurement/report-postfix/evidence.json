@@ -1,0 +1,39 @@
+{
+  "report_sha256": "a6d3199f382e6977c789e48618a0d85912c79d5d5ec7dbf066ae54e5080e281e",
+  "gates": {
+    "case_count": 13,
+    "raw_trial_count": 26,
+    "eligible_pair_count": 1,
+    "overload_retained": true,
+    "native_aliases_preserved": true
+  },
+  "identity": {
+    "fields_independently_separated": [
+      "corpus_sha256",
+      "window",
+      "duration",
+      "warmup",
+      "seed",
+      "arrival",
+      "phase"
+    ]
+  },
+  "existing": [
+    {
+      "source": "F:\\SocketServerClient\\results\\integration-smoke\\results.json",
+      "raw_trial_count": 24,
+      "cpp_client_trials": 12
+    },
+    {
+      "source": "F:\\SocketServerClient\\results\\large-frames-1790665249566346700\\results.json",
+      "raw_trial_count": 18,
+      "cpp_client_trials": 9
+    },
+    {
+      "source": "F:\\SocketServerClient\\results\\large-frames-1790666530090959100\\results.json",
+      "raw_trial_count": 18,
+      "cpp_client_trials": 9
+    }
+  ],
+  "original_report_sha256_unchanged": "b5e1728792a1ded9d4baf5656b69f07bac9a9677dc5ae15d609eece272c81f9e"
+}

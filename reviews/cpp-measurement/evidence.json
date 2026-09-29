@@ -1,0 +1,7661 @@
+{
+  "binary_sha256": {
+    "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe": "fe494c9bf033c15867de263994d3bcf288363285c94818b004775a294784361d",
+    "F:\\SocketServerClient\\src\\dotnet\\bin\\Release\\net11.0\\Bench.dll": "73489b69f86f49137b14fa8699ebf7929f4d9632e4937492e90deec55f0b4764"
+  },
+  "cases": [
+    {
+      "name": "steady",
+      "command": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "client",
+        "--port",
+        "62264",
+        "--corpus",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\empty.bin",
+        "--mode",
+        "transport",
+        "--connections",
+        "1",
+        "--duration",
+        "0.4",
+        "--warmup",
+        "0",
+        "--rate",
+        "100",
+        "--arrival",
+        "steady",
+        "--seed",
+        "42",
+        "--window",
+        "8",
+        "--drain-seconds",
+        "0.5",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\steady.json"
+      ],
+      "port": 62264,
+      "exit_code": 0,
+      "wall_seconds": 0.5027419999969425,
+      "after_first_request_seconds": 0.3940175000025192,
+      "peer_data_requests": 40,
+      "result": {
+        "kind": "client",
+        "language": "cpp",
+        "mode": "transport",
+        "success": true,
+        "valid": true,
+        "sustainable": true,
+        "implementation": "cpp23",
+        "compiler": "MSVC 195136260",
+        "cplusplus": 202400,
+        "build_configuration": "Release",
+        "windows_sdk": "10.0.26100.0",
+        "simdjson": "3.12.3",
+        "simdjson_implementation": "icelake",
+        "qpc_frequency": 10000000,
+        "sanitized": false,
+        "native_allocation_counters": null,
+        "native_allocation_note": "Use ETW heap diagnostic for full native allocation/free accounting; ordinary runs report process memory",
+        "resource_scope": "process-lifetime including setup warmup and shutdown; not measured-cohort CPU",
+        "cpu_seconds": 0.015625,
+        "private_bytes": 4710400,
+        "peak_commit_bytes": 4775936,
+        "working_set_bytes": 9904128,
+        "peak_working_set_bytes": 9904128,
+        "affinity_mask": 65535,
+        "duration_seconds": 0.4,
+        "window_seconds": 0.4,
+        "cohort_seconds": 0.4,
+        "drain_seconds": 0,
+        "offered": 40,
+        "admitted": 40,
+        "first_send_started": 40,
+        "acknowledged": 40,
+        "completed_frames": 40,
+        "rejected": 0,
+        "generator_late_rejected": 0,
+        "scheduler_late_count": 0,
+        "generator_adequate": true,
+        "pacing": "process-local high-resolution waitable timer plus <=200us spin",
+        "failed": 0,
+        "timedout": 0,
+        "unresolved": 0,
+        "completed_records": 0,
+        "completed_payload_bytes": 80,
+        "window_completed_frames": 40,
+        "window_records": 0,
+        "window_payload_bytes": 80,
+        "window_frames_per_second": 100,
+        "window_records_per_second": 0,
+        "window_payload_bytes_per_second": 200,
+        "cohort_frames_per_second": 100,
+        "queue_high_water": 1,
+        "inflight_bytes_high_water": 2,
+        "deadline_misses_1ms": 0,
+        "deadline_misses_5ms": 0,
+        "deadline_misses_10ms": 0,
+        "rate": 100,
+        "arrival": "steady",
+        "load_model": "scheduled",
+        "connections": 1,
+        "window": 8,
+        "inflight_bytes_limit": 67108864,
+        "unique_payload_bytes": 2,
+        "corpus_frames": 1,
+        "data_request_protocol_bytes": 720,
+        "data_ack_protocol_bytes": 1280,
+        "native_client_threads": 3,
+        "cursor_rule": "connection-local start=index; advance=connections per offered request; persists across phases",
+        "seed": 42,
+        "io_counter_scope": "process-lifetime including controls and warmup",
+        "send_operations": 83,
+        "receive_operations": 43,
+        "sent_protocol_bytes": 784,
+        "received_protocol_bytes": 2368,
+        "socket_buffer_requested": 262144,
+        "socket_send_buffer_effective": 262144,
+        "socket_receive_buffer_effective": 262144,
+        "scheduled_latency": {
+          "count": 40,
+          "p50_ns": 145919,
+          "p90_ns": 397311,
+          "p99_ns": 453631,
+          "p999_ns": 453631,
+          "max_ns": 453000,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              85503,
+              1
+            ],
+            [
+              86271,
+              1
+            ],
+            [
+              87551,
+              1
+            ],
+            [
+              88063,
+              1
+            ],
+            [
+              91135,
+              1
+            ],
+            [
+              97535,
+              1
+            ],
+            [
+              104959,
+              1
+            ],
+            [
+              110847,
+              1
+            ],
+            [
+              112127,
+              1
+            ],
+            [
+              113919,
+              1
+            ],
+            [
+              116479,
+              1
+            ],
+            [
+              116991,
+              1
+            ],
+            [
+              119039,
+              1
+            ],
+            [
+              119807,
+              1
+            ],
+            [
+              128511,
+              1
+            ],
+            [
+              129535,
+              1
+            ],
+            [
+              134655,
+              1
+            ],
+            [
+              139263,
+              1
+            ],
+            [
+              140287,
+              1
+            ],
+            [
+              145919,
+              1
+            ],
+            [
+              147967,
+              1
+            ],
+            [
+              180735,
+              1
+            ],
+            [
+              201727,
+              1
+            ],
+            [
+              203263,
+              1
+            ],
+            [
+              212479,
+              1
+            ],
+            [
+              214015,
+              1
+            ],
+            [
+              228351,
+              1
+            ],
+            [
+              233983,
+              1
+            ],
+            [
+              243711,
+              1
+            ],
+            [
+              253951,
+              1
+            ],
+            [
+              266239,
+              1
+            ],
+            [
+              280575,
+              1
+            ],
+            [
+              287743,
+              1
+            ],
+            [
+              308223,
+              1
+            ],
+            [
+              331775,
+              1
+            ],
+            [
+              397311,
+              1
+            ],
+            [
+              400383,
+              1
+            ],
+            [
+              409599,
+              1
+            ],
+            [
+              432127,
+              1
+            ],
+            [
+              453631,
+              1
+            ]
+          ]
+        },
+        "submitted_latency": {
+          "count": 40,
+          "p50_ns": 83711,
+          "p90_ns": 121343,
+          "p99_ns": 167423,
+          "p999_ns": 167423,
+          "max_ns": 167000,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              76287,
+              1
+            ],
+            [
+              76799,
+              1
+            ],
+            [
+              77055,
+              1
+            ],
+            [
+              79615,
+              1
+            ],
+            [
+              79871,
+              1
+            ],
+            [
+              80127,
+              1
+            ],
+            [
+              80383,
+              1
+            ],
+            [
+              80895,
+              1
+            ],
+            [
+              81407,
+              1
+            ],
+            [
+              81919,
+              1
+            ],
+            [
+              82175,
+              1
+            ],
+            [
+              82431,
+              1
+            ],
+            [
+              82943,
+              1
+            ],
+            [
+              83199,
+              2
+            ],
+            [
+              83455,
+              3
+            ],
+            [
+              83711,
+              2
+            ],
+            [
+              83967,
+              1
+            ],
+            [
+              86527,
+              1
+            ],
+            [
+              87295,
+              1
+            ],
+            [
+              87807,
+              1
+            ],
+            [
+              89599,
+              2
+            ],
+            [
+              90367,
+              1
+            ],
+            [
+              94719,
+              1
+            ],
+            [
+              95743,
+              1
+            ],
+            [
+              97279,
+              1
+            ],
+            [
+              102143,
+              1
+            ],
+            [
+              116479,
+              1
+            ],
+            [
+              116991,
+              1
+            ],
+            [
+              119807,
+              1
+            ],
+            [
+              121087,
+              1
+            ],
+            [
+              121343,
+              1
+            ],
+            [
+              124415,
+              1
+            ],
+            [
+              129791,
+              1
+            ],
+            [
+              138751,
+              1
+            ],
+            [
+              167423,
+              1
+            ]
+          ]
+        },
+        "client_delay": {
+          "count": 40,
+          "p50_ns": 61951,
+          "p90_ns": 279551,
+          "p99_ns": 315391,
+          "p999_ns": 315391,
+          "max_ns": 314600,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              4607,
+              1
+            ],
+            [
+              6815,
+              1
+            ],
+            [
+              7615,
+              1
+            ],
+            [
+              7807,
+              2
+            ],
+            [
+              7903,
+              1
+            ],
+            [
+              8703,
+              1
+            ],
+            [
+              9631,
+              1
+            ],
+            [
+              11615,
+              1
+            ],
+            [
+              18815,
+              1
+            ],
+            [
+              27135,
+              1
+            ],
+            [
+              29311,
+              1
+            ],
+            [
+              30335,
+              1
+            ],
+            [
+              31231,
+              1
+            ],
+            [
+              34303,
+              1
+            ],
+            [
+              35967,
+              1
+            ],
+            [
+              38655,
+              1
+            ],
+            [
+              40703,
+              1
+            ],
+            [
+              44671,
+              1
+            ],
+            [
+              61951,
+              1
+            ],
+            [
+              70911,
+              1
+            ],
+            [
+              99327,
+              1
+            ],
+            [
+              99839,
+              1
+            ],
+            [
+              111615,
+              1
+            ],
+            [
+              112895,
+              1
+            ],
+            [
+              113151,
+              1
+            ],
+            [
+              121599,
+              1
+            ],
+            [
+              132607,
+              1
+            ],
+            [
+              141311,
+              1
+            ],
+            [
+              160767,
+              1
+            ],
+            [
+              172543,
+              1
+            ],
+            [
+              196607,
+              1
+            ],
+            [
+              205311,
+              1
+            ],
+            [
+              221183,
+              1
+            ],
+            [
+              247807,
+              1
+            ],
+            [
+              279551,
+              1
+            ],
+            [
+              283647,
+              1
+            ],
+            [
+              308223,
+              1
+            ],
+            [
+              310271,
+              1
+            ],
+            [
+              315391,
+              1
+            ]
+          ]
+        },
+        "scheduler_lateness": {
+          "count": 40,
+          "p50_ns": 50815,
+          "p90_ns": 269311,
+          "p99_ns": 304127,
+          "p999_ns": 304127,
+          "max_ns": 303800,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              300,
+              8
+            ],
+            [
+              400,
+              2
+            ],
+            [
+              12415,
+              1
+            ],
+            [
+              19519,
+              1
+            ],
+            [
+              19839,
+              1
+            ],
+            [
+              23615,
+              1
+            ],
+            [
+              26751,
+              1
+            ],
+            [
+              29759,
+              1
+            ],
+            [
+              30527,
+              1
+            ],
+            [
+              34559,
+              1
+            ],
+            [
+              39807,
+              1
+            ],
+            [
+              50815,
+              1
+            ],
+            [
+              65279,
+              1
+            ],
+            [
+              85503,
+              1
+            ],
+            [
+              92415,
+              1
+            ],
+            [
+              105215,
+              1
+            ],
+            [
+              105727,
+              2
+            ],
+            [
+              106751,
+              1
+            ],
+            [
+              124927,
+              1
+            ],
+            [
+              129791,
+              1
+            ],
+            [
+              151039,
+              1
+            ],
+            [
+              166399,
+              1
+            ],
+            [
+              188415,
+              1
+            ],
+            [
+              196607,
+              1
+            ],
+            [
+              214527,
+              1
+            ],
+            [
+              239103,
+              1
+            ],
+            [
+              269311,
+              1
+            ],
+            [
+              272383,
+              1
+            ],
+            [
+              301055,
+              1
+            ],
+            [
+              303103,
+              1
+            ],
+            [
+              304127,
+              1
+            ]
+          ]
+        },
+        "latency_ns": {
+          "p50": 145919,
+          "p90": 397311,
+          "p99": 453631,
+          "p999": 453631,
+          "max": 453000
+        },
+        "size_latency": [
+          {
+            "count": 40,
+            "p50_ns": 145919,
+            "p90_ns": 397311,
+            "p99_ns": 453631,
+            "p999_ns": 453631,
+            "max_ns": 453000,
+            "overflow_60s": 0,
+            "buckets": [
+              [
+                85503,
+                1
+              ],
+              [
+                86271,
+                1
+              ],
+              [
+                87551,
+                1
+              ],
+              [
+                88063,
+                1
+              ],
+              [
+                91135,
+                1
+              ],
+              [
+                97535,
+                1
+              ],
+              [
+                104959,
+                1
+              ],
+              [
+                110847,
+                1
+              ],
+              [
+                112127,
+                1
+              ],
+              [
+                113919,
+                1
+              ],
+              [
+                116479,
+                1
+              ],
+              [
+                116991,
+                1
+              ],
+              [
+                119039,
+                1
+              ],
+              [
+                119807,
+                1
+              ],
+              [
+                128511,
+                1
+              ],
+              [
+                129535,
+                1
+              ],
+              [
+                134655,
+                1
+              ],
+              [
+                139263,
+                1
+              ],
+              [
+                140287,
+                1
+              ],
+              [
+                145919,
+                1
+              ],
+              [
+                147967,
+                1
+              ],
+              [
+                180735,
+                1
+              ],
+              [
+                201727,
+                1
+              ],
+              [
+                203263,
+                1
+              ],
+              [
+                212479,
+                1
+              ],
+              [
+                214015,
+                1
+              ],
+              [
+                228351,
+                1
+              ],
+              [
+                233983,
+                1
+              ],
+              [
+                243711,
+                1
+              ],
+              [
+                253951,
+                1
+              ],
+              [
+                266239,
+                1
+              ],
+              [
+                280575,
+                1
+              ],
+              [
+                287743,
+                1
+              ],
+              [
+                308223,
+                1
+              ],
+              [
+                331775,
+                1
+              ],
+              [
+                397311,
+                1
+              ],
+              [
+                400383,
+                1
+              ],
+              [
+                409599,
+                1
+              ],
+              [
+                432127,
+                1
+              ],
+              [
+                453631,
+                1
+              ]
+            ]
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          }
+        ],
+        "error": ""
+      }
+    },
+    {
+      "name": "poisson",
+      "command": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "client",
+        "--port",
+        "62266",
+        "--corpus",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\empty.bin",
+        "--mode",
+        "transport",
+        "--connections",
+        "1",
+        "--duration",
+        "0.4",
+        "--warmup",
+        "0",
+        "--rate",
+        "100",
+        "--arrival",
+        "poisson",
+        "--seed",
+        "42",
+        "--window",
+        "8",
+        "--drain-seconds",
+        "0.5",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\poisson.json"
+      ],
+      "port": 62266,
+      "exit_code": 0,
+      "wall_seconds": 0.49253589999716496,
+      "after_first_request_seconds": 0.38047159999405267,
+      "peer_data_requests": 39,
+      "result": {
+        "kind": "client",
+        "language": "cpp",
+        "mode": "transport",
+        "success": true,
+        "valid": true,
+        "sustainable": true,
+        "implementation": "cpp23",
+        "compiler": "MSVC 195136260",
+        "cplusplus": 202400,
+        "build_configuration": "Release",
+        "windows_sdk": "10.0.26100.0",
+        "simdjson": "3.12.3",
+        "simdjson_implementation": "icelake",
+        "qpc_frequency": 10000000,
+        "sanitized": false,
+        "native_allocation_counters": null,
+        "native_allocation_note": "Use ETW heap diagnostic for full native allocation/free accounting; ordinary runs report process memory",
+        "resource_scope": "process-lifetime including setup warmup and shutdown; not measured-cohort CPU",
+        "cpu_seconds": 0.015625,
+        "private_bytes": 4718592,
+        "peak_commit_bytes": 4784128,
+        "working_set_bytes": 9924608,
+        "peak_working_set_bytes": 9924608,
+        "affinity_mask": 65535,
+        "duration_seconds": 0.4,
+        "window_seconds": 0.4,
+        "cohort_seconds": 0.4,
+        "drain_seconds": 0,
+        "offered": 39,
+        "admitted": 39,
+        "first_send_started": 39,
+        "acknowledged": 39,
+        "completed_frames": 39,
+        "rejected": 0,
+        "generator_late_rejected": 0,
+        "scheduler_late_count": 0,
+        "generator_adequate": true,
+        "pacing": "process-local high-resolution waitable timer plus <=200us spin",
+        "failed": 0,
+        "timedout": 0,
+        "unresolved": 0,
+        "completed_records": 0,
+        "completed_payload_bytes": 78,
+        "window_completed_frames": 39,
+        "window_records": 0,
+        "window_payload_bytes": 78,
+        "window_frames_per_second": 97.5,
+        "window_records_per_second": 0,
+        "window_payload_bytes_per_second": 195,
+        "cohort_frames_per_second": 97.5,
+        "queue_high_water": 1,
+        "inflight_bytes_high_water": 2,
+        "deadline_misses_1ms": 0,
+        "deadline_misses_5ms": 0,
+        "deadline_misses_10ms": 0,
+        "rate": 100,
+        "arrival": "poisson",
+        "load_model": "scheduled",
+        "connections": 1,
+        "window": 8,
+        "inflight_bytes_limit": 67108864,
+        "unique_payload_bytes": 2,
+        "corpus_frames": 1,
+        "data_request_protocol_bytes": 702,
+        "data_ack_protocol_bytes": 1248,
+        "native_client_threads": 3,
+        "cursor_rule": "connection-local start=index; advance=connections per offered request; persists across phases",
+        "seed": 42,
+        "io_counter_scope": "process-lifetime including controls and warmup",
+        "send_operations": 81,
+        "receive_operations": 42,
+        "sent_protocol_bytes": 766,
+        "received_protocol_bytes": 2336,
+        "socket_buffer_requested": 262144,
+        "socket_send_buffer_effective": 262144,
+        "socket_receive_buffer_effective": 262144,
+        "scheduled_latency": {
+          "count": 39,
+          "p50_ns": 167423,
+          "p90_ns": 364543,
+          "p99_ns": 438271,
+          "p999_ns": 438271,
+          "max_ns": 438200,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              76543,
+              1
+            ],
+            [
+              81663,
+              1
+            ],
+            [
+              83967,
+              1
+            ],
+            [
+              87039,
+              1
+            ],
+            [
+              88575,
+              1
+            ],
+            [
+              90623,
+              1
+            ],
+            [
+              91647,
+              1
+            ],
+            [
+              94463,
+              1
+            ],
+            [
+              101631,
+              1
+            ],
+            [
+              111615,
+              1
+            ],
+            [
+              113407,
+              1
+            ],
+            [
+              113919,
+              1
+            ],
+            [
+              128511,
+              1
+            ],
+            [
+              130815,
+              1
+            ],
+            [
+              132607,
+              1
+            ],
+            [
+              146943,
+              1
+            ],
+            [
+              155135,
+              1
+            ],
+            [
+              162303,
+              1
+            ],
+            [
+              165887,
+              1
+            ],
+            [
+              167423,
+              1
+            ],
+            [
+              196095,
+              1
+            ],
+            [
+              229375,
+              1
+            ],
+            [
+              234495,
+              1
+            ],
+            [
+              235519,
+              1
+            ],
+            [
+              257535,
+              1
+            ],
+            [
+              264191,
+              1
+            ],
+            [
+              270335,
+              1
+            ],
+            [
+              272383,
+              1
+            ],
+            [
+              284671,
+              1
+            ],
+            [
+              286719,
+              1
+            ],
+            [
+              297983,
+              1
+            ],
+            [
+              310271,
+              1
+            ],
+            [
+              315391,
+              1
+            ],
+            [
+              321535,
+              1
+            ],
+            [
+              349183,
+              1
+            ],
+            [
+              364543,
+              1
+            ],
+            [
+              380927,
+              1
+            ],
+            [
+              403455,
+              1
+            ],
+            [
+              438271,
+              1
+            ]
+          ]
+        },
+        "submitted_latency": {
+          "count": 39,
+          "p50_ns": 83455,
+          "p90_ns": 137727,
+          "p99_ns": 181247,
+          "p999_ns": 181247,
+          "max_ns": 180900,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              64255,
+              1
+            ],
+            [
+              68351,
+              1
+            ],
+            [
+              71935,
+              1
+            ],
+            [
+              75007,
+              1
+            ],
+            [
+              76031,
+              1
+            ],
+            [
+              77055,
+              1
+            ],
+            [
+              77567,
+              1
+            ],
+            [
+              78847,
+              1
+            ],
+            [
+              79103,
+              2
+            ],
+            [
+              79359,
+              1
+            ],
+            [
+              80383,
+              1
+            ],
+            [
+              80639,
+              2
+            ],
+            [
+              81151,
+              1
+            ],
+            [
+              81407,
+              1
+            ],
+            [
+              81919,
+              2
+            ],
+            [
+              82431,
+              1
+            ],
+            [
+              83455,
+              1
+            ],
+            [
+              83711,
+              1
+            ],
+            [
+              84735,
+              1
+            ],
+            [
+              90879,
+              1
+            ],
+            [
+              91135,
+              1
+            ],
+            [
+              95231,
+              1
+            ],
+            [
+              101119,
+              1
+            ],
+            [
+              103167,
+              1
+            ],
+            [
+              107519,
+              1
+            ],
+            [
+              107775,
+              1
+            ],
+            [
+              119551,
+              1
+            ],
+            [
+              120831,
+              1
+            ],
+            [
+              121087,
+              1
+            ],
+            [
+              121855,
+              1
+            ],
+            [
+              127743,
+              1
+            ],
+            [
+              133119,
+              1
+            ],
+            [
+              137727,
+              1
+            ],
+            [
+              138239,
+              1
+            ],
+            [
+              142847,
+              1
+            ],
+            [
+              181247,
+              1
+            ]
+          ]
+        },
+        "client_delay": {
+          "count": 39,
+          "p50_ns": 88575,
+          "p90_ns": 271359,
+          "p99_ns": 311295,
+          "p999_ns": 311295,
+          "max_ns": 310600,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              6303,
+              1
+            ],
+            [
+              6703,
+              1
+            ],
+            [
+              8015,
+              2
+            ],
+            [
+              8415,
+              1
+            ],
+            [
+              9215,
+              1
+            ],
+            [
+              9503,
+              1
+            ],
+            [
+              9631,
+              1
+            ],
+            [
+              10303,
+              1
+            ],
+            [
+              10623,
+              1
+            ],
+            [
+              12223,
+              1
+            ],
+            [
+              12607,
+              2
+            ],
+            [
+              13023,
+              1
+            ],
+            [
+              28863,
+              1
+            ],
+            [
+              47103,
+              1
+            ],
+            [
+              64127,
+              1
+            ],
+            [
+              83199,
+              1
+            ],
+            [
+              86783,
+              1
+            ],
+            [
+              88575,
+              1
+            ],
+            [
+              90111,
+              1
+            ],
+            [
+              91135,
+              1
+            ],
+            [
+              150015,
+              1
+            ],
+            [
+              151551,
+              1
+            ],
+            [
+              156671,
+              1
+            ],
+            [
+              163327,
+              1
+            ],
+            [
+              171519,
+              1
+            ],
+            [
+              175615,
+              1
+            ],
+            [
+              176639,
+              1
+            ],
+            [
+              177151,
+              1
+            ],
+            [
+              179199,
+              1
+            ],
+            [
+              200191,
+              1
+            ],
+            [
+              204287,
+              1
+            ],
+            [
+              238079,
+              1
+            ],
+            [
+              267263,
+              1
+            ],
+            [
+              271359,
+              1
+            ],
+            [
+              273407,
+              1
+            ],
+            [
+              284671,
+              1
+            ],
+            [
+              311295,
+              1
+            ]
+          ]
+        },
+        "scheduler_lateness": {
+          "count": 39,
+          "p50_ns": 82431,
+          "p90_ns": 260095,
+          "p99_ns": 300031,
+          "p999_ns": 300031,
+          "max_ns": 299900,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              300,
+              8
+            ],
+            [
+              400,
+              1
+            ],
+            [
+              500,
+              4
+            ],
+            [
+              7007,
+              1
+            ],
+            [
+              13023,
+              1
+            ],
+            [
+              39039,
+              1
+            ],
+            [
+              54527,
+              1
+            ],
+            [
+              60415,
+              1
+            ],
+            [
+              79103,
+              1
+            ],
+            [
+              82431,
+              1
+            ],
+            [
+              84479,
+              1
+            ],
+            [
+              84735,
+              1
+            ],
+            [
+              136703,
+              1
+            ],
+            [
+              141823,
+              1
+            ],
+            [
+              143359,
+              1
+            ],
+            [
+              147967,
+              1
+            ],
+            [
+              148991,
+              1
+            ],
+            [
+              159231,
+              1
+            ],
+            [
+              164863,
+              1
+            ],
+            [
+              166911,
+              1
+            ],
+            [
+              172031,
+              2
+            ],
+            [
+              191999,
+              1
+            ],
+            [
+              232447,
+              1
+            ],
+            [
+              254975,
+              1
+            ],
+            [
+              260095,
+              1
+            ],
+            [
+              263167,
+              1
+            ],
+            [
+              276479,
+              1
+            ],
+            [
+              300031,
+              1
+            ]
+          ]
+        },
+        "latency_ns": {
+          "p50": 167423,
+          "p90": 364543,
+          "p99": 438271,
+          "p999": 438271,
+          "max": 438200
+        },
+        "size_latency": [
+          {
+            "count": 39,
+            "p50_ns": 167423,
+            "p90_ns": 364543,
+            "p99_ns": 438271,
+            "p999_ns": 438271,
+            "max_ns": 438200,
+            "overflow_60s": 0,
+            "buckets": [
+              [
+                76543,
+                1
+              ],
+              [
+                81663,
+                1
+              ],
+              [
+                83967,
+                1
+              ],
+              [
+                87039,
+                1
+              ],
+              [
+                88575,
+                1
+              ],
+              [
+                90623,
+                1
+              ],
+              [
+                91647,
+                1
+              ],
+              [
+                94463,
+                1
+              ],
+              [
+                101631,
+                1
+              ],
+              [
+                111615,
+                1
+              ],
+              [
+                113407,
+                1
+              ],
+              [
+                113919,
+                1
+              ],
+              [
+                128511,
+                1
+              ],
+              [
+                130815,
+                1
+              ],
+              [
+                132607,
+                1
+              ],
+              [
+                146943,
+                1
+              ],
+              [
+                155135,
+                1
+              ],
+              [
+                162303,
+                1
+              ],
+              [
+                165887,
+                1
+              ],
+              [
+                167423,
+                1
+              ],
+              [
+                196095,
+                1
+              ],
+              [
+                229375,
+                1
+              ],
+              [
+                234495,
+                1
+              ],
+              [
+                235519,
+                1
+              ],
+              [
+                257535,
+                1
+              ],
+              [
+                264191,
+                1
+              ],
+              [
+                270335,
+                1
+              ],
+              [
+                272383,
+                1
+              ],
+              [
+                284671,
+                1
+              ],
+              [
+                286719,
+                1
+              ],
+              [
+                297983,
+                1
+              ],
+              [
+                310271,
+                1
+              ],
+              [
+                315391,
+                1
+              ],
+              [
+                321535,
+                1
+              ],
+              [
+                349183,
+                1
+              ],
+              [
+                364543,
+                1
+              ],
+              [
+                380927,
+                1
+              ],
+              [
+                403455,
+                1
+              ],
+              [
+                438271,
+                1
+              ]
+            ]
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          }
+        ],
+        "error": ""
+      }
+    },
+    {
+      "name": "burst",
+      "command": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "client",
+        "--port",
+        "62268",
+        "--corpus",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\empty.bin",
+        "--mode",
+        "transport",
+        "--connections",
+        "1",
+        "--duration",
+        "0.4",
+        "--warmup",
+        "0",
+        "--rate",
+        "100",
+        "--arrival",
+        "burst",
+        "--seed",
+        "42",
+        "--window",
+        "8",
+        "--drain-seconds",
+        "0.5",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\burst.json"
+      ],
+      "port": 62268,
+      "exit_code": 0,
+      "wall_seconds": 0.49159469999722205,
+      "after_first_request_seconds": 0.3884009999965201,
+      "peer_data_requests": 24,
+      "result": {
+        "kind": "client",
+        "language": "cpp",
+        "mode": "transport",
+        "success": true,
+        "valid": true,
+        "sustainable": true,
+        "implementation": "cpp23",
+        "compiler": "MSVC 195136260",
+        "cplusplus": 202400,
+        "build_configuration": "Release",
+        "windows_sdk": "10.0.26100.0",
+        "simdjson": "3.12.3",
+        "simdjson_implementation": "icelake",
+        "qpc_frequency": 10000000,
+        "sanitized": false,
+        "native_allocation_counters": null,
+        "native_allocation_note": "Use ETW heap diagnostic for full native allocation/free accounting; ordinary runs report process memory",
+        "resource_scope": "process-lifetime including setup warmup and shutdown; not measured-cohort CPU",
+        "cpu_seconds": 0,
+        "private_bytes": 4706304,
+        "peak_commit_bytes": 4771840,
+        "working_set_bytes": 9904128,
+        "peak_working_set_bytes": 9904128,
+        "affinity_mask": 65535,
+        "duration_seconds": 0.4,
+        "window_seconds": 0.4,
+        "cohort_seconds": 0.4,
+        "drain_seconds": 0,
+        "offered": 24,
+        "admitted": 24,
+        "first_send_started": 24,
+        "acknowledged": 24,
+        "completed_frames": 24,
+        "rejected": 0,
+        "generator_late_rejected": 0,
+        "scheduler_late_count": 0,
+        "generator_adequate": true,
+        "pacing": "process-local high-resolution waitable timer plus <=200us spin",
+        "failed": 0,
+        "timedout": 0,
+        "unresolved": 0,
+        "completed_records": 0,
+        "completed_payload_bytes": 48,
+        "window_completed_frames": 24,
+        "window_records": 0,
+        "window_payload_bytes": 48,
+        "window_frames_per_second": 60,
+        "window_records_per_second": 0,
+        "window_payload_bytes_per_second": 120,
+        "cohort_frames_per_second": 60,
+        "queue_high_water": 1,
+        "inflight_bytes_high_water": 2,
+        "deadline_misses_1ms": 0,
+        "deadline_misses_5ms": 0,
+        "deadline_misses_10ms": 0,
+        "rate": 100,
+        "arrival": "burst",
+        "load_model": "scheduled",
+        "connections": 1,
+        "window": 8,
+        "inflight_bytes_limit": 67108864,
+        "unique_payload_bytes": 2,
+        "corpus_frames": 1,
+        "data_request_protocol_bytes": 432,
+        "data_ack_protocol_bytes": 768,
+        "native_client_threads": 3,
+        "cursor_rule": "connection-local start=index; advance=connections per offered request; persists across phases",
+        "seed": 42,
+        "io_counter_scope": "process-lifetime including controls and warmup",
+        "send_operations": 51,
+        "receive_operations": 27,
+        "sent_protocol_bytes": 496,
+        "received_protocol_bytes": 1856,
+        "socket_buffer_requested": 262144,
+        "socket_send_buffer_effective": 262144,
+        "socket_receive_buffer_effective": 262144,
+        "scheduled_latency": {
+          "count": 24,
+          "p50_ns": 299007,
+          "p90_ns": 433151,
+          "p99_ns": 481279,
+          "p999_ns": 481279,
+          "max_ns": 480500,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              92927,
+              1
+            ],
+            [
+              97535,
+              1
+            ],
+            [
+              98815,
+              1
+            ],
+            [
+              113663,
+              1
+            ],
+            [
+              127999,
+              1
+            ],
+            [
+              128255,
+              1
+            ],
+            [
+              138751,
+              1
+            ],
+            [
+              147455,
+              1
+            ],
+            [
+              212479,
+              1
+            ],
+            [
+              258559,
+              1
+            ],
+            [
+              287743,
+              1
+            ],
+            [
+              299007,
+              1
+            ],
+            [
+              301055,
+              1
+            ],
+            [
+              314367,
+              1
+            ],
+            [
+              320511,
+              1
+            ],
+            [
+              379903,
+              1
+            ],
+            [
+              398335,
+              1
+            ],
+            [
+              399359,
+              1
+            ],
+            [
+              404479,
+              1
+            ],
+            [
+              418815,
+              1
+            ],
+            [
+              425983,
+              1
+            ],
+            [
+              433151,
+              1
+            ],
+            [
+              470015,
+              1
+            ],
+            [
+              481279,
+              1
+            ]
+          ]
+        },
+        "submitted_latency": {
+          "count": 24,
+          "p50_ns": 93951,
+          "p90_ns": 144895,
+          "p99_ns": 188927,
+          "p999_ns": 188927,
+          "max_ns": 188600,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              82175,
+              1
+            ],
+            [
+              82687,
+              1
+            ],
+            [
+              83711,
+              1
+            ],
+            [
+              83967,
+              1
+            ],
+            [
+              87295,
+              1
+            ],
+            [
+              87551,
+              1
+            ],
+            [
+              88319,
+              1
+            ],
+            [
+              88831,
+              1
+            ],
+            [
+              89087,
+              1
+            ],
+            [
+              89599,
+              1
+            ],
+            [
+              90623,
+              1
+            ],
+            [
+              93951,
+              1
+            ],
+            [
+              113407,
+              1
+            ],
+            [
+              115967,
+              1
+            ],
+            [
+              116991,
+              1
+            ],
+            [
+              119551,
+              1
+            ],
+            [
+              121087,
+              1
+            ],
+            [
+              124159,
+              1
+            ],
+            [
+              127231,
+              1
+            ],
+            [
+              132607,
+              1
+            ],
+            [
+              133631,
+              1
+            ],
+            [
+              144895,
+              1
+            ],
+            [
+              160767,
+              1
+            ],
+            [
+              188927,
+              1
+            ]
+          ]
+        },
+        "client_delay": {
+          "count": 24,
+          "p50_ns": 189951,
+          "p90_ns": 320511,
+          "p99_ns": 335871,
+          "p999_ns": 335871,
+          "max_ns": 335700,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              6415,
+              1
+            ],
+            [
+              7215,
+              1
+            ],
+            [
+              9823,
+              1
+            ],
+            [
+              10015,
+              1
+            ],
+            [
+              10719,
+              1
+            ],
+            [
+              14207,
+              1
+            ],
+            [
+              14527,
+              1
+            ],
+            [
+              25343,
+              1
+            ],
+            [
+              123903,
+              1
+            ],
+            [
+              169471,
+              1
+            ],
+            [
+              171519,
+              1
+            ],
+            [
+              189951,
+              1
+            ],
+            [
+              209407,
+              1
+            ],
+            [
+              211455,
+              1
+            ],
+            [
+              218111,
+              1
+            ],
+            [
+              229887,
+              1
+            ],
+            [
+              272383,
+              1
+            ],
+            [
+              295935,
+              1
+            ],
+            [
+              300031,
+              1
+            ],
+            [
+              309247,
+              1
+            ],
+            [
+              316415,
+              1
+            ],
+            [
+              320511,
+              1
+            ],
+            [
+              331775,
+              1
+            ],
+            [
+              335871,
+              1
+            ]
+          ]
+        },
+        "scheduler_lateness": {
+          "count": 24,
+          "p50_ns": 174591,
+          "p90_ns": 307199,
+          "p99_ns": 320511,
+          "p999_ns": 320511,
+          "max_ns": 320000,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              300,
+              5
+            ],
+            [
+              400,
+              1
+            ],
+            [
+              500,
+              1
+            ],
+            [
+              17919,
+              1
+            ],
+            [
+              117759,
+              1
+            ],
+            [
+              154623,
+              1
+            ],
+            [
+              162303,
+              1
+            ],
+            [
+              174591,
+              1
+            ],
+            [
+              197119,
+              1
+            ],
+            [
+              201215,
+              1
+            ],
+            [
+              208383,
+              1
+            ],
+            [
+              221695,
+              1
+            ],
+            [
+              263167,
+              1
+            ],
+            [
+              286719,
+              1
+            ],
+            [
+              290815,
+              1
+            ],
+            [
+              294911,
+              1
+            ],
+            [
+              304127,
+              1
+            ],
+            [
+              307199,
+              1
+            ],
+            [
+              311295,
+              1
+            ],
+            [
+              320511,
+              1
+            ]
+          ]
+        },
+        "latency_ns": {
+          "p50": 299007,
+          "p90": 433151,
+          "p99": 481279,
+          "p999": 481279,
+          "max": 480500
+        },
+        "size_latency": [
+          {
+            "count": 24,
+            "p50_ns": 299007,
+            "p90_ns": 433151,
+            "p99_ns": 481279,
+            "p999_ns": 481279,
+            "max_ns": 480500,
+            "overflow_60s": 0,
+            "buckets": [
+              [
+                92927,
+                1
+              ],
+              [
+                97535,
+                1
+              ],
+              [
+                98815,
+                1
+              ],
+              [
+                113663,
+                1
+              ],
+              [
+                127999,
+                1
+              ],
+              [
+                128255,
+                1
+              ],
+              [
+                138751,
+                1
+              ],
+              [
+                147455,
+                1
+              ],
+              [
+                212479,
+                1
+              ],
+              [
+                258559,
+                1
+              ],
+              [
+                287743,
+                1
+              ],
+              [
+                299007,
+                1
+              ],
+              [
+                301055,
+                1
+              ],
+              [
+                314367,
+                1
+              ],
+              [
+                320511,
+                1
+              ],
+              [
+                379903,
+                1
+              ],
+              [
+                398335,
+                1
+              ],
+              [
+                399359,
+                1
+              ],
+              [
+                404479,
+                1
+              ],
+              [
+                418815,
+                1
+              ],
+              [
+                425983,
+                1
+              ],
+              [
+                433151,
+                1
+              ],
+              [
+                470015,
+                1
+              ],
+              [
+                481279,
+                1
+              ]
+            ]
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          }
+        ],
+        "error": ""
+      }
+    },
+    {
+      "name": "warmup",
+      "command": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "client",
+        "--port",
+        "62270",
+        "--corpus",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\empty.bin",
+        "--mode",
+        "transport",
+        "--connections",
+        "1",
+        "--duration",
+        "0.4",
+        "--warmup",
+        "0.1",
+        "--rate",
+        "100",
+        "--arrival",
+        "steady",
+        "--seed",
+        "42",
+        "--window",
+        "8",
+        "--drain-seconds",
+        "0.5",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\warmup.json"
+      ],
+      "port": 62270,
+      "exit_code": 0,
+      "wall_seconds": 0.6422536000027321,
+      "after_first_request_seconds": 0.5349309000011999,
+      "peer_data_requests": 50,
+      "result": {
+        "kind": "client",
+        "language": "cpp",
+        "mode": "transport",
+        "success": true,
+        "valid": true,
+        "sustainable": true,
+        "implementation": "cpp23",
+        "compiler": "MSVC 195136260",
+        "cplusplus": 202400,
+        "build_configuration": "Release",
+        "windows_sdk": "10.0.26100.0",
+        "simdjson": "3.12.3",
+        "simdjson_implementation": "icelake",
+        "qpc_frequency": 10000000,
+        "sanitized": false,
+        "native_allocation_counters": null,
+        "native_allocation_note": "Use ETW heap diagnostic for full native allocation/free accounting; ordinary runs report process memory",
+        "resource_scope": "process-lifetime including setup warmup and shutdown; not measured-cohort CPU",
+        "cpu_seconds": 0.015625,
+        "private_bytes": 4714496,
+        "peak_commit_bytes": 4784128,
+        "working_set_bytes": 9904128,
+        "peak_working_set_bytes": 9904128,
+        "affinity_mask": 65535,
+        "duration_seconds": 0.4,
+        "window_seconds": 0.4,
+        "cohort_seconds": 0.4,
+        "drain_seconds": 0,
+        "offered": 40,
+        "admitted": 40,
+        "first_send_started": 40,
+        "acknowledged": 40,
+        "completed_frames": 40,
+        "rejected": 0,
+        "generator_late_rejected": 0,
+        "scheduler_late_count": 0,
+        "generator_adequate": true,
+        "pacing": "process-local high-resolution waitable timer plus <=200us spin",
+        "failed": 0,
+        "timedout": 0,
+        "unresolved": 0,
+        "completed_records": 0,
+        "completed_payload_bytes": 80,
+        "window_completed_frames": 40,
+        "window_records": 0,
+        "window_payload_bytes": 80,
+        "window_frames_per_second": 100,
+        "window_records_per_second": 0,
+        "window_payload_bytes_per_second": 200,
+        "cohort_frames_per_second": 100,
+        "queue_high_water": 1,
+        "inflight_bytes_high_water": 2,
+        "deadline_misses_1ms": 0,
+        "deadline_misses_5ms": 0,
+        "deadline_misses_10ms": 0,
+        "rate": 100,
+        "arrival": "steady",
+        "load_model": "scheduled",
+        "connections": 1,
+        "window": 8,
+        "inflight_bytes_limit": 67108864,
+        "unique_payload_bytes": 2,
+        "corpus_frames": 1,
+        "data_request_protocol_bytes": 720,
+        "data_ack_protocol_bytes": 1280,
+        "native_client_threads": 3,
+        "cursor_rule": "connection-local start=index; advance=connections per offered request; persists across phases",
+        "seed": 42,
+        "io_counter_scope": "process-lifetime including controls and warmup",
+        "send_operations": 106,
+        "receive_operations": 56,
+        "sent_protocol_bytes": 1028,
+        "received_protocol_bytes": 3776,
+        "socket_buffer_requested": 262144,
+        "socket_send_buffer_effective": 262144,
+        "socket_receive_buffer_effective": 262144,
+        "scheduled_latency": {
+          "count": 40,
+          "p50_ns": 107263,
+          "p90_ns": 332799,
+          "p99_ns": 378879,
+          "p999_ns": 378879,
+          "max_ns": 378300,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              76543,
+              1
+            ],
+            [
+              78591,
+              1
+            ],
+            [
+              81663,
+              1
+            ],
+            [
+              83455,
+              1
+            ],
+            [
+              85759,
+              1
+            ],
+            [
+              86271,
+              1
+            ],
+            [
+              86527,
+              1
+            ],
+            [
+              86783,
+              2
+            ],
+            [
+              88831,
+              1
+            ],
+            [
+              90623,
+              1
+            ],
+            [
+              91903,
+              1
+            ],
+            [
+              92415,
+              1
+            ],
+            [
+              93183,
+              1
+            ],
+            [
+              93439,
+              1
+            ],
+            [
+              98815,
+              1
+            ],
+            [
+              100607,
+              1
+            ],
+            [
+              102655,
+              1
+            ],
+            [
+              104703,
+              1
+            ],
+            [
+              107263,
+              1
+            ],
+            [
+              109823,
+              1
+            ],
+            [
+              111871,
+              1
+            ],
+            [
+              113919,
+              1
+            ],
+            [
+              114175,
+              1
+            ],
+            [
+              116223,
+              1
+            ],
+            [
+              120319,
+              1
+            ],
+            [
+              123647,
+              1
+            ],
+            [
+              133119,
+              1
+            ],
+            [
+              141823,
+              1
+            ],
+            [
+              157695,
+              1
+            ],
+            [
+              265215,
+              1
+            ],
+            [
+              270335,
+              1
+            ],
+            [
+              276479,
+              1
+            ],
+            [
+              279551,
+              1
+            ],
+            [
+              307199,
+              1
+            ],
+            [
+              332799,
+              1
+            ],
+            [
+              358399,
+              1
+            ],
+            [
+              359423,
+              1
+            ],
+            [
+              363519,
+              1
+            ],
+            [
+              378879,
+              1
+            ]
+          ]
+        },
+        "submitted_latency": {
+          "count": 40,
+          "p50_ns": 81407,
+          "p90_ns": 92159,
+          "p99_ns": 133119,
+          "p999_ns": 133119,
+          "max_ns": 132900,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              70655,
+              1
+            ],
+            [
+              72191,
+              1
+            ],
+            [
+              72959,
+              1
+            ],
+            [
+              75007,
+              1
+            ],
+            [
+              75263,
+              1
+            ],
+            [
+              75519,
+              1
+            ],
+            [
+              75775,
+              1
+            ],
+            [
+              76799,
+              1
+            ],
+            [
+              77823,
+              1
+            ],
+            [
+              78335,
+              1
+            ],
+            [
+              78847,
+              1
+            ],
+            [
+              79103,
+              2
+            ],
+            [
+              79359,
+              1
+            ],
+            [
+              79615,
+              1
+            ],
+            [
+              80127,
+              2
+            ],
+            [
+              80383,
+              1
+            ],
+            [
+              80639,
+              1
+            ],
+            [
+              81407,
+              1
+            ],
+            [
+              82175,
+              1
+            ],
+            [
+              82431,
+              2
+            ],
+            [
+              82687,
+              1
+            ],
+            [
+              82943,
+              1
+            ],
+            [
+              83455,
+              2
+            ],
+            [
+              84735,
+              2
+            ],
+            [
+              85247,
+              1
+            ],
+            [
+              85759,
+              1
+            ],
+            [
+              86783,
+              1
+            ],
+            [
+              88319,
+              1
+            ],
+            [
+              91135,
+              1
+            ],
+            [
+              91391,
+              1
+            ],
+            [
+              92159,
+              1
+            ],
+            [
+              116479,
+              1
+            ],
+            [
+              118015,
+              1
+            ],
+            [
+              121343,
+              1
+            ],
+            [
+              133119,
+              1
+            ]
+          ]
+        },
+        "client_delay": {
+          "count": 40,
+          "p50_ns": 19839,
+          "p90_ns": 253439,
+          "p99_ns": 300031,
+          "p999_ns": 300031,
+          "max_ns": 299200,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              5903,
+              1
+            ],
+            [
+              6015,
+              1
+            ],
+            [
+              6303,
+              1
+            ],
+            [
+              6415,
+              1
+            ],
+            [
+              7407,
+              1
+            ],
+            [
+              7711,
+              1
+            ],
+            [
+              7903,
+              1
+            ],
+            [
+              8015,
+              1
+            ],
+            [
+              8415,
+              2
+            ],
+            [
+              8607,
+              1
+            ],
+            [
+              8927,
+              1
+            ],
+            [
+              9215,
+              1
+            ],
+            [
+              9503,
+              2
+            ],
+            [
+              10719,
+              1
+            ],
+            [
+              11615,
+              1
+            ],
+            [
+              13215,
+              1
+            ],
+            [
+              13919,
+              1
+            ],
+            [
+              19839,
+              1
+            ],
+            [
+              21951,
+              1
+            ],
+            [
+              25151,
+              1
+            ],
+            [
+              27519,
+              1
+            ],
+            [
+              34815,
+              1
+            ],
+            [
+              35455,
+              1
+            ],
+            [
+              36223,
+              1
+            ],
+            [
+              38015,
+              1
+            ],
+            [
+              40959,
+              1
+            ],
+            [
+              41087,
+              1
+            ],
+            [
+              53119,
+              1
+            ],
+            [
+              148479,
+              1
+            ],
+            [
+              151551,
+              1
+            ],
+            [
+              193535,
+              1
+            ],
+            [
+              203775,
+              1
+            ],
+            [
+              221183,
+              1
+            ],
+            [
+              253439,
+              1
+            ],
+            [
+              272383,
+              1
+            ],
+            [
+              276479,
+              1
+            ],
+            [
+              280575,
+              1
+            ],
+            [
+              300031,
+              1
+            ]
+          ]
+        },
+        "scheduler_lateness": {
+          "count": 40,
+          "p50_ns": 13215,
+          "p90_ns": 244735,
+          "p99_ns": 292863,
+          "p999_ns": 292863,
+          "max_ns": 292400,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              200,
+              2
+            ],
+            [
+              300,
+              15
+            ],
+            [
+              4111,
+              1
+            ],
+            [
+              6111,
+              1
+            ],
+            [
+              13215,
+              1
+            ],
+            [
+              15615,
+              1
+            ],
+            [
+              16031,
+              1
+            ],
+            [
+              17535,
+              1
+            ],
+            [
+              21247,
+              1
+            ],
+            [
+              28031,
+              1
+            ],
+            [
+              28159,
+              1
+            ],
+            [
+              29759,
+              1
+            ],
+            [
+              30655,
+              1
+            ],
+            [
+              33791,
+              1
+            ],
+            [
+              45439,
+              1
+            ],
+            [
+              137727,
+              1
+            ],
+            [
+              143359,
+              1
+            ],
+            [
+              184319,
+              1
+            ],
+            [
+              193023,
+              1
+            ],
+            [
+              214527,
+              1
+            ],
+            [
+              244735,
+              1
+            ],
+            [
+              265215,
+              1
+            ],
+            [
+              268287,
+              1
+            ],
+            [
+              272383,
+              1
+            ],
+            [
+              292863,
+              1
+            ]
+          ]
+        },
+        "latency_ns": {
+          "p50": 107263,
+          "p90": 332799,
+          "p99": 378879,
+          "p999": 378879,
+          "max": 378300
+        },
+        "size_latency": [
+          {
+            "count": 40,
+            "p50_ns": 107263,
+            "p90_ns": 332799,
+            "p99_ns": 378879,
+            "p999_ns": 378879,
+            "max_ns": 378300,
+            "overflow_60s": 0,
+            "buckets": [
+              [
+                76543,
+                1
+              ],
+              [
+                78591,
+                1
+              ],
+              [
+                81663,
+                1
+              ],
+              [
+                83455,
+                1
+              ],
+              [
+                85759,
+                1
+              ],
+              [
+                86271,
+                1
+              ],
+              [
+                86527,
+                1
+              ],
+              [
+                86783,
+                2
+              ],
+              [
+                88831,
+                1
+              ],
+              [
+                90623,
+                1
+              ],
+              [
+                91903,
+                1
+              ],
+              [
+                92415,
+                1
+              ],
+              [
+                93183,
+                1
+              ],
+              [
+                93439,
+                1
+              ],
+              [
+                98815,
+                1
+              ],
+              [
+                100607,
+                1
+              ],
+              [
+                102655,
+                1
+              ],
+              [
+                104703,
+                1
+              ],
+              [
+                107263,
+                1
+              ],
+              [
+                109823,
+                1
+              ],
+              [
+                111871,
+                1
+              ],
+              [
+                113919,
+                1
+              ],
+              [
+                114175,
+                1
+              ],
+              [
+                116223,
+                1
+              ],
+              [
+                120319,
+                1
+              ],
+              [
+                123647,
+                1
+              ],
+              [
+                133119,
+                1
+              ],
+              [
+                141823,
+                1
+              ],
+              [
+                157695,
+                1
+              ],
+              [
+                265215,
+                1
+              ],
+              [
+                270335,
+                1
+              ],
+              [
+                276479,
+                1
+              ],
+              [
+                279551,
+                1
+              ],
+              [
+                307199,
+                1
+              ],
+              [
+                332799,
+                1
+              ],
+              [
+                358399,
+                1
+              ],
+              [
+                359423,
+                1
+              ],
+              [
+                363519,
+                1
+              ],
+              [
+                378879,
+                1
+              ]
+            ]
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          }
+        ],
+        "error": ""
+      }
+    },
+    {
+      "name": "overload-drain",
+      "command": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "client",
+        "--port",
+        "62272",
+        "--corpus",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\empty.bin",
+        "--mode",
+        "transport",
+        "--connections",
+        "1",
+        "--duration",
+        "0.4",
+        "--warmup",
+        "0",
+        "--rate",
+        "1000",
+        "--arrival",
+        "steady",
+        "--seed",
+        "42",
+        "--window",
+        "8",
+        "--drain-seconds",
+        "2",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\overload-drain.json"
+      ],
+      "port": 62272,
+      "exit_code": 0,
+      "wall_seconds": 0.6910553999987314,
+      "after_first_request_seconds": 0.5865823999993154,
+      "peer_data_requests": 23,
+      "result": {
+        "kind": "client",
+        "language": "cpp",
+        "mode": "transport",
+        "success": true,
+        "valid": true,
+        "sustainable": false,
+        "implementation": "cpp23",
+        "compiler": "MSVC 195136260",
+        "cplusplus": 202400,
+        "build_configuration": "Release",
+        "windows_sdk": "10.0.26100.0",
+        "simdjson": "3.12.3",
+        "simdjson_implementation": "icelake",
+        "qpc_frequency": 10000000,
+        "sanitized": false,
+        "native_allocation_counters": null,
+        "native_allocation_note": "Use ETW heap diagnostic for full native allocation/free accounting; ordinary runs report process memory",
+        "resource_scope": "process-lifetime including setup warmup and shutdown; not measured-cohort CPU",
+        "cpu_seconds": 0.015625,
+        "private_bytes": 4702208,
+        "peak_commit_bytes": 4780032,
+        "working_set_bytes": 9900032,
+        "peak_working_set_bytes": 9900032,
+        "affinity_mask": 65535,
+        "duration_seconds": 0.4,
+        "window_seconds": 0.4,
+        "cohort_seconds": 0.5818778,
+        "drain_seconds": 0.1819974,
+        "offered": 400,
+        "admitted": 23,
+        "first_send_started": 23,
+        "acknowledged": 23,
+        "completed_frames": 23,
+        "rejected": 377,
+        "generator_late_rejected": 0,
+        "scheduler_late_count": 1,
+        "generator_adequate": false,
+        "pacing": "process-local high-resolution waitable timer plus <=200us spin",
+        "failed": 0,
+        "timedout": 0,
+        "unresolved": 0,
+        "completed_records": 0,
+        "completed_payload_bytes": 46,
+        "window_completed_frames": 15,
+        "window_records": 0,
+        "window_payload_bytes": 30,
+        "window_frames_per_second": 37.5,
+        "window_records_per_second": 0,
+        "window_payload_bytes_per_second": 75,
+        "cohort_frames_per_second": 39.5271996973,
+        "queue_high_water": 8,
+        "inflight_bytes_high_water": 16,
+        "deadline_misses_1ms": 400,
+        "deadline_misses_5ms": 400,
+        "deadline_misses_10ms": 400,
+        "rate": 1000,
+        "arrival": "steady",
+        "load_model": "scheduled",
+        "connections": 1,
+        "window": 8,
+        "inflight_bytes_limit": 67108864,
+        "unique_payload_bytes": 2,
+        "corpus_frames": 1,
+        "data_request_protocol_bytes": 414,
+        "data_ack_protocol_bytes": 736,
+        "native_client_threads": 3,
+        "cursor_rule": "connection-local start=index; advance=connections per offered request; persists across phases",
+        "seed": 42,
+        "io_counter_scope": "process-lifetime including controls and warmup",
+        "send_operations": 49,
+        "receive_operations": 26,
+        "sent_protocol_bytes": 478,
+        "received_protocol_bytes": 1824,
+        "socket_buffer_requested": 262144,
+        "socket_send_buffer_effective": 262144,
+        "socket_receive_buffer_effective": 262144,
+        "scheduled_latency": {
+          "count": 23,
+          "p50_ns": 201326591,
+          "p90_ns": 202375167,
+          "p99_ns": 202899455,
+          "p999_ns": 202899455,
+          "max_ns": 202844600,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              25231359,
+              1
+            ],
+            [
+              49676287,
+              1
+            ],
+            [
+              73924607,
+              1
+            ],
+            [
+              98566143,
+              1
+            ],
+            [
+              122683391,
+              1
+            ],
+            [
+              147324927,
+              1
+            ],
+            [
+              171442175,
+              1
+            ],
+            [
+              195559423,
+              1
+            ],
+            [
+              201326591,
+              4
+            ],
+            [
+              201850879,
+              3
+            ],
+            [
+              202375167,
+              6
+            ],
+            [
+              202899455,
+              2
+            ]
+          ]
+        },
+        "submitted_latency": {
+          "count": 23,
+          "p50_ns": 201326591,
+          "p90_ns": 202375167,
+          "p99_ns": 202899455,
+          "p999_ns": 202899455,
+          "max_ns": 202605000,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              25231359,
+              1
+            ],
+            [
+              49676287,
+              1
+            ],
+            [
+              73662463,
+              1
+            ],
+            [
+              98303999,
+              1
+            ],
+            [
+              122683391,
+              1
+            ],
+            [
+              146800639,
+              1
+            ],
+            [
+              170917887,
+              1
+            ],
+            [
+              195035135,
+              1
+            ],
+            [
+              200802303,
+              1
+            ],
+            [
+              201326591,
+              3
+            ],
+            [
+              201850879,
+              6
+            ],
+            [
+              202375167,
+              4
+            ],
+            [
+              202899455,
+              1
+            ]
+          ]
+        },
+        "client_delay": {
+          "count": 23,
+          "p50_ns": 139263,
+          "p90_ns": 270335,
+          "p99_ns": 309247,
+          "p999_ns": 309247,
+          "max_ns": 308900,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              4911,
+              2
+            ],
+            [
+              5215,
+              1
+            ],
+            [
+              8927,
+              1
+            ],
+            [
+              9215,
+              1
+            ],
+            [
+              14719,
+              1
+            ],
+            [
+              33407,
+              1
+            ],
+            [
+              44927,
+              1
+            ],
+            [
+              87295,
+              1
+            ],
+            [
+              92927,
+              1
+            ],
+            [
+              121087,
+              1
+            ],
+            [
+              139263,
+              1
+            ],
+            [
+              150015,
+              1
+            ],
+            [
+              188927,
+              1
+            ],
+            [
+              189439,
+              1
+            ],
+            [
+              189951,
+              1
+            ],
+            [
+              211967,
+              1
+            ],
+            [
+              229887,
+              1
+            ],
+            [
+              232959,
+              1
+            ],
+            [
+              239615,
+              1
+            ],
+            [
+              270335,
+              1
+            ],
+            [
+              289791,
+              1
+            ],
+            [
+              309247,
+              1
+            ]
+          ]
+        },
+        "scheduler_lateness": {
+          "count": 400,
+          "p50_ns": 132607,
+          "p90_ns": 311295,
+          "p99_ns": 667647,
+          "p999_ns": 1097727,
+          "max_ns": 1094500,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              0,
+              22
+            ],
+            [
+              100,
+              16
+            ],
+            [
+              200,
+              11
+            ],
+            [
+              300,
+              49
+            ],
+            [
+              400,
+              4
+            ],
+            [
+              600,
+              3
+            ],
+            [
+              2807,
+              1
+            ],
+            [
+              3407,
+              1
+            ],
+            [
+              7503,
+              1
+            ],
+            [
+              12703,
+              1
+            ],
+            [
+              16127,
+              1
+            ],
+            [
+              18047,
+              1
+            ],
+            [
+              18431,
+              1
+            ],
+            [
+              19647,
+              1
+            ],
+            [
+              20031,
+              1
+            ],
+            [
+              20735,
+              1
+            ],
+            [
+              20927,
+              1
+            ],
+            [
+              21119,
+              1
+            ],
+            [
+              23231,
+              1
+            ],
+            [
+              24063,
+              1
+            ],
+            [
+              24639,
+              1
+            ],
+            [
+              24959,
+              1
+            ],
+            [
+              25727,
+              1
+            ],
+            [
+              27839,
+              1
+            ],
+            [
+              28031,
+              1
+            ],
+            [
+              28735,
+              1
+            ],
+            [
+              31615,
+              1
+            ],
+            [
+              32639,
+              1
+            ],
+            [
+              32895,
+              1
+            ],
+            [
+              34431,
+              2
+            ],
+            [
+              34815,
+              1
+            ],
+            [
+              35583,
+              2
+            ],
+            [
+              36223,
+              1
+            ],
+            [
+              36479,
+              1
+            ],
+            [
+              37119,
+              1
+            ],
+            [
+              37503,
+              1
+            ],
+            [
+              40191,
+              1
+            ],
+            [
+              45695,
+              1
+            ],
+            [
+              47743,
+              1
+            ],
+            [
+              48767,
+              1
+            ],
+            [
+              50303,
+              1
+            ],
+            [
+              50559,
+              1
+            ],
+            [
+              51327,
+              1
+            ],
+            [
+              51839,
+              1
+            ],
+            [
+              59519,
+              1
+            ],
+            [
+              61439,
+              1
+            ],
+            [
+              62719,
+              1
+            ],
+            [
+              63103,
+              1
+            ],
+            [
+              64511,
+              1
+            ],
+            [
+              65023,
+              2
+            ],
+            [
+              66815,
+              1
+            ],
+            [
+              69375,
+              1
+            ],
+            [
+              70399,
+              1
+            ],
+            [
+              70655,
+              1
+            ],
+            [
+              77055,
+              1
+            ],
+            [
+              78847,
+              1
+            ],
+            [
+              79103,
+              1
+            ],
+            [
+              81919,
+              1
+            ],
+            [
+              82687,
+              1
+            ],
+            [
+              83711,
+              1
+            ],
+            [
+              83967,
+              1
+            ],
+            [
+              85759,
+              1
+            ],
+            [
+              86015,
+              1
+            ],
+            [
+              86271,
+              1
+            ],
+            [
+              87807,
+              1
+            ],
+            [
+              88319,
+              1
+            ],
+            [
+              89343,
+              1
+            ],
+            [
+              90367,
+              1
+            ],
+            [
+              93951,
+              1
+            ],
+            [
+              94463,
+              1
+            ],
+            [
+              94719,
+              1
+            ],
+            [
+              95231,
+              1
+            ],
+            [
+              97791,
+              1
+            ],
+            [
+              99327,
+              1
+            ],
+            [
+              100607,
+              1
+            ],
+            [
+              102911,
+              1
+            ],
+            [
+              104191,
+              2
+            ],
+            [
+              104959,
+              1
+            ],
+            [
+              105727,
+              1
+            ],
+            [
+              106495,
+              1
+            ],
+            [
+              107775,
+              1
+            ],
+            [
+              115199,
+              1
+            ],
+            [
+              115455,
+              1
+            ],
+            [
+              115711,
+              2
+            ],
+            [
+              118527,
+              1
+            ],
+            [
+              118783,
+              1
+            ],
+            [
+              124415,
+              1
+            ],
+            [
+              125951,
+              1
+            ],
+            [
+              126975,
+              2
+            ],
+            [
+              127487,
+              1
+            ],
+            [
+              130815,
+              2
+            ],
+            [
+              131071,
+              1
+            ],
+            [
+              131583,
+              1
+            ],
+            [
+              132607,
+              1
+            ],
+            [
+              137215,
+              1
+            ],
+            [
+              139263,
+              2
+            ],
+            [
+              139775,
+              2
+            ],
+            [
+              140287,
+              1
+            ],
+            [
+              142335,
+              1
+            ],
+            [
+              143359,
+              1
+            ],
+            [
+              144895,
+              1
+            ],
+            [
+              145407,
+              1
+            ],
+            [
+              146431,
+              1
+            ],
+            [
+              147455,
+              1
+            ],
+            [
+              148479,
+              1
+            ],
+            [
+              148991,
+              1
+            ],
+            [
+              151039,
+              2
+            ],
+            [
+              160255,
+              1
+            ],
+            [
+              161279,
+              1
+            ],
+            [
+              162815,
+              1
+            ],
+            [
+              166399,
+              1
+            ],
+            [
+              166911,
+              1
+            ],
+            [
+              169983,
+              1
+            ],
+            [
+              171007,
+              1
+            ],
+            [
+              172031,
+              2
+            ],
+            [
+              173567,
+              2
+            ],
+            [
+              175103,
+              1
+            ],
+            [
+              175615,
+              3
+            ],
+            [
+              176639,
+              1
+            ],
+            [
+              177663,
+              1
+            ],
+            [
+              179199,
+              1
+            ],
+            [
+              179711,
+              1
+            ],
+            [
+              181247,
+              2
+            ],
+            [
+              181759,
+              1
+            ],
+            [
+              182783,
+              1
+            ],
+            [
+              183295,
+              1
+            ],
+            [
+              185855,
+              1
+            ],
+            [
+              186879,
+              2
+            ],
+            [
+              188415,
+              1
+            ],
+            [
+              189439,
+              1
+            ],
+            [
+              190463,
+              1
+            ],
+            [
+              193535,
+              1
+            ],
+            [
+              194047,
+              1
+            ],
+            [
+              195071,
+              2
+            ],
+            [
+              197631,
+              1
+            ],
+            [
+              198655,
+              1
+            ],
+            [
+              199167,
+              1
+            ],
+            [
+              205311,
+              2
+            ],
+            [
+              205823,
+              2
+            ],
+            [
+              206847,
+              1
+            ],
+            [
+              207359,
+              2
+            ],
+            [
+              208383,
+              1
+            ],
+            [
+              208895,
+              1
+            ],
+            [
+              209919,
+              1
+            ],
+            [
+              210943,
+              1
+            ],
+            [
+              211455,
+              1
+            ],
+            [
+              211967,
+              2
+            ],
+            [
+              212479,
+              2
+            ],
+            [
+              212991,
+              2
+            ],
+            [
+              215039,
+              1
+            ],
+            [
+              215551,
+              1
+            ],
+            [
+              216575,
+              1
+            ],
+            [
+              217087,
+              2
+            ],
+            [
+              217599,
+              1
+            ],
+            [
+              218111,
+              1
+            ],
+            [
+              218623,
+              2
+            ],
+            [
+              219135,
+              1
+            ],
+            [
+              219647,
+              3
+            ],
+            [
+              220159,
+              2
+            ],
+            [
+              220671,
+              1
+            ],
+            [
+              222207,
+              1
+            ],
+            [
+              226303,
+              2
+            ],
+            [
+              227327,
+              2
+            ],
+            [
+              228863,
+              2
+            ],
+            [
+              229375,
+              1
+            ],
+            [
+              230399,
+              1
+            ],
+            [
+              230911,
+              1
+            ],
+            [
+              231423,
+              1
+            ],
+            [
+              231935,
+              1
+            ],
+            [
+              233471,
+              1
+            ],
+            [
+              234495,
+              1
+            ],
+            [
+              235519,
+              1
+            ],
+            [
+              236031,
+              1
+            ],
+            [
+              238079,
+              1
+            ],
+            [
+              239615,
+              1
+            ],
+            [
+              241151,
+              1
+            ],
+            [
+              245247,
+              2
+            ],
+            [
+              248319,
+              1
+            ],
+            [
+              249343,
+              1
+            ],
+            [
+              250879,
+              1
+            ],
+            [
+              251391,
+              2
+            ],
+            [
+              254463,
+              2
+            ],
+            [
+              259071,
+              1
+            ],
+            [
+              259583,
+              1
+            ],
+            [
+              260607,
+              1
+            ],
+            [
+              261631,
+              1
+            ],
+            [
+              262143,
+              1
+            ],
+            [
+              267263,
+              2
+            ],
+            [
+              270335,
+              1
+            ],
+            [
+              271359,
+              1
+            ],
+            [
+              272383,
+              2
+            ],
+            [
+              273407,
+              1
+            ],
+            [
+              275455,
+              3
+            ],
+            [
+              276479,
+              1
+            ],
+            [
+              277503,
+              1
+            ],
+            [
+              281599,
+              3
+            ],
+            [
+              282623,
+              1
+            ],
+            [
+              286719,
+              1
+            ],
+            [
+              289791,
+              1
+            ],
+            [
+              290815,
+              1
+            ],
+            [
+              292863,
+              2
+            ],
+            [
+              293887,
+              4
+            ],
+            [
+              294911,
+              2
+            ],
+            [
+              295935,
+              1
+            ],
+            [
+              296959,
+              2
+            ],
+            [
+              297983,
+              1
+            ],
+            [
+              300031,
+              3
+            ],
+            [
+              302079,
+              1
+            ],
+            [
+              303103,
+              1
+            ],
+            [
+              306175,
+              1
+            ],
+            [
+              309247,
+              1
+            ],
+            [
+              310271,
+              1
+            ],
+            [
+              311295,
+              1
+            ],
+            [
+              312319,
+              1
+            ],
+            [
+              313343,
+              1
+            ],
+            [
+              317439,
+              2
+            ],
+            [
+              321535,
+              1
+            ],
+            [
+              326655,
+              1
+            ],
+            [
+              329727,
+              1
+            ],
+            [
+              333823,
+              1
+            ],
+            [
+              338943,
+              1
+            ],
+            [
+              350207,
+              1
+            ],
+            [
+              378879,
+              1
+            ],
+            [
+              383999,
+              4
+            ],
+            [
+              397311,
+              1
+            ],
+            [
+              407551,
+              1
+            ],
+            [
+              417791,
+              1
+            ],
+            [
+              425983,
+              1
+            ],
+            [
+              431103,
+              1
+            ],
+            [
+              434175,
+              1
+            ],
+            [
+              482303,
+              1
+            ],
+            [
+              522239,
+              1
+            ],
+            [
+              523263,
+              1
+            ],
+            [
+              546815,
+              1
+            ],
+            [
+              563199,
+              1
+            ],
+            [
+              567295,
+              1
+            ],
+            [
+              571391,
+              1
+            ],
+            [
+              575487,
+              1
+            ],
+            [
+              610303,
+              2
+            ],
+            [
+              649215,
+              1
+            ],
+            [
+              657407,
+              1
+            ],
+            [
+              663551,
+              1
+            ],
+            [
+              665599,
+              1
+            ],
+            [
+              667647,
+              1
+            ],
+            [
+              690175,
+              1
+            ],
+            [
+              700415,
+              1
+            ],
+            [
+              743423,
+              1
+            ],
+            [
+              1097727,
+              1
+            ]
+          ]
+        },
+        "latency_ns": {
+          "p50": 201326591,
+          "p90": 202375167,
+          "p99": 202899455,
+          "p999": 202899455,
+          "max": 202844600
+        },
+        "size_latency": [
+          {
+            "count": 23,
+            "p50_ns": 201326591,
+            "p90_ns": 202375167,
+            "p99_ns": 202899455,
+            "p999_ns": 202899455,
+            "max_ns": 202844600,
+            "overflow_60s": 0,
+            "buckets": [
+              [
+                25231359,
+                1
+              ],
+              [
+                49676287,
+                1
+              ],
+              [
+                73924607,
+                1
+              ],
+              [
+                98566143,
+                1
+              ],
+              [
+                122683391,
+                1
+              ],
+              [
+                147324927,
+                1
+              ],
+              [
+                171442175,
+                1
+              ],
+              [
+                195559423,
+                1
+              ],
+              [
+                201326591,
+                4
+              ],
+              [
+                201850879,
+                3
+              ],
+              [
+                202375167,
+                6
+              ],
+              [
+                202899455,
+                2
+              ]
+            ]
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          }
+        ],
+        "error": ""
+      }
+    },
+    {
+      "name": "end-count",
+      "command": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "client",
+        "--port",
+        "62274",
+        "--corpus",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\empty.bin",
+        "--mode",
+        "transport",
+        "--connections",
+        "1",
+        "--duration",
+        "0.4",
+        "--warmup",
+        "0",
+        "--rate",
+        "100",
+        "--arrival",
+        "steady",
+        "--seed",
+        "42",
+        "--window",
+        "8",
+        "--drain-seconds",
+        "0.5",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\end-count.json"
+      ],
+      "port": 62274,
+      "exit_code": 1,
+      "wall_seconds": 0.49947960000281455,
+      "after_first_request_seconds": 0.39497519999713404,
+      "peer_data_requests": 40,
+      "result": {
+        "kind": "client",
+        "language": "cpp",
+        "mode": "transport",
+        "success": false,
+        "valid": false,
+        "sustainable": false,
+        "implementation": "cpp23",
+        "compiler": "MSVC 195136260",
+        "cplusplus": 202400,
+        "build_configuration": "Release",
+        "windows_sdk": "10.0.26100.0",
+        "simdjson": "3.12.3",
+        "simdjson_implementation": "icelake",
+        "qpc_frequency": 10000000,
+        "sanitized": false,
+        "native_allocation_counters": null,
+        "native_allocation_note": "Use ETW heap diagnostic for full native allocation/free accounting; ordinary runs report process memory",
+        "resource_scope": "process-lifetime including setup warmup and shutdown; not measured-cohort CPU",
+        "cpu_seconds": 0.015625,
+        "private_bytes": 4702208,
+        "peak_commit_bytes": 4767744,
+        "working_set_bytes": 9949184,
+        "peak_working_set_bytes": 9949184,
+        "affinity_mask": 65535,
+        "duration_seconds": 0.4,
+        "window_seconds": 0.4,
+        "cohort_seconds": 0.4,
+        "drain_seconds": 0,
+        "offered": 40,
+        "admitted": 40,
+        "first_send_started": 40,
+        "acknowledged": 40,
+        "completed_frames": 40,
+        "rejected": 0,
+        "generator_late_rejected": 0,
+        "scheduler_late_count": 0,
+        "generator_adequate": true,
+        "pacing": "process-local high-resolution waitable timer plus <=200us spin",
+        "failed": 0,
+        "timedout": 0,
+        "unresolved": 0,
+        "completed_records": 0,
+        "completed_payload_bytes": 80,
+        "window_completed_frames": 40,
+        "window_records": 0,
+        "window_payload_bytes": 80,
+        "window_frames_per_second": 100,
+        "window_records_per_second": 0,
+        "window_payload_bytes_per_second": 200,
+        "cohort_frames_per_second": 100,
+        "queue_high_water": 1,
+        "inflight_bytes_high_water": 2,
+        "deadline_misses_1ms": 0,
+        "deadline_misses_5ms": 0,
+        "deadline_misses_10ms": 0,
+        "rate": 100,
+        "arrival": "steady",
+        "load_model": "scheduled",
+        "connections": 1,
+        "window": 8,
+        "inflight_bytes_limit": 67108864,
+        "unique_payload_bytes": 2,
+        "corpus_frames": 1,
+        "data_request_protocol_bytes": 720,
+        "data_ack_protocol_bytes": 1280,
+        "native_client_threads": 3,
+        "cursor_rule": "connection-local start=index; advance=connections per offered request; persists across phases",
+        "seed": 42,
+        "io_counter_scope": "process-lifetime including controls and warmup",
+        "send_operations": 83,
+        "receive_operations": 43,
+        "sent_protocol_bytes": 784,
+        "received_protocol_bytes": 2368,
+        "socket_buffer_requested": 262144,
+        "socket_send_buffer_effective": 262144,
+        "socket_receive_buffer_effective": 262144,
+        "scheduled_latency": {
+          "count": 40,
+          "p50_ns": 105471,
+          "p90_ns": 408575,
+          "p99_ns": 483327,
+          "p999_ns": 483327,
+          "max_ns": 482900,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              89343,
+              1
+            ],
+            [
+              89599,
+              1
+            ],
+            [
+              90879,
+              1
+            ],
+            [
+              91135,
+              1
+            ],
+            [
+              91903,
+              1
+            ],
+            [
+              92415,
+              2
+            ],
+            [
+              93951,
+              1
+            ],
+            [
+              94207,
+              1
+            ],
+            [
+              95231,
+              1
+            ],
+            [
+              96767,
+              1
+            ],
+            [
+              98559,
+              1
+            ],
+            [
+              98815,
+              1
+            ],
+            [
+              101887,
+              1
+            ],
+            [
+              102143,
+              1
+            ],
+            [
+              102399,
+              1
+            ],
+            [
+              103423,
+              1
+            ],
+            [
+              103679,
+              2
+            ],
+            [
+              105471,
+              1
+            ],
+            [
+              105983,
+              1
+            ],
+            [
+              106239,
+              1
+            ],
+            [
+              106495,
+              1
+            ],
+            [
+              108543,
+              1
+            ],
+            [
+              110847,
+              1
+            ],
+            [
+              112127,
+              2
+            ],
+            [
+              120831,
+              1
+            ],
+            [
+              122879,
+              1
+            ],
+            [
+              124159,
+              1
+            ],
+            [
+              127743,
+              1
+            ],
+            [
+              131583,
+              1
+            ],
+            [
+              173055,
+              1
+            ],
+            [
+              394239,
+              1
+            ],
+            [
+              400383,
+              1
+            ],
+            [
+              408575,
+              1
+            ],
+            [
+              465919,
+              1
+            ],
+            [
+              471039,
+              1
+            ],
+            [
+              482303,
+              1
+            ],
+            [
+              483327,
+              1
+            ]
+          ]
+        },
+        "submitted_latency": {
+          "count": 40,
+          "p50_ns": 95743,
+          "p90_ns": 123135,
+          "p99_ns": 158719,
+          "p999_ns": 158719,
+          "max_ns": 158500,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              78591,
+              1
+            ],
+            [
+              79871,
+              1
+            ],
+            [
+              80639,
+              2
+            ],
+            [
+              81919,
+              1
+            ],
+            [
+              82431,
+              1
+            ],
+            [
+              83199,
+              1
+            ],
+            [
+              83711,
+              1
+            ],
+            [
+              84479,
+              1
+            ],
+            [
+              85247,
+              1
+            ],
+            [
+              86271,
+              1
+            ],
+            [
+              86783,
+              1
+            ],
+            [
+              88319,
+              1
+            ],
+            [
+              90623,
+              1
+            ],
+            [
+              91135,
+              1
+            ],
+            [
+              93951,
+              1
+            ],
+            [
+              94207,
+              1
+            ],
+            [
+              95231,
+              1
+            ],
+            [
+              95487,
+              1
+            ],
+            [
+              95743,
+              3
+            ],
+            [
+              97023,
+              1
+            ],
+            [
+              98047,
+              1
+            ],
+            [
+              98303,
+              1
+            ],
+            [
+              99071,
+              1
+            ],
+            [
+              100607,
+              1
+            ],
+            [
+              102655,
+              1
+            ],
+            [
+              103423,
+              1
+            ],
+            [
+              104191,
+              1
+            ],
+            [
+              113407,
+              1
+            ],
+            [
+              114431,
+              2
+            ],
+            [
+              118527,
+              1
+            ],
+            [
+              119295,
+              1
+            ],
+            [
+              123135,
+              1
+            ],
+            [
+              131071,
+              1
+            ],
+            [
+              136703,
+              1
+            ],
+            [
+              149503,
+              1
+            ],
+            [
+              158719,
+              1
+            ]
+          ]
+        },
+        "client_delay": {
+          "count": 40,
+          "p50_ns": 8415,
+          "p90_ns": 330751,
+          "p99_ns": 351231,
+          "p999_ns": 351231,
+          "max_ns": 350900,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              6511,
+              1
+            ],
+            [
+              6607,
+              1
+            ],
+            [
+              7215,
+              2
+            ],
+            [
+              7407,
+              1
+            ],
+            [
+              7503,
+              1
+            ],
+            [
+              7615,
+              3
+            ],
+            [
+              7807,
+              1
+            ],
+            [
+              7903,
+              3
+            ],
+            [
+              8015,
+              1
+            ],
+            [
+              8111,
+              2
+            ],
+            [
+              8319,
+              3
+            ],
+            [
+              8415,
+              3
+            ],
+            [
+              8703,
+              1
+            ],
+            [
+              8927,
+              2
+            ],
+            [
+              9215,
+              1
+            ],
+            [
+              9407,
+              1
+            ],
+            [
+              9631,
+              1
+            ],
+            [
+              9823,
+              2
+            ],
+            [
+              10207,
+              1
+            ],
+            [
+              10623,
+              1
+            ],
+            [
+              14527,
+              1
+            ],
+            [
+              297983,
+              1
+            ],
+            [
+              319487,
+              1
+            ],
+            [
+              330751,
+              1
+            ],
+            [
+              333823,
+              1
+            ],
+            [
+              334847,
+              1
+            ],
+            [
+              346111,
+              1
+            ],
+            [
+              351231,
+              1
+            ]
+          ]
+        },
+        "scheduler_lateness": {
+          "count": 40,
+          "p50_ns": 300,
+          "p90_ns": 317439,
+          "p99_ns": 339967,
+          "p999_ns": 339967,
+          "max_ns": 339800,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              300,
+              31
+            ],
+            [
+              600,
+              1
+            ],
+            [
+              800,
+              1
+            ],
+            [
+              290815,
+              1
+            ],
+            [
+              312319,
+              1
+            ],
+            [
+              317439,
+              1
+            ],
+            [
+              323583,
+              2
+            ],
+            [
+              324607,
+              1
+            ],
+            [
+              339967,
+              1
+            ]
+          ]
+        },
+        "latency_ns": {
+          "p50": 105471,
+          "p90": 408575,
+          "p99": 483327,
+          "p999": 483327,
+          "max": 482900
+        },
+        "size_latency": [
+          {
+            "count": 40,
+            "p50_ns": 105471,
+            "p90_ns": 408575,
+            "p99_ns": 483327,
+            "p999_ns": 483327,
+            "max_ns": 482900,
+            "overflow_60s": 0,
+            "buckets": [
+              [
+                89343,
+                1
+              ],
+              [
+                89599,
+                1
+              ],
+              [
+                90879,
+                1
+              ],
+              [
+                91135,
+                1
+              ],
+              [
+                91903,
+                1
+              ],
+              [
+                92415,
+                2
+              ],
+              [
+                93951,
+                1
+              ],
+              [
+                94207,
+                1
+              ],
+              [
+                95231,
+                1
+              ],
+              [
+                96767,
+                1
+              ],
+              [
+                98559,
+                1
+              ],
+              [
+                98815,
+                1
+              ],
+              [
+                101887,
+                1
+              ],
+              [
+                102143,
+                1
+              ],
+              [
+                102399,
+                1
+              ],
+              [
+                103423,
+                1
+              ],
+              [
+                103679,
+                2
+              ],
+              [
+                105471,
+                1
+              ],
+              [
+                105983,
+                1
+              ],
+              [
+                106239,
+                1
+              ],
+              [
+                106495,
+                1
+              ],
+              [
+                108543,
+                1
+              ],
+              [
+                110847,
+                1
+              ],
+              [
+                112127,
+                2
+              ],
+              [
+                120831,
+                1
+              ],
+              [
+                122879,
+                1
+              ],
+              [
+                124159,
+                1
+              ],
+              [
+                127743,
+                1
+              ],
+              [
+                131583,
+                1
+              ],
+              [
+                173055,
+                1
+              ],
+              [
+                394239,
+                1
+              ],
+              [
+                400383,
+                1
+              ],
+              [
+                408575,
+                1
+              ],
+              [
+                465919,
+                1
+              ],
+              [
+                471039,
+                1
+              ],
+              [
+                482303,
+                1
+              ],
+              [
+                483327,
+                1
+              ]
+            ]
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          }
+        ],
+        "error": "end_summary_mismatch"
+      }
+    },
+    {
+      "name": "end-sum",
+      "command": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "client",
+        "--port",
+        "62276",
+        "--corpus",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\empty.bin",
+        "--mode",
+        "transport",
+        "--connections",
+        "1",
+        "--duration",
+        "0.4",
+        "--warmup",
+        "0",
+        "--rate",
+        "100",
+        "--arrival",
+        "steady",
+        "--seed",
+        "42",
+        "--window",
+        "8",
+        "--drain-seconds",
+        "0.5",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\end-sum.json"
+      ],
+      "port": 62276,
+      "exit_code": 1,
+      "wall_seconds": 0.49982909999380354,
+      "after_first_request_seconds": 0.39447439999639755,
+      "peer_data_requests": 40,
+      "result": {
+        "kind": "client",
+        "language": "cpp",
+        "mode": "transport",
+        "success": false,
+        "valid": false,
+        "sustainable": false,
+        "implementation": "cpp23",
+        "compiler": "MSVC 195136260",
+        "cplusplus": 202400,
+        "build_configuration": "Release",
+        "windows_sdk": "10.0.26100.0",
+        "simdjson": "3.12.3",
+        "simdjson_implementation": "icelake",
+        "qpc_frequency": 10000000,
+        "sanitized": false,
+        "native_allocation_counters": null,
+        "native_allocation_note": "Use ETW heap diagnostic for full native allocation/free accounting; ordinary runs report process memory",
+        "resource_scope": "process-lifetime including setup warmup and shutdown; not measured-cohort CPU",
+        "cpu_seconds": 0.015625,
+        "private_bytes": 4710400,
+        "peak_commit_bytes": 4771840,
+        "working_set_bytes": 9953280,
+        "peak_working_set_bytes": 9953280,
+        "affinity_mask": 65535,
+        "duration_seconds": 0.4,
+        "window_seconds": 0.4,
+        "cohort_seconds": 0.4,
+        "drain_seconds": 0,
+        "offered": 40,
+        "admitted": 40,
+        "first_send_started": 40,
+        "acknowledged": 40,
+        "completed_frames": 40,
+        "rejected": 0,
+        "generator_late_rejected": 0,
+        "scheduler_late_count": 0,
+        "generator_adequate": true,
+        "pacing": "process-local high-resolution waitable timer plus <=200us spin",
+        "failed": 0,
+        "timedout": 0,
+        "unresolved": 0,
+        "completed_records": 0,
+        "completed_payload_bytes": 80,
+        "window_completed_frames": 40,
+        "window_records": 0,
+        "window_payload_bytes": 80,
+        "window_frames_per_second": 100,
+        "window_records_per_second": 0,
+        "window_payload_bytes_per_second": 200,
+        "cohort_frames_per_second": 100,
+        "queue_high_water": 1,
+        "inflight_bytes_high_water": 2,
+        "deadline_misses_1ms": 0,
+        "deadline_misses_5ms": 0,
+        "deadline_misses_10ms": 0,
+        "rate": 100,
+        "arrival": "steady",
+        "load_model": "scheduled",
+        "connections": 1,
+        "window": 8,
+        "inflight_bytes_limit": 67108864,
+        "unique_payload_bytes": 2,
+        "corpus_frames": 1,
+        "data_request_protocol_bytes": 720,
+        "data_ack_protocol_bytes": 1280,
+        "native_client_threads": 3,
+        "cursor_rule": "connection-local start=index; advance=connections per offered request; persists across phases",
+        "seed": 42,
+        "io_counter_scope": "process-lifetime including controls and warmup",
+        "send_operations": 83,
+        "receive_operations": 43,
+        "sent_protocol_bytes": 784,
+        "received_protocol_bytes": 2368,
+        "socket_buffer_requested": 262144,
+        "socket_send_buffer_effective": 262144,
+        "socket_receive_buffer_effective": 262144,
+        "scheduled_latency": {
+          "count": 40,
+          "p50_ns": 208383,
+          "p90_ns": 472063,
+          "p99_ns": 608255,
+          "p999_ns": 608255,
+          "max_ns": 607000,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              86015,
+              1
+            ],
+            [
+              88319,
+              1
+            ],
+            [
+              91135,
+              1
+            ],
+            [
+              93183,
+              1
+            ],
+            [
+              93951,
+              1
+            ],
+            [
+              95999,
+              2
+            ],
+            [
+              97535,
+              1
+            ],
+            [
+              101631,
+              1
+            ],
+            [
+              119807,
+              1
+            ],
+            [
+              129023,
+              1
+            ],
+            [
+              131583,
+              1
+            ],
+            [
+              134655,
+              1
+            ],
+            [
+              137727,
+              1
+            ],
+            [
+              141311,
+              1
+            ],
+            [
+              145407,
+              1
+            ],
+            [
+              162303,
+              1
+            ],
+            [
+              179711,
+              1
+            ],
+            [
+              204287,
+              1
+            ],
+            [
+              208383,
+              1
+            ],
+            [
+              216063,
+              1
+            ],
+            [
+              235519,
+              1
+            ],
+            [
+              296959,
+              1
+            ],
+            [
+              329727,
+              1
+            ],
+            [
+              378879,
+              1
+            ],
+            [
+              392191,
+              1
+            ],
+            [
+              405503,
+              1
+            ],
+            [
+              412671,
+              1
+            ],
+            [
+              416767,
+              1
+            ],
+            [
+              432127,
+              1
+            ],
+            [
+              449535,
+              1
+            ],
+            [
+              453631,
+              1
+            ],
+            [
+              454655,
+              1
+            ],
+            [
+              463871,
+              2
+            ],
+            [
+              472063,
+              1
+            ],
+            [
+              478207,
+              1
+            ],
+            [
+              569343,
+              1
+            ],
+            [
+              587775,
+              1
+            ],
+            [
+              608255,
+              1
+            ]
+          ]
+        },
+        "submitted_latency": {
+          "count": 40,
+          "p50_ns": 105471,
+          "p90_ns": 140799,
+          "p99_ns": 155135,
+          "p999_ns": 155135,
+          "max_ns": 154900,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              78335,
+              1
+            ],
+            [
+              80895,
+              1
+            ],
+            [
+              81151,
+              1
+            ],
+            [
+              81407,
+              2
+            ],
+            [
+              81663,
+              1
+            ],
+            [
+              82175,
+              1
+            ],
+            [
+              82943,
+              1
+            ],
+            [
+              83711,
+              1
+            ],
+            [
+              84223,
+              1
+            ],
+            [
+              85247,
+              1
+            ],
+            [
+              85503,
+              1
+            ],
+            [
+              86015,
+              1
+            ],
+            [
+              86271,
+              1
+            ],
+            [
+              88319,
+              1
+            ],
+            [
+              88575,
+              2
+            ],
+            [
+              92927,
+              1
+            ],
+            [
+              95999,
+              1
+            ],
+            [
+              105471,
+              1
+            ],
+            [
+              109055,
+              1
+            ],
+            [
+              117247,
+              1
+            ],
+            [
+              119039,
+              1
+            ],
+            [
+              121855,
+              1
+            ],
+            [
+              122367,
+              1
+            ],
+            [
+              123647,
+              1
+            ],
+            [
+              125183,
+              1
+            ],
+            [
+              125951,
+              1
+            ],
+            [
+              126975,
+              1
+            ],
+            [
+              127743,
+              1
+            ],
+            [
+              128511,
+              1
+            ],
+            [
+              129791,
+              1
+            ],
+            [
+              133631,
+              1
+            ],
+            [
+              134143,
+              1
+            ],
+            [
+              135167,
+              1
+            ],
+            [
+              140799,
+              1
+            ],
+            [
+              142847,
+              1
+            ],
+            [
+              145407,
+              1
+            ],
+            [
+              148479,
+              1
+            ],
+            [
+              155135,
+              1
+            ]
+          ]
+        },
+        "client_delay": {
+          "count": 40,
+          "p50_ns": 87551,
+          "p90_ns": 366591,
+          "p99_ns": 494591,
+          "p999_ns": 494591,
+          "max_ns": 494400,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              6703,
+              1
+            ],
+            [
+              7807,
+              1
+            ],
+            [
+              8831,
+              1
+            ],
+            [
+              9119,
+              1
+            ],
+            [
+              9919,
+              1
+            ],
+            [
+              10015,
+              1
+            ],
+            [
+              10111,
+              1
+            ],
+            [
+              10303,
+              1
+            ],
+            [
+              10815,
+              1
+            ],
+            [
+              11615,
+              2
+            ],
+            [
+              13119,
+              1
+            ],
+            [
+              15007,
+              1
+            ],
+            [
+              15519,
+              2
+            ],
+            [
+              16223,
+              1
+            ],
+            [
+              40191,
+              1
+            ],
+            [
+              81151,
+              1
+            ],
+            [
+              83455,
+              1
+            ],
+            [
+              87551,
+              1
+            ],
+            [
+              93183,
+              1
+            ],
+            [
+              122879,
+              1
+            ],
+            [
+              210943,
+              1
+            ],
+            [
+              243711,
+              1
+            ],
+            [
+              244223,
+              1
+            ],
+            [
+              276479,
+              1
+            ],
+            [
+              286719,
+              1
+            ],
+            [
+              304127,
+              1
+            ],
+            [
+              309247,
+              1
+            ],
+            [
+              315391,
+              1
+            ],
+            [
+              321535,
+              1
+            ],
+            [
+              322559,
+              1
+            ],
+            [
+              326655,
+              1
+            ],
+            [
+              339967,
+              1
+            ],
+            [
+              351231,
+              1
+            ],
+            [
+              366591,
+              1
+            ],
+            [
+              372735,
+              1
+            ],
+            [
+              459775,
+              1
+            ],
+            [
+              485375,
+              1
+            ],
+            [
+              494591,
+              1
+            ]
+          ]
+        },
+        "scheduler_lateness": {
+          "count": 40,
+          "p50_ns": 72447,
+          "p90_ns": 349183,
+          "p99_ns": 479231,
+          "p999_ns": 479231,
+          "max_ns": 478700,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              100,
+              1
+            ],
+            [
+              300,
+              6
+            ],
+            [
+              400,
+              2
+            ],
+            [
+              500,
+              4
+            ],
+            [
+              1803,
+              1
+            ],
+            [
+              3007,
+              1
+            ],
+            [
+              6815,
+              1
+            ],
+            [
+              28159,
+              1
+            ],
+            [
+              61311,
+              1
+            ],
+            [
+              67071,
+              1
+            ],
+            [
+              72447,
+              1
+            ],
+            [
+              77823,
+              1
+            ],
+            [
+              108031,
+              1
+            ],
+            [
+              199679,
+              1
+            ],
+            [
+              211967,
+              1
+            ],
+            [
+              235007,
+              1
+            ],
+            [
+              253439,
+              1
+            ],
+            [
+              275455,
+              1
+            ],
+            [
+              291839,
+              1
+            ],
+            [
+              296959,
+              1
+            ],
+            [
+              302079,
+              1
+            ],
+            [
+              307199,
+              1
+            ],
+            [
+              308223,
+              1
+            ],
+            [
+              312319,
+              1
+            ],
+            [
+              326655,
+              1
+            ],
+            [
+              327679,
+              1
+            ],
+            [
+              349183,
+              1
+            ],
+            [
+              362495,
+              1
+            ],
+            [
+              449535,
+              1
+            ],
+            [
+              472063,
+              1
+            ],
+            [
+              479231,
+              1
+            ]
+          ]
+        },
+        "latency_ns": {
+          "p50": 208383,
+          "p90": 472063,
+          "p99": 608255,
+          "p999": 608255,
+          "max": 607000
+        },
+        "size_latency": [
+          {
+            "count": 40,
+            "p50_ns": 208383,
+            "p90_ns": 472063,
+            "p99_ns": 608255,
+            "p999_ns": 608255,
+            "max_ns": 607000,
+            "overflow_60s": 0,
+            "buckets": [
+              [
+                86015,
+                1
+              ],
+              [
+                88319,
+                1
+              ],
+              [
+                91135,
+                1
+              ],
+              [
+                93183,
+                1
+              ],
+              [
+                93951,
+                1
+              ],
+              [
+                95999,
+                2
+              ],
+              [
+                97535,
+                1
+              ],
+              [
+                101631,
+                1
+              ],
+              [
+                119807,
+                1
+              ],
+              [
+                129023,
+                1
+              ],
+              [
+                131583,
+                1
+              ],
+              [
+                134655,
+                1
+              ],
+              [
+                137727,
+                1
+              ],
+              [
+                141311,
+                1
+              ],
+              [
+                145407,
+                1
+              ],
+              [
+                162303,
+                1
+              ],
+              [
+                179711,
+                1
+              ],
+              [
+                204287,
+                1
+              ],
+              [
+                208383,
+                1
+              ],
+              [
+                216063,
+                1
+              ],
+              [
+                235519,
+                1
+              ],
+              [
+                296959,
+                1
+              ],
+              [
+                329727,
+                1
+              ],
+              [
+                378879,
+                1
+              ],
+              [
+                392191,
+                1
+              ],
+              [
+                405503,
+                1
+              ],
+              [
+                412671,
+                1
+              ],
+              [
+                416767,
+                1
+              ],
+              [
+                432127,
+                1
+              ],
+              [
+                449535,
+                1
+              ],
+              [
+                453631,
+                1
+              ],
+              [
+                454655,
+                1
+              ],
+              [
+                463871,
+                2
+              ],
+              [
+                472063,
+                1
+              ],
+              [
+                478207,
+                1
+              ],
+              [
+                569343,
+                1
+              ],
+              [
+                587775,
+                1
+              ],
+              [
+                608255,
+                1
+              ]
+            ]
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          }
+        ],
+        "error": "end_summary_mismatch"
+      }
+    },
+    {
+      "name": "drop",
+      "command": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "client",
+        "--port",
+        "62278",
+        "--corpus",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\empty.bin",
+        "--mode",
+        "transport",
+        "--connections",
+        "1",
+        "--duration",
+        "0.4",
+        "--warmup",
+        "0",
+        "--rate",
+        "100",
+        "--arrival",
+        "steady",
+        "--seed",
+        "42",
+        "--window",
+        "8",
+        "--drain-seconds",
+        "0.5",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\drop.json"
+      ],
+      "port": 62278,
+      "exit_code": 1,
+      "wall_seconds": 0.10781520000455203,
+      "after_first_request_seconds": 0.0031365000031655654,
+      "peer_data_requests": 1,
+      "result": {
+        "kind": "client",
+        "language": "cpp",
+        "mode": "transport",
+        "success": false,
+        "valid": false,
+        "sustainable": false,
+        "implementation": "cpp23",
+        "compiler": "MSVC 195136260",
+        "cplusplus": 202400,
+        "build_configuration": "Release",
+        "windows_sdk": "10.0.26100.0",
+        "simdjson": "3.12.3",
+        "simdjson_implementation": "icelake",
+        "qpc_frequency": 10000000,
+        "sanitized": false,
+        "native_allocation_counters": null,
+        "native_allocation_note": "Use ETW heap diagnostic for full native allocation/free accounting; ordinary runs report process memory",
+        "resource_scope": "process-lifetime including setup warmup and shutdown; not measured-cohort CPU",
+        "cpu_seconds": 0,
+        "private_bytes": 4714496,
+        "peak_commit_bytes": 4800512,
+        "working_set_bytes": 9953280,
+        "peak_working_set_bytes": 9953280,
+        "affinity_mask": 65535,
+        "duration_seconds": 0.4,
+        "window_seconds": 0.4,
+        "cohort_seconds": 0.4,
+        "drain_seconds": 0,
+        "offered": 1,
+        "admitted": 1,
+        "first_send_started": 1,
+        "acknowledged": 0,
+        "completed_frames": 0,
+        "rejected": 0,
+        "generator_late_rejected": 0,
+        "scheduler_late_count": 0,
+        "generator_adequate": true,
+        "pacing": "process-local high-resolution waitable timer plus <=200us spin",
+        "failed": 0,
+        "timedout": 0,
+        "unresolved": 1,
+        "completed_records": 0,
+        "completed_payload_bytes": 0,
+        "window_completed_frames": 0,
+        "window_records": 0,
+        "window_payload_bytes": 0,
+        "window_frames_per_second": 0,
+        "window_records_per_second": 0,
+        "window_payload_bytes_per_second": 0,
+        "cohort_frames_per_second": 0,
+        "queue_high_water": 1,
+        "inflight_bytes_high_water": 2,
+        "deadline_misses_1ms": 1,
+        "deadline_misses_5ms": 1,
+        "deadline_misses_10ms": 1,
+        "rate": 100,
+        "arrival": "steady",
+        "load_model": "scheduled",
+        "connections": 1,
+        "window": 8,
+        "inflight_bytes_limit": 67108864,
+        "unique_payload_bytes": 2,
+        "corpus_frames": 1,
+        "data_request_protocol_bytes": 0,
+        "data_ack_protocol_bytes": 0,
+        "native_client_threads": 3,
+        "cursor_rule": "connection-local start=index; advance=connections per offered request; persists across phases",
+        "seed": 42,
+        "io_counter_scope": "process-lifetime including controls and warmup",
+        "send_operations": 4,
+        "receive_operations": 2,
+        "sent_protocol_bytes": 66,
+        "received_protocol_bytes": 16,
+        "socket_buffer_requested": 262144,
+        "socket_send_buffer_effective": 262144,
+        "socket_receive_buffer_effective": 262144,
+        "scheduled_latency": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "submitted_latency": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "client_delay": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "scheduler_lateness": {
+          "count": 1,
+          "p50_ns": 293887,
+          "p90_ns": 293887,
+          "p99_ns": 293887,
+          "p999_ns": 293887,
+          "max_ns": 293100,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              293887,
+              1
+            ]
+          ]
+        },
+        "latency_ns": {
+          "p50": null,
+          "p90": null,
+          "p99": null,
+          "p999": null,
+          "max": 0
+        },
+        "size_latency": [
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          }
+        ],
+        "error": "response_eof"
+      }
+    },
+    {
+      "name": "corrupt",
+      "command": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "client",
+        "--port",
+        "62280",
+        "--corpus",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\empty.bin",
+        "--mode",
+        "transport",
+        "--connections",
+        "1",
+        "--duration",
+        "0.4",
+        "--warmup",
+        "0",
+        "--rate",
+        "100",
+        "--arrival",
+        "steady",
+        "--seed",
+        "42",
+        "--window",
+        "8",
+        "--drain-seconds",
+        "0.5",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\corrupt.json"
+      ],
+      "port": 62280,
+      "exit_code": 1,
+      "wall_seconds": 0.1063648000053945,
+      "after_first_request_seconds": 0.00310880000324687,
+      "peer_data_requests": 1,
+      "result": {
+        "kind": "client",
+        "language": "cpp",
+        "mode": "transport",
+        "success": false,
+        "valid": false,
+        "sustainable": false,
+        "implementation": "cpp23",
+        "compiler": "MSVC 195136260",
+        "cplusplus": 202400,
+        "build_configuration": "Release",
+        "windows_sdk": "10.0.26100.0",
+        "simdjson": "3.12.3",
+        "simdjson_implementation": "icelake",
+        "qpc_frequency": 10000000,
+        "sanitized": false,
+        "native_allocation_counters": null,
+        "native_allocation_note": "Use ETW heap diagnostic for full native allocation/free accounting; ordinary runs report process memory",
+        "resource_scope": "process-lifetime including setup warmup and shutdown; not measured-cohort CPU",
+        "cpu_seconds": 0.015625,
+        "private_bytes": 4714496,
+        "peak_commit_bytes": 4800512,
+        "working_set_bytes": 9957376,
+        "peak_working_set_bytes": 9957376,
+        "affinity_mask": 65535,
+        "duration_seconds": 0.4,
+        "window_seconds": 0.4,
+        "cohort_seconds": 0.4,
+        "drain_seconds": 0,
+        "offered": 1,
+        "admitted": 1,
+        "first_send_started": 1,
+        "acknowledged": 0,
+        "completed_frames": 0,
+        "rejected": 0,
+        "generator_late_rejected": 0,
+        "scheduler_late_count": 0,
+        "generator_adequate": true,
+        "pacing": "process-local high-resolution waitable timer plus <=200us spin",
+        "failed": 1,
+        "timedout": 0,
+        "unresolved": 0,
+        "completed_records": 0,
+        "completed_payload_bytes": 0,
+        "window_completed_frames": 0,
+        "window_records": 0,
+        "window_payload_bytes": 0,
+        "window_frames_per_second": 0,
+        "window_records_per_second": 0,
+        "window_payload_bytes_per_second": 0,
+        "cohort_frames_per_second": 0,
+        "queue_high_water": 1,
+        "inflight_bytes_high_water": 2,
+        "deadline_misses_1ms": 1,
+        "deadline_misses_5ms": 1,
+        "deadline_misses_10ms": 1,
+        "rate": 100,
+        "arrival": "steady",
+        "load_model": "scheduled",
+        "connections": 1,
+        "window": 8,
+        "inflight_bytes_limit": 67108864,
+        "unique_payload_bytes": 2,
+        "corpus_frames": 1,
+        "data_request_protocol_bytes": 0,
+        "data_ack_protocol_bytes": 0,
+        "native_client_threads": 3,
+        "cursor_rule": "connection-local start=index; advance=connections per offered request; persists across phases",
+        "seed": 42,
+        "io_counter_scope": "process-lifetime including controls and warmup",
+        "send_operations": 4,
+        "receive_operations": 2,
+        "sent_protocol_bytes": 66,
+        "received_protocol_bytes": 48,
+        "socket_buffer_requested": 262144,
+        "socket_send_buffer_effective": 262144,
+        "socket_receive_buffer_effective": 262144,
+        "scheduled_latency": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "submitted_latency": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "client_delay": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "scheduler_lateness": {
+          "count": 1,
+          "p50_ns": 15615,
+          "p90_ns": 15615,
+          "p99_ns": 15615,
+          "p999_ns": 15615,
+          "max_ns": 15600,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              15615,
+              1
+            ]
+          ]
+        },
+        "latency_ns": {
+          "p50": null,
+          "p90": null,
+          "p99": null,
+          "p999": null,
+          "max": 0
+        },
+        "size_latency": [
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          }
+        ],
+        "error": "ack_mismatch"
+      }
+    },
+    {
+      "name": "withhold",
+      "command": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "client",
+        "--port",
+        "62282",
+        "--corpus",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\empty.bin",
+        "--mode",
+        "transport",
+        "--connections",
+        "1",
+        "--duration",
+        "0.1",
+        "--warmup",
+        "0",
+        "--rate",
+        "100",
+        "--arrival",
+        "steady",
+        "--seed",
+        "42",
+        "--window",
+        "8",
+        "--drain-seconds",
+        "0.5",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\withhold.json"
+      ],
+      "port": 62282,
+      "exit_code": 1,
+      "wall_seconds": 0.6201261000023806,
+      "after_first_request_seconds": 0.5158179999998538,
+      "peer_data_requests": 1,
+      "result": {
+        "kind": "client",
+        "language": "cpp",
+        "mode": "transport",
+        "success": false,
+        "valid": false,
+        "sustainable": false,
+        "implementation": "cpp23",
+        "compiler": "MSVC 195136260",
+        "cplusplus": 202400,
+        "build_configuration": "Release",
+        "windows_sdk": "10.0.26100.0",
+        "simdjson": "3.12.3",
+        "simdjson_implementation": "icelake",
+        "qpc_frequency": 10000000,
+        "sanitized": false,
+        "native_allocation_counters": null,
+        "native_allocation_note": "Use ETW heap diagnostic for full native allocation/free accounting; ordinary runs report process memory",
+        "resource_scope": "process-lifetime including setup warmup and shutdown; not measured-cohort CPU",
+        "cpu_seconds": 0.015625,
+        "private_bytes": 4706304,
+        "peak_commit_bytes": 4788224,
+        "working_set_bytes": 9961472,
+        "peak_working_set_bytes": 9961472,
+        "affinity_mask": 65535,
+        "duration_seconds": 0.1,
+        "window_seconds": 0.1,
+        "cohort_seconds": 0.1,
+        "drain_seconds": 0.4120272,
+        "offered": 10,
+        "admitted": 8,
+        "first_send_started": 8,
+        "acknowledged": 0,
+        "completed_frames": 0,
+        "rejected": 2,
+        "generator_late_rejected": 0,
+        "scheduler_late_count": 0,
+        "generator_adequate": true,
+        "pacing": "process-local high-resolution waitable timer plus <=200us spin",
+        "failed": 0,
+        "timedout": 0,
+        "unresolved": 8,
+        "completed_records": 0,
+        "completed_payload_bytes": 0,
+        "window_completed_frames": 0,
+        "window_records": 0,
+        "window_payload_bytes": 0,
+        "window_frames_per_second": 0,
+        "window_records_per_second": 0,
+        "window_payload_bytes_per_second": 0,
+        "cohort_frames_per_second": 0,
+        "queue_high_water": 8,
+        "inflight_bytes_high_water": 16,
+        "deadline_misses_1ms": 10,
+        "deadline_misses_5ms": 10,
+        "deadline_misses_10ms": 10,
+        "rate": 100,
+        "arrival": "steady",
+        "load_model": "scheduled",
+        "connections": 1,
+        "window": 8,
+        "inflight_bytes_limit": 67108864,
+        "unique_payload_bytes": 2,
+        "corpus_frames": 1,
+        "data_request_protocol_bytes": 0,
+        "data_ack_protocol_bytes": 0,
+        "native_client_threads": 3,
+        "cursor_rule": "connection-local start=index; advance=connections per offered request; persists across phases",
+        "seed": 42,
+        "io_counter_scope": "process-lifetime including controls and warmup",
+        "send_operations": 18,
+        "receive_operations": 2,
+        "sent_protocol_bytes": 192,
+        "received_protocol_bytes": 16,
+        "socket_buffer_requested": 262144,
+        "socket_send_buffer_effective": 262144,
+        "socket_receive_buffer_effective": 262144,
+        "scheduled_latency": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "submitted_latency": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "client_delay": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "scheduler_lateness": {
+          "count": 10,
+          "p50_ns": 66303,
+          "p90_ns": 269311,
+          "p99_ns": 278527,
+          "p999_ns": 278527,
+          "max_ns": 278100,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              300,
+              2
+            ],
+            [
+              400,
+              1
+            ],
+            [
+              600,
+              1
+            ],
+            [
+              66303,
+              1
+            ],
+            [
+              93183,
+              1
+            ],
+            [
+              232447,
+              1
+            ],
+            [
+              264191,
+              1
+            ],
+            [
+              269311,
+              1
+            ],
+            [
+              278527,
+              1
+            ]
+          ]
+        },
+        "latency_ns": {
+          "p50": null,
+          "p90": null,
+          "p99": null,
+          "p999": null,
+          "max": 0
+        },
+        "size_latency": [
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          }
+        ],
+        "error": "receive_failed"
+      }
+    },
+    {
+      "name": "withhold-after-one",
+      "command": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "client",
+        "--port",
+        "62286",
+        "--corpus",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\empty.bin",
+        "--mode",
+        "transport",
+        "--connections",
+        "1",
+        "--duration",
+        "0.1",
+        "--warmup",
+        "0",
+        "--rate",
+        "100",
+        "--arrival",
+        "steady",
+        "--seed",
+        "42",
+        "--window",
+        "8",
+        "--drain-seconds",
+        "0.5",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\withhold-after-one.json"
+      ],
+      "port": 62286,
+      "exit_code": 1,
+      "wall_seconds": 0.6238357999973232,
+      "after_first_request_seconds": 0.5200167999937548,
+      "peer_data_requests": 2,
+      "result": {
+        "kind": "client",
+        "language": "cpp",
+        "mode": "transport",
+        "success": false,
+        "valid": false,
+        "sustainable": false,
+        "implementation": "cpp23",
+        "compiler": "MSVC 195136260",
+        "cplusplus": 202400,
+        "build_configuration": "Release",
+        "windows_sdk": "10.0.26100.0",
+        "simdjson": "3.12.3",
+        "simdjson_implementation": "icelake",
+        "qpc_frequency": 10000000,
+        "sanitized": false,
+        "native_allocation_counters": null,
+        "native_allocation_note": "Use ETW heap diagnostic for full native allocation/free accounting; ordinary runs report process memory",
+        "resource_scope": "process-lifetime including setup warmup and shutdown; not measured-cohort CPU",
+        "cpu_seconds": 0.015625,
+        "private_bytes": 4714496,
+        "peak_commit_bytes": 4800512,
+        "working_set_bytes": 9969664,
+        "peak_working_set_bytes": 9969664,
+        "affinity_mask": 65535,
+        "duration_seconds": 0.1,
+        "window_seconds": 0.1,
+        "cohort_seconds": 0.1,
+        "drain_seconds": 0.4152849,
+        "offered": 10,
+        "admitted": 9,
+        "first_send_started": 9,
+        "acknowledged": 1,
+        "completed_frames": 1,
+        "rejected": 1,
+        "generator_late_rejected": 0,
+        "scheduler_late_count": 0,
+        "generator_adequate": true,
+        "pacing": "process-local high-resolution waitable timer plus <=200us spin",
+        "failed": 0,
+        "timedout": 0,
+        "unresolved": 8,
+        "completed_records": 0,
+        "completed_payload_bytes": 2,
+        "window_completed_frames": 1,
+        "window_records": 0,
+        "window_payload_bytes": 2,
+        "window_frames_per_second": 10,
+        "window_records_per_second": 0,
+        "window_payload_bytes_per_second": 20,
+        "cohort_frames_per_second": 10,
+        "queue_high_water": 8,
+        "inflight_bytes_high_water": 16,
+        "deadline_misses_1ms": 9,
+        "deadline_misses_5ms": 9,
+        "deadline_misses_10ms": 9,
+        "rate": 100,
+        "arrival": "steady",
+        "load_model": "scheduled",
+        "connections": 1,
+        "window": 8,
+        "inflight_bytes_limit": 67108864,
+        "unique_payload_bytes": 2,
+        "corpus_frames": 1,
+        "data_request_protocol_bytes": 18,
+        "data_ack_protocol_bytes": 32,
+        "native_client_threads": 3,
+        "cursor_rule": "connection-local start=index; advance=connections per offered request; persists across phases",
+        "seed": 42,
+        "io_counter_scope": "process-lifetime including controls and warmup",
+        "send_operations": 20,
+        "receive_operations": 3,
+        "sent_protocol_bytes": 210,
+        "received_protocol_bytes": 48,
+        "socket_buffer_requested": 262144,
+        "socket_send_buffer_effective": 262144,
+        "socket_receive_buffer_effective": 262144,
+        "scheduled_latency": {
+          "count": 1,
+          "p50_ns": 110079,
+          "p90_ns": 110079,
+          "p99_ns": 110079,
+          "p999_ns": 110079,
+          "max_ns": 109900,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              110079,
+              1
+            ]
+          ]
+        },
+        "submitted_latency": {
+          "count": 1,
+          "p50_ns": 99071,
+          "p90_ns": 99071,
+          "p99_ns": 99071,
+          "p999_ns": 99071,
+          "max_ns": 99000,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              99071,
+              1
+            ]
+          ]
+        },
+        "client_delay": {
+          "count": 1,
+          "p50_ns": 10911,
+          "p90_ns": 10911,
+          "p99_ns": 10911,
+          "p999_ns": 10911,
+          "max_ns": 10900,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              10911,
+              1
+            ]
+          ]
+        },
+        "scheduler_lateness": {
+          "count": 10,
+          "p50_ns": 500,
+          "p90_ns": 264191,
+          "p99_ns": 278527,
+          "p999_ns": 278527,
+          "max_ns": 277700,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              300,
+              4
+            ],
+            [
+              500,
+              2
+            ],
+            [
+              1103,
+              1
+            ],
+            [
+              184319,
+              1
+            ],
+            [
+              264191,
+              1
+            ],
+            [
+              278527,
+              1
+            ]
+          ]
+        },
+        "latency_ns": {
+          "p50": 110079,
+          "p90": 110079,
+          "p99": 110079,
+          "p999": 110079,
+          "max": 109900
+        },
+        "size_latency": [
+          {
+            "count": 1,
+            "p50_ns": 110079,
+            "p90_ns": 110079,
+            "p99_ns": 110079,
+            "p999_ns": 110079,
+            "max_ns": 109900,
+            "overflow_60s": 0,
+            "buckets": [
+              [
+                110079,
+                1
+              ]
+            ]
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          }
+        ],
+        "error": "receive_failed"
+      }
+    }
+  ]
+}

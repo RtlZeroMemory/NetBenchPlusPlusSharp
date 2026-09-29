@@ -1,0 +1,76 @@
+{
+  "name": "rework-campaign",
+  "purpose": "Declared EASY/HARD matrix with controlled comparisons and controls. See docs/benchmarks/methodology.md.",
+  "seed": 20260929,
+  "server_cores": 4,
+  "corpora": {
+    "easy64k": {"profile": "easy", "bytes": 536870912, "frame_bytes": 65536, "seed": 101},
+    "hard64k": {"profile": "hard", "bytes": 536870912, "frame_bytes": 65536, "seed": 203},
+    "hardmix": {"profile": "hard", "bytes": 1073741824, "frame_bytes": 1048576, "min_frame_bytes": 4096, "seed": 202},
+    "mixed64k": {"profile": "mixed", "bytes": 268435456, "frame_bytes": 65536, "seed": 42}
+  },
+  "defaults": {"connections": 16, "window": 64, "socket_buffer": 4194304, "drain": 30, "inflight_bytes": 67108864},
+  "phases": [
+    {"name": "processing-controls", "repetitions": 3, "cells": [
+      {"name": "proc-easy-aggregate", "group": "Processing-only controls (one core, no sockets)", "title": "EASY aggregate", "kind": "process", "corpus": "easy64k", "mode": "aggregate", "duration": 10, "warmup": 5},
+      {"name": "proc-easy-reuse", "group": "Processing-only controls (one core, no sockets)", "title": "EASY retain-reuse", "kind": "process", "corpus": "easy64k", "mode": "retain-reuse", "duration": 10, "warmup": 5},
+      {"name": "proc-hard64k-aggregate", "group": "Processing-only controls (one core, no sockets)", "title": "HARD content, 64 KiB frames, aggregate", "kind": "process", "corpus": "hard64k", "mode": "aggregate", "duration": 10, "warmup": 5},
+      {"name": "proc-hardmix-aggregate", "group": "Processing-only controls (one core, no sockets)", "title": "HARD mixed frames, aggregate", "kind": "process", "corpus": "hardmix", "mode": "aggregate", "duration": 10, "warmup": 5},
+      {"name": "proc-hardmix-reuse", "group": "Processing-only controls (one core, no sockets)", "title": "HARD mixed frames, retain-reuse", "kind": "process", "corpus": "hardmix", "mode": "retain-reuse", "duration": 10, "warmup": 5, "retain_batches": 64, "retain_bytes": 16777216},
+      {"name": "proc-hardmix-allocate", "group": "Processing-only controls (one core, no sockets)", "title": "HARD mixed frames, retain-allocate", "kind": "process", "corpus": "hardmix", "mode": "retain-allocate", "duration": 10, "warmup": 5, "retain_batches": 64, "retain_bytes": 16777216}
+    ]},
+    {"name": "easy-saturation", "repetitions": 7, "cells": [
+      {"name": "easy-aggregate-sat", "group": "EASY — closed-loop saturation (16 connections × 4 outstanding)", "title": "EASY aggregate", "corpus": "easy64k", "mode": "aggregate", "duration": 30, "warmup": 15},
+      {"name": "easy-reuse-sat", "group": "EASY — closed-loop saturation (16 connections × 4 outstanding)", "title": "EASY retain-reuse", "corpus": "easy64k", "mode": "retain-reuse", "duration": 30, "warmup": 15}
+    ]},
+    {"name": "hard-saturation", "repetitions": 5, "cells": [
+      {"name": "hard-aggregate-sat", "group": "HARD — closed-loop saturation (16 × 4, 4 KiB–1 MiB frames)", "title": "HARD aggregate", "corpus": "hardmix", "mode": "aggregate", "duration": 60, "warmup": 20, "retain_batches": 64, "retain_bytes": 16777216},
+      {"name": "hard-reuse-sat", "group": "HARD — closed-loop saturation (16 × 4, 4 KiB–1 MiB frames)", "title": "HARD retain-reuse, 64 batches", "corpus": "hardmix", "mode": "retain-reuse", "duration": 60, "warmup": 20, "retain_batches": 64, "retain_bytes": 16777216},
+      {"name": "hard-allocate-sat", "group": "HARD — closed-loop saturation (16 × 4, 4 KiB–1 MiB frames)", "title": "HARD retain-allocate, 64 batches", "corpus": "hardmix", "mode": "retain-allocate", "duration": 60, "warmup": 20, "retain_batches": 64, "retain_bytes": 16777216}
+    ]},
+    {"name": "controlled-comparisons", "repetitions": 5, "cells": [
+      {"name": "ctl-hard64k-aggregate", "group": "Controlled comparisons (one variable changed from EASY or HARD)", "title": "HARD content at EASY settings: aggregate", "corpus": "hard64k", "mode": "aggregate", "duration": 30, "warmup": 15},
+      {"name": "ctl-hard64k-reuse", "group": "Controlled comparisons (one variable changed from EASY or HARD)", "title": "HARD content at EASY settings: retain-reuse", "corpus": "hard64k", "mode": "retain-reuse", "duration": 30, "warmup": 15},
+      {"name": "ctl-hardmix-allocate-8", "group": "Controlled comparisons (one variable changed from EASY or HARD)", "title": "HARD retain-allocate, 8 batches retained", "corpus": "hardmix", "mode": "retain-allocate", "duration": 60, "warmup": 20, "retain_batches": 8, "retain_bytes": 16777216}
+    ]},
+    {"name": "easy-paced", "repetitions": 7, "cells": [
+      {"name": "easy-aggregate-paced", "group": "EASY — steady arrivals at 50% of the slower server's capacity", "title": "EASY aggregate", "corpus": "easy64k", "mode": "aggregate", "duration": 30, "warmup": 15, "rate": {"of": "easy-aggregate-sat", "fraction": 0.5}},
+      {"name": "easy-reuse-paced", "group": "EASY — steady arrivals at 50% of the slower server's capacity", "title": "EASY retain-reuse", "corpus": "easy64k", "mode": "retain-reuse", "duration": 30, "warmup": 15, "rate": {"of": "easy-reuse-sat", "fraction": 0.5}}
+    ]},
+    {"name": "hard-sustained", "repetitions": 5, "cells": [
+      {"name": "hard-reuse-poisson", "group": "HARD — Poisson arrivals at 70% of the slower server's capacity", "title": "HARD retain-reuse", "corpus": "hardmix", "mode": "retain-reuse", "arrival": "poisson", "duration": 60, "warmup": 20, "retain_batches": 64, "retain_bytes": 16777216, "rate": {"of": "hard-reuse-sat", "fraction": 0.7}},
+      {"name": "hard-allocate-poisson", "group": "HARD — Poisson arrivals at 70% of the slower server's capacity", "title": "HARD retain-allocate", "corpus": "hardmix", "mode": "retain-allocate", "arrival": "poisson", "duration": 60, "warmup": 20, "retain_batches": 64, "retain_bytes": 16777216, "rate": {"of": "hard-allocate-sat", "fraction": 0.7}}
+    ]},
+    {"name": "hard-burst", "repetitions": 5, "cells": [
+      {"name": "hard-reuse-burst", "group": "HARD — bursts: 5 s at 60%, 1 s at 150% of the slower server's capacity", "title": "HARD retain-reuse", "corpus": "hardmix", "mode": "retain-reuse", "arrival": "burst", "duration": 60, "warmup": 20, "retain_batches": 64, "retain_bytes": 16777216, "rate": {"of": "hard-reuse-sat", "fraction": 1.0}},
+      {"name": "hard-allocate-burst", "group": "HARD — bursts: 5 s at 60%, 1 s at 150% of the slower server's capacity", "title": "HARD retain-allocate", "corpus": "hardmix", "mode": "retain-allocate", "arrival": "burst", "duration": 60, "warmup": 20, "retain_batches": 64, "retain_bytes": 16777216, "rate": {"of": "hard-allocate-sat", "fraction": 1.0}}
+    ]},
+    {"name": "hard-overload", "repetitions": 3, "cells": [
+      {"name": "hard-allocate-overload", "group": "HARD — steady overload at 120% of the slower server's capacity", "title": "HARD retain-allocate", "corpus": "hardmix", "mode": "retain-allocate", "duration": 30, "warmup": 20, "retain_batches": 64, "retain_bytes": 16777216, "rate": {"of": "hard-allocate-sat", "fraction": 1.2}}
+    ]},
+    {"name": "csharp-default-gc", "repetitions": 3, "cells": [
+      {"name": "default-gc-hard-allocate-sat", "group": "C# server with the runtime-default GC (DATAS on); C++ unchanged", "title": "HARD retain-allocate, saturation (C# DATAS on)", "corpus": "hardmix", "mode": "retain-allocate", "duration": 60, "warmup": 20, "retain_batches": 64, "retain_bytes": 16777216, "server_env": {"DOTNET_GCDynamicAdaptationMode": "1"}},
+      {"name": "default-gc-hard-allocate-poisson", "group": "C# server with the runtime-default GC (DATAS on); C++ unchanged", "title": "HARD retain-allocate, Poisson at 70% (C# DATAS on)", "corpus": "hardmix", "mode": "retain-allocate", "arrival": "poisson", "duration": 60, "warmup": 20, "retain_batches": 64, "retain_bytes": 16777216, "rate": {"of": "hard-allocate-sat", "fraction": 0.7}, "server_env": {"DOTNET_GCDynamicAdaptationMode": "1"}}
+    ]},
+    {"name": "transport-controls", "repetitions": 3, "cells": [
+      {"name": "transport-easy", "group": "Transport-only controls (no JSON)", "title": "EASY frames, 64 KiB", "corpus": "easy64k", "mode": "transport", "duration": 30, "warmup": 15},
+      {"name": "transport-hardmix", "group": "Transport-only controls (no JSON)", "title": "HARD frames, 4 KiB–1 MiB", "corpus": "hardmix", "mode": "transport", "duration": 30, "warmup": 15}
+    ]},
+    {"name": "client-headroom", "repetitions": 3, "cells": [
+      {"name": "headroom-easy-aggregate", "group": "Client headroom: same cells with a fourth client core", "title": "EASY aggregate, 4 client cores", "corpus": "easy64k", "mode": "aggregate", "duration": 30, "warmup": 15, "client_cores": "client+spare"},
+      {"name": "headroom-hard-reuse", "group": "Client headroom: same cells with a fourth client core", "title": "HARD retain-reuse, 4 client cores", "corpus": "hardmix", "mode": "retain-reuse", "duration": 60, "warmup": 20, "retain_batches": 64, "retain_bytes": 16777216, "client_cores": "client+spare"}
+    ]},
+    {"name": "alternate-client", "repetitions": 3, "cells": [
+      {"name": "alt-easy-aggregate", "group": "Alternate (C#) client sensitivity", "title": "EASY aggregate, C# client", "corpus": "easy64k", "mode": "aggregate", "duration": 30, "warmup": 15, "client": "csharp"},
+      {"name": "alt-hard-reuse", "group": "Alternate (C#) client sensitivity", "title": "HARD retain-reuse, C# client", "corpus": "hardmix", "mode": "retain-reuse", "duration": 60, "warmup": 20, "retain_batches": 64, "retain_bytes": 16777216, "client": "csharp"}
+    ]},
+    {"name": "first-pass-bridge", "repetitions": 3, "cells": [
+      {"name": "bridge-aggregate", "group": "First-pass bridge: first-pass corpus and retention, rework binaries", "title": "Mixed 64 KiB aggregate", "corpus": "mixed64k", "mode": "aggregate", "duration": 30, "warmup": 15},
+      {"name": "bridge-reuse", "group": "First-pass bridge: first-pass corpus and retention, rework binaries", "title": "Mixed 64 KiB retain-reuse", "corpus": "mixed64k", "mode": "retain-reuse", "duration": 30, "warmup": 15},
+      {"name": "bridge-allocate", "group": "First-pass bridge: first-pass corpus and retention, rework binaries", "title": "Mixed 64 KiB retain-allocate", "corpus": "mixed64k", "mode": "retain-allocate", "duration": 30, "warmup": 15}
+    ]},
+    {"name": "stress", "repetitions": 3, "cells": [
+      {"name": "stress-fragmented", "group": "Stress (not ordinary valid-traffic performance)", "title": "EASY aggregate, every socket operation capped at 4 KiB", "corpus": "easy64k", "mode": "aggregate", "duration": 30, "warmup": 15, "io_cap": 4096}
+    ]}
+  ]
+}

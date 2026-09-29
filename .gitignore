@@ -1,8 +1,35 @@
+# Build outputs
 **/bin/
 **/obj/
 src/cpp/build*/
 **/__pycache__/
-data/*.bin
-results/
+.vs/
+*.user
+
+# Generated test data (tools/corpus.py and the runner regenerate it)
+data/
+*.bin
+!tests/fixtures/golden.bin
+
+# Profiler traces
 *.nettrace
 *.etl
+
+# Benchmark output stays local. The published folders below keep their summaries and a
+# compressed results.json.gz; per-trial folders and the uncompressed results.json are left out.
+results/*
+!results/README.md
+!results/final-campaign-20260929/
+!results/rework-campaign-20260929/
+!results/rework-core-20260929/
+!results/first-benchmark-20260929/
+!results/diagnostics-baseline-20260929/
+!results/diagnostics-rework-20260929/
+!results/diagnostics-fairness-20260929/
+!results/diagnostics-csharp-parser-20260929/
+!results/audit-checks/
+!results/audit-baseline-20260929/
+results/**/[0-9][0-9][0-9][0-9]-*/
+results/**/results.json
+results/**/ab.log
+results/audit-baseline-20260929/source/

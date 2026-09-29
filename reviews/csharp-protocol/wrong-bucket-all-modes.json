@@ -1,0 +1,23 @@
+{
+  "aggregate": {
+    "exit": 0,
+    "valid": true
+  },
+  "retain-reuse": {
+    "exit": 0,
+    "valid": true
+  },
+  "retain-allocate": {
+    "exit": 0,
+    "valid": true
+  },
+  "selftest_negative_control": {
+    "exit": 2,
+    "output": {
+      "event": "error",
+      "valid": false,
+      "error": "end_summary_mismatch",
+      "error_type": "InvalidDataException"
+    }
+  }
+}

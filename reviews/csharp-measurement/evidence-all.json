@@ -1,0 +1,109 @@
+{
+  "binary_sha256": {
+    "F:\\SocketServerClient\\src\\dotnet\\bin\\Release\\net11.0\\Bench.dll": "73489b69f86f49137b14fa8699ebf7929f4d9632e4937492e90deec55f0b4764",
+    "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe": "fe494c9bf033c15867de263994d3bcf288363285c94818b004775a294784361d"
+  },
+  "metadata": [
+    {
+      "name": "bad-sum-cs-aggregate",
+      "exit_code": 0,
+      "valid": true
+    },
+    {
+      "name": "bad-sum-cpp-aggregate",
+      "exit_code": 1,
+      "valid": false
+    },
+    {
+      "name": "bad-sum-cs-retain-reuse",
+      "exit_code": 0,
+      "valid": true
+    },
+    {
+      "name": "bad-sum-cpp-retain-reuse",
+      "exit_code": 1,
+      "valid": false
+    },
+    {
+      "name": "bad-sum-cs-retain-allocate",
+      "exit_code": 0,
+      "valid": true
+    },
+    {
+      "name": "bad-sum-cpp-retain-allocate",
+      "exit_code": 1,
+      "valid": false
+    }
+  ],
+  "client": [
+    {
+      "name": "cs-count-0.1-100",
+      "exit_code": 1,
+      "wall_seconds": 0.37915489999431884,
+      "observed_after_window_seconds": 0.051648200000636274,
+      "offered": 10,
+      "admitted": 10,
+      "acknowledged": 10,
+      "failed": 0,
+      "timedout": 0,
+      "unresolved": 0,
+      "cohort_seconds": 0.1,
+      "drain_seconds": 0
+    },
+    {
+      "name": "cs-sum-0.1-100",
+      "exit_code": 1,
+      "wall_seconds": 0.3793856999982381,
+      "observed_after_window_seconds": 0.05217619999748421,
+      "offered": 10,
+      "admitted": 10,
+      "acknowledged": 10,
+      "failed": 0,
+      "timedout": 0,
+      "unresolved": 0,
+      "cohort_seconds": 0.1,
+      "drain_seconds": 0
+    },
+    {
+      "name": "cs-withhold-0.1-100",
+      "exit_code": 1,
+      "wall_seconds": 0.9154685999965295,
+      "observed_after_window_seconds": 0.5635565000033239,
+      "offered": 10,
+      "admitted": 8,
+      "acknowledged": 0,
+      "failed": 0,
+      "timedout": 8,
+      "unresolved": 8,
+      "cohort_seconds": 0.1,
+      "drain_seconds": 0
+    },
+    {
+      "name": "cs-pause-0.025-none-0.4-1000",
+      "exit_code": 0,
+      "offered": 400,
+      "admitted": 23,
+      "acknowledged": 23,
+      "rejected": 377,
+      "misses_10ms": 400,
+      "cohort_seconds": 0.5840396,
+      "drain_seconds": 0.1840396
+    },
+    {
+      "name": "cs-pause-0.1-none-0.4-1000",
+      "exit_code": 0,
+      "offered": 400,
+      "admitted": 11,
+      "acknowledged": 11,
+      "rejected": 389,
+      "misses_10ms": 400,
+      "cohort_seconds": 1.1064133,
+      "drain_seconds": 0.7064133
+    }
+  ],
+  "report": {
+    "fixture": "F:\\SocketServerClient\\reviews\\csharp-measurement\\report-inadequate",
+    "exit_code": 0,
+    "inadequate_pairs_presented": true
+  }
+}

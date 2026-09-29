@@ -1,209 +1,174 @@
+using System.Buffers.Binary;
 using System.Globalization;
 using System.Net.Sockets;
+
+[assembly: System.Runtime.Versioning.SupportedOSPlatform("windows")]
 
 namespace TcpBench;
 
 sealed class Options
 {
-    public string Command = "";
-    public string Mode = "aggregate";
-    public string Corpus = "";
-    public string Output = "";
-    public string Arrival = "steady";
-    public int Port = 9000;
-    public int MaxFrame = 1048576;
-    public int MaxConnections = 32;
-    public int Workers = 4;
-    public int IdleMs = 5000;
-    public int FrameMs = 30000;
-    public int RetainBatches = 8;
-    public int SocketBuffer = 262144;
-    public int Connections = 4;
-    public int Window = 8;
-    public int PauseEvery;
-    public int PauseMs;
-    public int ControlStdin;
-    public int IoCap = int.MaxValue;
+    public const int HardLimit = 16 * 1024 * 1024;
+    public string Command = "", Corpus = "", Output = "", Arrival = "steady";
+    public Mode Mode = Mode.Aggregate;
+    public int Port = 9000, MaxConnections = 32, Workers = 4, Connections = 4, Window = 8;
+    public int IdleMs = 5000, FrameMs = 30000, SocketBuffer = 262144, PauseEvery, PauseMs, IoCap, ControlStdin;
+    public int MaxFrame = 1048576, RetainBatches = 8;
     public long RetainBytes = 67108864, InflightBytes = 67108864;
-    public double Duration = 10;
-    public double Warmup = 2;
-    public double Rate;
-    public double DrainSeconds = 30;
-    public double RunSeconds;
+    public double Duration = 10, Warmup = 2, Rate, DrainSeconds = 30;
     public ulong Seed = 42;
     public byte[] Manifest = new byte[32];
+
+    static readonly Dictionary<string, string> Allowed = new()
+    {
+        ["server"] = " port mode max-frame max-connections workers manifest-hash idle-timeout-ms frame-timeout-ms " +
+            "retain-batches retain-bytes socket-buffer output pause-every pause-ms io-cap control-stdin ",
+        ["client"] = " port corpus mode connections duration warmup window inflight-bytes rate arrival seed " +
+            "manifest-hash socket-buffer drain-seconds output io-cap ",
+        ["process"] = " corpus mode duration warmup output retain-batches retain-bytes ",
+        ["selftest"] = " corpus "
+    };
+
     public static Options Parse(string[] args)
     {
-        if (args.Length == 0)
+        if (args.Length == 0 || !Allowed.TryGetValue(args[0], out string? allowed))
         {
-            throw new ArgumentException("usage: Bench server|client|process|selftest [--name value]");
+            throw new BenchException("usage: Bench server|client|process|selftest [--name value]");
         }
 
-        var o = new Options
-        {
-            Command = args[0]
-        };
-        string allowed = o.Command switch
-        {
-            "server" => "port mode max-frame max-connections workers manifest-hash idle-timeout-ms frame-timeout-ms " +
-                "retain-batches retain-bytes socket-buffer output run-seconds pause-every pause-ms io-cap control-stdin",
-            "client" => "port corpus mode connections duration warmup window inflight-bytes rate arrival seed " +
-                "manifest-hash socket-buffer drain-seconds output io-cap",
-            "process" => "corpus mode duration warmup output retain-batches retain-bytes",
-            "selftest" => "corpus",
-            _ => throw new ArgumentException("unknown command")
-        };
-        var names = allowed.Split(' ').ToHashSet(StringComparer.Ordinal);
-        var seen = new HashSet<string>(StringComparer.Ordinal);
+        var o = new Options { Command = args[0] };
+        var values = new Dictionary<string, string>();
         for (int i = 1; i < args.Length; i += 2)
         {
             if (!args[i].StartsWith("--", StringComparison.Ordinal) || i + 1 >= args.Length)
             {
-                throw new ArgumentException("options require --name value");
+                throw new BenchException("options require --name value");
             }
 
-            string name = args[i][2..], value = args[i + 1];
-            if (!names.Contains(name) || !seen.Add(name))
+            string name = args[i][2..];
+            if (!allowed.Split(' ', StringSplitOptions.RemoveEmptyEntries).Contains(name) || !values.TryAdd(name, args[i + 1]))
             {
-                throw new ArgumentException("unknown or duplicate option: " + name);
-            }
-
-            int Int(int min, int max) =>
-                int.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out int v) && v >= min && v <= max
-                    ? v : throw new ArgumentException("invalid --" + name);
-            long Long(long min, long max) =>
-                long.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out long v) && v >= min && v <= max
-                    ? v : throw new ArgumentException("invalid --" + name);
-            double Real(double min, double max) =>
-                double.TryParse(value, NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent, CultureInfo.InvariantCulture, out double v)
-                    && double.IsFinite(v) && v >= min && v <= max
-                    ? v : throw new ArgumentException("invalid --" + name);
-            switch (name)
-            {
-                case "port":
-                    o.Port = Int(1, 65535);
-                    break;
-                case "mode":
-                    o.Mode = value;
-                    break;
-                case "corpus":
-                    o.Corpus = value;
-                    break;
-                case "output":
-                    o.Output = value;
-                    break;
-                case "arrival":
-                    o.Arrival = value;
-                    break;
-                case "max-frame":
-                    o.MaxFrame = Int(1, Wire.HardLimit);
-                    break;
-                case "max-connections":
-                    o.MaxConnections = Int(1, 1024);
-                    break;
-                case "workers":
-                    o.Workers = Int(1, 1024);
-                    break;
-                case "idle-timeout-ms":
-                    o.IdleMs = Int(1, 3600000);
-                    break;
-                case "frame-timeout-ms":
-                    o.FrameMs = Int(1, 3600000);
-                    break;
-                case "retain-batches":
-                    o.RetainBatches = Int(1, 65536);
-                    break;
-                case "retain-bytes":
-                    o.RetainBytes = Long(1, int.MaxValue);
-                    break;
-                case "socket-buffer":
-                    o.SocketBuffer = Int(1024, 16777216);
-                    break;
-                case "connections":
-                    o.Connections = Int(1, 1024);
-                    break;
-                case "window":
-                    o.Window = Int(1, 1048576);
-                    break;
-                case "inflight-bytes":
-                    o.InflightBytes = Long(1, 2147483648);
-                    break;
-                case "duration":
-                    o.Duration = Real(0.001, 86400);
-                    break;
-                case "warmup":
-                    o.Warmup = Real(0, 86400);
-                    break;
-                case "rate":
-                    o.Rate = Real(0, 1000000000);
-                    break;
-                case "drain-seconds":
-                    o.DrainSeconds = Real(0.001, 86400);
-                    break;
-                case "run-seconds":
-                    o.RunSeconds = Real(0, 86400);
-                    break;
-                case "pause-every":
-                    o.PauseEvery = Int(0, int.MaxValue);
-                    break;
-                case "pause-ms":
-                    o.PauseMs = Int(0, 3600000);
-                    break;
-                case "io-cap":
-                    o.IoCap = Int(1, Wire.HardLimit);
-                    break;
-                case "control-stdin":
-                    o.ControlStdin = Int(0, 1);
-                    break;
-                case "seed":
-                    o.Seed = ulong.Parse(value, NumberStyles.None, CultureInfo.InvariantCulture);
-                    break;
-                case "manifest-hash":
-                    if (value.Length != 64)
-                    {
-                        throw new ArgumentException("manifest hash must have 64 hex digits");
-                    }
-
-                    o.Manifest = Convert.FromHexString(value);
-                    break;
+                throw new BenchException("unknown or duplicate option: " + name);
             }
         }
 
-        if (o.Mode is not ("aggregate" or "retain-reuse" or "retain-allocate" or "transport"))
+        double Number(string name, double current, double min, double max, bool integer = true)
         {
-            throw new ArgumentException("invalid mode");
+            if (!values.TryGetValue(name, out string? text))
+            {
+                return current;
+            }
+
+            NumberStyles style = integer ? NumberStyles.None : NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent;
+            return double.TryParse(text, style, CultureInfo.InvariantCulture, out double v) && double.IsFinite(v) && v >= min && v <= max
+                ? v
+                : throw new BenchException("invalid --" + name);
         }
 
+        string Text(string name, string current) => values.GetValueOrDefault(name, current);
+
+        o.Mode = Text("mode", "aggregate") switch
+        {
+            "aggregate" => Mode.Aggregate,
+            "retain-reuse" => Mode.RetainReuse,
+            "retain-allocate" => Mode.RetainAllocate,
+            "transport" => Mode.Transport,
+            _ => throw new BenchException("invalid mode")
+        };
+        o.Corpus = Text("corpus", "");
+        o.Output = Text("output", "");
+        o.Arrival = Text("arrival", "steady");
+        o.Port = (int)Number("port", o.Port, 1, 65535);
+        o.MaxFrame = (int)Number("max-frame", o.MaxFrame, 1, HardLimit);
+        o.MaxConnections = (int)Number("max-connections", o.MaxConnections, 1, 1024);
+        o.Workers = (int)Number("workers", o.Workers, 1, 256);
+        o.IdleMs = (int)Number("idle-timeout-ms", o.IdleMs, 1, 3_600_000);
+        o.FrameMs = (int)Number("frame-timeout-ms", o.FrameMs, 1, 3_600_000);
+        o.RetainBatches = (int)Number("retain-batches", o.RetainBatches, 1, 65536);
+        o.RetainBytes = (long)Number("retain-bytes", o.RetainBytes, 1, 2147483648);
+        o.SocketBuffer = (int)Number("socket-buffer", o.SocketBuffer, 0, 16777216);
+        o.Connections = (int)Number("connections", o.Connections, 1, 1024);
+        o.Window = (int)Number("window", o.Window, 1, 1048576);
+        o.InflightBytes = (long)Number("inflight-bytes", o.InflightBytes, 1, 2147483648);
+        o.Duration = Number("duration", o.Duration, 0.001, 86400, false);
+        o.Warmup = Number("warmup", o.Warmup, 0, 86400, false);
+        o.Rate = Number("rate", o.Rate, 0, 1e9, false);
+        o.DrainSeconds = Number("drain-seconds", o.DrainSeconds, 0.001, 86400, false);
+        o.PauseEvery = (int)Number("pause-every", o.PauseEvery, 0, int.MaxValue);
+        o.PauseMs = (int)Number("pause-ms", o.PauseMs, 0, 60000);
+        o.IoCap = (int)Number("io-cap", o.IoCap, 0, HardLimit);
+        o.ControlStdin = (int)Number("control-stdin", o.ControlStdin, 0, 1);
+        if (values.TryGetValue("seed", out string? seed) && !ulong.TryParse(seed, NumberStyles.None, CultureInfo.InvariantCulture, out o.Seed))
+        {
+            throw new BenchException("invalid --seed");
+        }
+
+        string manifest = Text("manifest-hash", new string('0', 64));
+        if (manifest.Length != 64 || !manifest.All(Uri.IsHexDigit))
+        {
+            throw new BenchException("manifest hash must have 64 hex digits");
+        }
+
+        o.Manifest = Convert.FromHexString(manifest);
         if (o.Arrival is not ("steady" or "poisson" or "burst"))
         {
-            throw new ArgumentException("invalid arrival");
+            throw new BenchException("invalid arrival");
         }
 
-        if (o.Command is "client" or "process" && o.Corpus.Length == 0)
+        if (o.SocketBuffer is > 0 and < 1024)
         {
-            throw new ArgumentException("--corpus required");
-        }
-
-        if (o.Command == "server" &&
-            ((long)o.MaxFrame * o.MaxConnections > 1073741824 ||
-            o.Mode.StartsWith("retain", StringComparison.Ordinal) && o.RetainBytes * o.MaxConnections > 2147483648))
-        {
-            throw new ArgumentException("scenario exceeds application memory envelope");
+            throw new BenchException("invalid --socket-buffer");
         }
 
         if ((o.PauseEvery == 0) != (o.PauseMs == 0))
         {
-            throw new ArgumentException("pause-every and pause-ms must both be positive or both zero");
+            throw new BenchException("pause-every and pause-ms must both be positive or both zero");
+        }
+
+        if (o.Command is "client" or "process" && o.Corpus.Length == 0)
+        {
+            throw new BenchException("--corpus required");
+        }
+
+        if (o.Command == "client" && o.Rate == 0 && o.Window % o.Connections != 0)
+        {
+            throw new BenchException("closed loop requires window to be a multiple of connections");
+        }
+
+        if (o.Command == "server" && ((long)o.MaxFrame * o.MaxConnections > 1L << 30 ||
+            o.Mode is Mode.RetainReuse or Mode.RetainAllocate && o.RetainBytes * o.MaxConnections > 1L << 31))
+        {
+            throw new BenchException("scenario exceeds application memory envelope");
         }
 
         return o;
     }
 
+    public static string Name(Mode mode) => mode switch
+    {
+        Mode.Aggregate => "aggregate",
+        Mode.RetainReuse => "retain-reuse",
+        Mode.RetainAllocate => "retain-allocate",
+        _ => "transport"
+    };
+
+    public static void Header(Span<byte> h, int length, ushort type, ulong sequence)
+    {
+        BinaryPrimitives.WriteUInt32BigEndian(h, (uint)length);
+        BinaryPrimitives.WriteUInt16BigEndian(h[4..], 1);
+        BinaryPrimitives.WriteUInt16BigEndian(h[6..], type);
+        BinaryPrimitives.WriteUInt64BigEndian(h[8..], sequence);
+    }
+
+    // TCP_NODELAY always; buffer sizes only when positive (0 keeps Windows autotuning).
     public void Configure(Socket socket)
     {
         socket.NoDelay = true;
-        socket.SendBufferSize = SocketBuffer;
-        socket.ReceiveBufferSize = SocketBuffer;
+        if (SocketBuffer > 0)
+        {
+            socket.SendBufferSize = SocketBuffer;
+            socket.ReceiveBufferSize = SocketBuffer;
+        }
     }
 }
 
@@ -213,25 +178,21 @@ static class Program
     {
         try
         {
-            Options options = Options.Parse(args);
-            return options.Command switch
+            Options o = Options.Parse(args);
+            return o.Command switch
             {
-                "server" => await Server.Run(options),
-                "client" => await Load.Run(options),
-                "process" => ProcessControl.Run(options),
-                "selftest" => SelfTest.Run(options),
-                _ => 2
+                "server" => await Server.Run(o),
+                "client" => await Client.Run(o),
+                "process" => ProcessControl.Run(o),
+                _ => SelfTest.Run(o)
             };
         }
-        catch (Exception e)
+        catch (Exception e) when (e is BenchException or IOException or SocketException or UnauthorizedAccessException or OperationCanceledException)
         {
-            JsonOutput.Print(new
-            {
-                @event = "error",
-                valid = false,
-                error = e.Message,
-                error_type = e.GetType().Name
-            });
+            // Also replace any stale --output file, so a failed run never leaves an old result.
+            int at = Array.IndexOf(args, "--output");
+            string output = at > 0 && at + 1 < args.Length ? args[at + 1] : "";
+            JsonOutput.Emit(output, new { @event = "error", valid = false, error = e.Message });
             return 2;
         }
     }

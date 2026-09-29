@@ -1,0 +1,41 @@
+{
+  "name": "diagnostics",
+  "purpose": "Controlled single-variable diagnostics for the first-pass anomalies and for client headroom. Not headline evidence.",
+  "seed": 7,
+  "server_cores": 4,
+  "corpora": {
+    "mixed1m": {"profile": "mixed", "bytes": 268435456, "frame_bytes": 1048576, "seed": 42},
+    "easy64k": {"profile": "easy", "bytes": 536870912, "frame_bytes": 65536, "seed": 101}
+  },
+  "defaults": {"duration": 10, "warmup": 3, "connections": 1, "window": 1, "group": "Diagnostics"},
+  "phases": [
+    {"name": "tcp-stall", "repetitions": 1, "cells": [
+      {"name": "stall-w1-256k", "title": "1 MiB transport + 2 ms pause, window 1, 256 KiB buffers", "corpus": "mixed1m", "mode": "transport", "pause_every": 1, "pause_ms": 2, "window": 1, "socket_buffer": 262144},
+      {"name": "stall-w2-256k", "title": "... window 2, 256 KiB", "corpus": "mixed1m", "mode": "transport", "pause_every": 1, "pause_ms": 2, "window": 2, "socket_buffer": 262144, "servers": ["cpp"]},
+      {"name": "stall-w64-256k", "title": "... window 64, 256 KiB", "corpus": "mixed1m", "mode": "transport", "pause_every": 1, "pause_ms": 2, "window": 64, "socket_buffer": 262144},
+      {"name": "stall-w1-1m", "title": "... window 1, 1 MiB", "corpus": "mixed1m", "mode": "transport", "pause_every": 1, "pause_ms": 2, "window": 1, "socket_buffer": 1048576, "servers": ["cpp"]},
+      {"name": "stall-w64-1m", "title": "... window 64, 1 MiB", "corpus": "mixed1m", "mode": "transport", "pause_every": 1, "pause_ms": 2, "window": 64, "socket_buffer": 1048576, "servers": ["cpp"]},
+      {"name": "stall-w1-4m", "title": "... window 1, 4 MiB", "corpus": "mixed1m", "mode": "transport", "pause_every": 1, "pause_ms": 2, "window": 1, "socket_buffer": 4194304, "servers": ["cpp"]},
+      {"name": "stall-w64-4m", "title": "... window 64, 4 MiB", "corpus": "mixed1m", "mode": "transport", "pause_every": 1, "pause_ms": 2, "window": 64, "socket_buffer": 4194304},
+      {"name": "stall-w1-os", "title": "... window 1, OS autotuning", "corpus": "mixed1m", "mode": "transport", "pause_every": 1, "pause_ms": 2, "window": 1, "socket_buffer": 0, "servers": ["cpp"]},
+      {"name": "stall-w64-os", "title": "... window 64, OS autotuning", "corpus": "mixed1m", "mode": "transport", "pause_every": 1, "pause_ms": 2, "window": 64, "socket_buffer": 0},
+      {"name": "nostall-w64-256k", "title": "1 MiB transport, no pause, window 64, 256 KiB", "corpus": "mixed1m", "mode": "transport", "window": 64, "socket_buffer": 262144, "servers": ["cpp"]}
+    ]},
+    {"name": "large-json", "repetitions": 1, "cells": [
+      {"name": "json1m-w1-256k", "title": "1 MiB JSON aggregate, window 1, 256 KiB", "corpus": "mixed1m", "mode": "aggregate", "window": 1, "socket_buffer": 262144},
+      {"name": "json1m-w64-256k", "title": "1 MiB JSON aggregate, window 64, 256 KiB", "corpus": "mixed1m", "mode": "aggregate", "window": 64, "socket_buffer": 262144},
+      {"name": "json1m-w1-os", "title": "1 MiB JSON aggregate, window 1, OS autotuning", "corpus": "mixed1m", "mode": "aggregate", "window": 1, "socket_buffer": 0},
+      {"name": "json1m-w64-os", "title": "1 MiB JSON aggregate, window 64, OS autotuning", "corpus": "mixed1m", "mode": "aggregate", "window": 64, "socket_buffer": 0}
+    ]},
+    {"name": "fairness", "repetitions": 2, "cells": [
+      {"name": "easy-aggregate-yield-4m", "title": "EASY aggregate after per-frame yield, 4 MiB buffers", "corpus": "easy64k", "mode": "aggregate", "connections": 16, "window": 64, "duration": 20, "warmup": 10, "socket_buffer": 4194304},
+      {"name": "easy-transport-yield-4m", "title": "EASY transport after per-frame yield, 4 MiB buffers", "corpus": "easy64k", "mode": "transport", "connections": 16, "window": 64, "duration": 20, "warmup": 10, "socket_buffer": 4194304}
+    ]},
+    {"name": "headroom", "repetitions": 1, "cells": [
+      {"name": "easy-transport-3c", "title": "EASY transport, 3 client cores", "corpus": "easy64k", "mode": "transport", "connections": 16, "window": 64, "duration": 20, "warmup": 10},
+      {"name": "easy-transport-4c", "title": "EASY transport, 4 client cores", "corpus": "easy64k", "mode": "transport", "connections": 16, "window": 64, "duration": 20, "warmup": 10, "client_cores": "client+spare"},
+      {"name": "easy-aggregate-3c", "title": "EASY aggregate, 3 client cores", "corpus": "easy64k", "mode": "aggregate", "connections": 16, "window": 64, "duration": 20, "warmup": 10},
+      {"name": "easy-aggregate-4c", "title": "EASY aggregate, 4 client cores", "corpus": "easy64k", "mode": "aggregate", "connections": 16, "window": 64, "duration": 20, "warmup": 10, "client_cores": "client+spare"}
+    ]}
+  ]
+}

@@ -2,10 +2,9 @@
 import argparse
 import json
 import random
-import struct
 from pathlib import Path
 
-from protocol import ROOT, ACK, TOTAL, begin, connection, corpus, frame, response, start_server
+from protocol import ACK, Server, Summary, corpus, frame, response
 
 
 def payloads(seed, count):
@@ -30,29 +29,20 @@ def payloads(seed, count):
 
 
 def run(binary, mode, fixtures):
-    process, log, port = start_server(binary, mode, ROOT / "results/differential" / binary.stem)
-    try:
-        with connection(port) as sock:
-            begin(sock)
-            counts, sums, digest, size, records = [0] * 64, [0] * 64, corpus.OFFSET, 0, 0
+    with Server(binary, "--mode", mode, "--max-frame", "65536") as server:
+        with server.connect() as sock:
+            summary = Summary()
             for index, (payload, expected) in enumerate(fixtures):
                 seq = index + 2
                 sock.sendall(frame(2, seq, payload))
                 actual = ACK.unpack(response(sock, 2, seq))
                 assert actual == (expected["records"], expected["digest"]), (mode, index, actual, expected)
-                digest = corpus.fnv(struct.pack(">QQQ", seq, *actual), digest)
-                size += len(payload)
-                records += expected["records"]
-                counts = [a + b for a, b in zip(counts, expected["counts"])]
-                sums = [a + b for a, b in zip(sums, expected["sums"])]
+                summary.add(seq, payload, expected)
             end_seq = len(fixtures) + 2
             sock.sendall(frame(3, end_seq))
-            assert TOTAL.unpack(response(sock, 3, end_seq)) == (len(fixtures), size, records, digest, *counts, *sums)
-    finally:
-        process.terminate()
-        process.wait(timeout=10)
-        log.close()
-    return {"binary": str(binary), "mode": mode, "validated_frames": len(fixtures), "records": records}
+            assert response(sock, 3, end_seq) == summary.pack()
+        assert server.stop()["valid"]
+    return {"binary": str(binary), "mode": mode, "validated_frames": len(fixtures), "records": summary.records}
 
 
 def main():

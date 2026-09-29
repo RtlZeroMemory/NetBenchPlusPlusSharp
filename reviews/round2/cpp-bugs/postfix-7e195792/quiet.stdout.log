@@ -1,0 +1,42 @@
+{
+  "binary_sha256": "7e1957923dcdcd1cbb71e72e9373286677473681ec2cddea1500e2f8e144a329",
+  "binary_unchanged": true,
+  "cases": [
+    {
+      "mode": "retain-reuse",
+      "control": "eof",
+      "quiet_seconds": 0.15,
+      "frame_and_idle_deadline_ms": 100,
+      "graceful_connections": 1,
+      "completed_frames": 1,
+      "rejection_reasons": {}
+    },
+    {
+      "mode": "retain-reuse",
+      "control": "end",
+      "quiet_seconds": 0.15,
+      "frame_and_idle_deadline_ms": 100,
+      "graceful_connections": 1,
+      "completed_frames": 1,
+      "rejection_reasons": {}
+    },
+    {
+      "mode": "retain-allocate",
+      "control": "eof",
+      "quiet_seconds": 0.15,
+      "frame_and_idle_deadline_ms": 100,
+      "graceful_connections": 1,
+      "completed_frames": 1,
+      "rejection_reasons": {}
+    },
+    {
+      "mode": "retain-allocate",
+      "control": "end",
+      "quiet_seconds": 0.15,
+      "frame_and_idle_deadline_ms": 100,
+      "graceful_connections": 1,
+      "completed_frames": 1,
+      "rejection_reasons": {}
+    }
+  ]
+}

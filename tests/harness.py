@@ -1,138 +1,127 @@
-"""Small independent checks for the corpus, affinity inheritance, and runner accounting."""
-import json
+"""Independent checks for the corpus generator, runner and report (no timed traffic)."""
 import csv
-import os
+import hashlib
+import json
+import math
 import subprocess
 import sys
-import time
+import tempfile
 from pathlib import Path
-from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "tools"))
-sys.path.insert(0, str(ROOT / "bench"))
-import corpus
-import run
-import report as report_tool
+sys.path[:0] = [str(ROOT / "tools"), str(ROOT / "bench")]
+import corpus  # noqa: E402
+import report  # noqa: E402
+import run  # noqa: E402
+
+
+def corpus_checks(folder):
+    for profile in corpus.PROFILES:
+        a, b = folder / f"{profile}-a.bin", folder / f"{profile}-b.bin"
+        left = corpus.write_frames(a, corpus.generate_payloads(65536, 4096, 123, profile))
+        right = corpus.write_frames(b, corpus.generate_payloads(65536, 4096, 123, profile))
+        assert left == right and a.read_bytes() == b.read_bytes(), profile
+        for payload, expected in corpus.read_corpus(a):
+            assert all(corpus.process(payload)[k] == v for k, v in expected.items())
+    sizes = [len(p) for p in corpus.generate_payloads(8 << 20, 1 << 20, 5, "hard", 4096)]
+    assert min(sizes) < 64 << 10 and max(sizes) > 256 << 10, "mixed frame sizes are not mixed"
+    # Profile "mixed" must stay byte-identical to the first-pass generator (digest of its output).
+    digest = hashlib.sha256(b"".join(corpus.generate_payloads(1 << 20, 65536, 42))).hexdigest()
+    assert digest == "403e5dab305bd57bcb68890cad6d0d8e7c10996b056c22a5586ccf21b73d8d0c", digest
+    truncated = folder / "truncated.bin"
+    truncated.write_bytes((folder / "hard-a.bin").read_bytes()[:-1])
+    try:
+        list(corpus.read_corpus(truncated))
+    except ValueError:
+        return
+    raise AssertionError("truncated corpus accepted")
+
+
+def entry(server, repetition, *, valid=True, cpu=0.5, lateness_ns=0, late=0, offered=1000, scheduled=True, rate=1.0):
+    result = {"valid": valid, "load_model": "scheduled" if scheduled else "closed-loop",
+              "counts": {"offered": offered, "admitted": offered, "rejected": 0, "acknowledged": offered, "failed": 0,
+                         "unresolved": 0, "timedout": 0, "generator_late_rejected": 0, "aborted_schedule_rejected": 0},
+              "window": {"seconds": 1, "frames": offered, "records": int(offered * rate), "payload_bytes": offered},
+              "latency": {"scheduled": {"count": offered, "p50_ns": 1000, "p99_ns": 2000}},
+              "generator": {"lateness": {"count": offered, "p99_ns": lateness_ns}, "late_over_1ms": late},
+              "resources": {"seconds": 1, "cpu_seconds": 3 * cpu, "logical_cpus": 3}}
+    server_result = {"valid": True, "measured": {"complete": True, "seconds": 1, "frames": offered, "records": offered,
+                                                 "cpu_seconds": 1}, "lifetime": {}, "stages": {}, "retention": {}}
+    cell = {"phase": "p", "name": "c", "kind": "tcp", "mode": "aggregate", "repetition": repetition, "connections": 1,
+            "window": 1, "rate": 1, "arrival": "steady", "socket_buffer": 0, "retain_batches": 8, "duration": 1,
+            "warmup": 0}
+    return {"ordinal": repetition, "cell": cell, "server": server, "client": "cpp", "builds": {}, "corpus": {"name": "x"},
+            "elapsed_seconds": 1, "background_cpu_seconds": 0, "logical_cpus": 16, "runner_error": None,
+            "path": f"{server}-{repetition}", "result": result, "server_result": server_result}
+
+
+def report_checks(folder):
+    entries = [entry("cpp", 0), entry("csharp", 0, rate=0.5),                        # eligible pair
+               entry("cpp", 1), entry("csharp", 1, lateness_ns=150_000),            # p99 lateness over 100 us
+               entry("cpp", 2), entry("csharp", 2, late=2),                          # 0.2% > 0.1% over 1 ms
+               entry("cpp", 3, cpu=0.9), entry("csharp", 3),                         # client CPU above 85%
+               entry("cpp", 4, valid=False), entry("csharp", 4),                     # invalid
+               entry("cpp", 5, late=1), entry("csharp", 5, late=1)]                  # 0.1%: allowed; strict v1 fails
+    rows = [report.row(e) for e in entries]
+    report.mark_pairs(rows)
+    by = {(r["server"], r["repetition"]): r for r in rows}
+    assert by["csharp", 1]["exclusion"] == "lateness_p99_over_100us" and by["cpp", 1]["exclusion"] == "partner_excluded"
+    assert by["csharp", 2]["exclusion"] == "late_over_1ms_above_0.1pct" and not by["cpp", 2]["eligible"]
+    assert by["cpp", 3]["exclusion"] == "client_cpu_over_85pct" and not by["csharp", 3]["eligible"]
+    assert by["cpp", 4]["exclusion"] == "invalid_or_unreconciled" and not by["csharp", 4]["eligible"]
+    assert by["cpp", 5]["eligible"] and by["cpp", 5]["strict_v1_adequate"] is False
+    assert report.row(entry("cpp", 9, cpu=0.9, scheduled=False))["exclusion"] == "client_cpu_over_85pct"
+    # Offered-demand percentiles: rejected demand is a miss, never a finite latency.
+    histogram = {"count": 98, "buckets": [[1_000_000, 98]]}
+    assert report.offered_quantile(histogram, 2, .98) == 1.0 and report.offered_quantile(histogram, 2, .99) == math.inf
+    line = report.ratio_line("t", rows, "records_per_second", "records/s")
+    assert line == "| t | records/s | 2 | 0.750 | – |", line  # repetitions 0 (0.5) and 5 (1.0) only
+    (folder / "results.json").write_text(json.dumps(entries), encoding="utf-8")
+    subprocess.run([sys.executable, str(ROOT / "bench/report.py"), str(folder)], check=True, capture_output=True)
+    with (folder / "trials.csv").open(newline="", encoding="utf-8") as stream:
+        rows = list(csv.DictReader(stream))
+    assert len(rows) == 12 and sum(r["eligible"] == "True" for r in rows) == 4
+    text = (folder / "report.md").read_text(encoding="utf-8")
+    assert "4 of 12 trials eligible" in text and "lateness_p99_over_100us" in text
+    capacity = run.capacity([{"cell": {"name": "c"}, "server": s, "runner_error": None,
+                              "result": {"window": {"frames": f, "seconds": 2}}}
+                             for s, f in [("cpp", 100), ("cpp", 120), ("csharp", 80), ("csharp", 60)]], "c")
+    assert capacity == 35, capacity  # slower server's median frames per second
+
+
+def runner_checks(folder):
+    layout = run.cpu_layout(4)
+    cores = layout["physical_core_masks"]
+    assert layout["spare"] & cores[0], "physical core 0 is the spare"
+    for a, b in [("server", "client"), ("server", "spare"), ("client", "spare")]:
+        assert not layout[a] & layout[b]
+        assert not any(core & layout[a] and core & layout[b] for core in cores), "SMT siblings shared"
+    probe = ("import ctypes,json,os;k=ctypes.WinDLL('kernel32');k.GetCurrentProcess.restype=ctypes.c_void_p;"
+             "k.GetProcessAffinityMask.argtypes=[ctypes.c_void_p,ctypes.POINTER(ctypes.c_size_t),ctypes.POINTER(ctypes.c_size_t)];"
+             "p,s=ctypes.c_size_t(),ctypes.c_size_t();k.GetProcessAffinityMask(k.GetCurrentProcess(),ctypes.byref(p),ctypes.byref(s));"
+             "print(json.dumps({'mask':p.value,'processors':os.environ['DOTNET_PROCESSOR_COUNT']}))")
+    with (folder / "affinity.json").open("w", encoding="utf-8") as log:
+        child = run.spawn([sys.executable, "-c", probe], layout["server"], log)
+        assert child.wait(timeout=10) == 0
+    assert json.loads((folder / "affinity.json").read_text()) == {"mask": layout["server"], "processors": "4"}
+    # A real protocol failure (frames larger than --max-frame) is persisted, not dropped.
+    bad = folder / "bad.bin"
+    corpus.write_frames(bad, corpus.generate_payloads(8192, 4096, 1))
+    cell = run.DEFAULTS | {"name": "failure", "phase": "p", "repetition": 0, "mode": "aggregate", "duration": 0.2,
+                           "warmup": 0, "connections": 1, "window": 1, "seed": 1, "drain": 2}
+    info = {"name": "bad", "path": str(bad), "sha256": run.sha256(bad), "max_frame_bytes": 16}
+    summary = run.trial(folder, 1, cell, "cpp", layout, info)
+    saved = json.loads((Path(summary["path"]) / "summary.json").read_text(encoding="utf-8"))
+    assert saved["runner_error"] and report.row(saved)["exclusion"] == "invalid_or_unreconciled"
 
 
 def main():
-    folder = ROOT / "results/harness"
-    folder.mkdir(parents=True, exist_ok=True)
-    first, second = folder / "first.bin", folder / "second.bin"
-    left = corpus.write_frames(first, corpus.generate_payloads(16384, 4096, 123))
-    right = corpus.write_frames(second, corpus.generate_payloads(16384, 4096, 123))
-    assert left == right and first.read_bytes() == second.read_bytes()
-    for payload, expected in corpus.read_corpus(first):
-        actual = corpus.process(payload)
-        assert all(actual[key] == value for key, value in expected.items())
-    malformed = folder / "truncated.bin"
-    malformed.write_bytes(first.read_bytes()[:-1])
-    try:
-        list(corpus.read_corpus(malformed))
-    except ValueError:
-        pass
-    else:
-        raise AssertionError("Truncated corpus accepted")
-    report_folder = folder / "report-gates"
-    report_folder.mkdir(exist_ok=True)
-    entries = []
-    for pair in range(6):
-        for server in ["csharp", "cpp"]:
-            result = {"valid": True, "success": True, "generator_adequate": True,
-                      "sustainable": False, "window_seconds": 1, "window_completed_frames": 100,
-                      "completed_frames": 100, "offered": 120, "admitted": 100, "rejected": 20,
-                      "failed": 0, "timedout": 0, "unresolved": 0, "misses_1ms": 23,
-                      "latency_ns": {"count": 100, "overflow_60s": 0, "p99": 10000}}
-            if pair == 1 and server == "cpp": result["generator_adequate"] = False
-            if pair == 2 and server == "csharp": result["valid"] = False
-            if pair == 2 and server == "cpp": del result["generator_adequate"]
-            scenario = {"mode": "aggregate", "frame_bytes": 4096, "connections": 1,
-                        "rate": 120, "duration": 1, "phase": "measurement", "pair": pair,
-                        "corpus_sha256": server if pair == 3 else "common"}
-            entry = {"server": server, "client": "cpp", "scenario": scenario,
-                     "result": result, "path": f"fixture-{pair}-{server}"}
-            if pair == 4:
-                entry["builds"] = {"csharp": server, "cpp": "same"}
-            if pair == 5:
-                entry["cpu_masks"] = {"server": 1 if server == "cpp" else 2}
-            entries.append(entry)
-    (report_folder / "results.json").write_text(json.dumps(entries), encoding="utf-8")
-    subprocess.run([sys.executable, str(ROOT / "bench/report.py"), str(report_folder)], check=True)
-    with (report_folder / "trials.csv").open(newline="", encoding="utf-8") as stream:
-        rows = list(csv.DictReader(stream))
-    assert len(rows) == 12 and sum(row["comparison_eligible"] == "True" for row in rows) == 9
-    assert rows[0]["sustainable"] == "False" and rows[0]["comparison_eligible"] == "True"
-    assert rows[0]["misses_1ms"] == "23" and rows[0]["latency_samples"] == "100"
-    report = (report_folder / "report.md").read_text(encoding="utf-8")
-    assert "Eligible trials: 9 / 12" in report and "fixture-1-cpp" in report
-    assert report.count("| 1 | 1.0000 |") == 1, "Invalid, inadequate or unlike pairs entered comparison"
-    assert "runner_failure" in report_tool.exclusion_reasons(entries[0] | {"runner_error": "forced stop"})
-    for seconds in [float("nan"), float("inf"), 0, -1]:
-        entry = entries[0] | {"result": entries[0]["result"] | {"window_seconds": seconds}}
-        assert "invalid_window" in report_tool.exclusion_reasons(entry)
-    # Exercise the real campaign dispatch without running 54 timed subprocess trials.
-    campaign_folder = folder / f"campaign-plan-{time.time_ns()}"
-    planned = []
-
-    def capture_trial(destination, executables, masks, scenario, server, client, ordinal):
-        summary = {"scenario": scenario, "server": server, "client": client,
-                   "result": {"window_completed_frames": 50 if server == "csharp" else 100,
-                              "window_seconds": 1}}
-        planned.append(summary)
-        return summary
-
-    argv = ["run.py", "--suite", "first", "--output", str(campaign_folder), "--corpus-bytes", "1024"]
-    with patch.object(sys, "argv", argv), patch.object(run, "trial", capture_trial), \
-            patch.object(run, "environment_details", return_value={}):
-        run.main()
-    assert len(planned) == 54
-    assert sum(row["scenario"]["phase"] == "closed-loop" for row in planned) == 24
-    assert sum(row["scenario"]["phase"] == "alternate-client" for row in planned) == 8
-    scheduled = [row for row in planned if row["scenario"]["phase"] == "scheduled-exploration"]
-    assert len(scheduled) == 18 and {row["scenario"]["rate"] for row in scheduled} == {25, 45, 60}
-    assert all(row["scenario"]["duration"] == 30 and row["scenario"]["warmup"] == 5 for row in planned)
-    if os.name == "nt":
-        masks = run.cpu_masks(4)
-        assert not masks["server"] & masks["client"]
-        assert not masks["spare"] & (masks["client"] | masks["server"])
-        for core in masks["physical_core_masks"]:
-            assert not (core & masks["server"] and core & masks["client"])
-        child_code = """import ctypes,json,os
-k=ctypes.WinDLL('kernel32',use_last_error=True)
-k.GetCurrentProcess.restype=ctypes.c_void_p
-k.GetProcessAffinityMask.argtypes=[ctypes.c_void_p,ctypes.POINTER(ctypes.c_size_t),ctypes.POINTER(ctypes.c_size_t)]
-p,s=ctypes.c_size_t(),ctypes.c_size_t()
-assert k.GetProcessAffinityMask(k.GetCurrentProcess(),ctypes.byref(p),ctypes.byref(s))
-print(json.dumps({'mask':p.value,'processors':os.environ['DOTNET_PROCESSOR_COUNT']}))
-"""
-        with (folder / "affinity.json").open("w", encoding="utf-8") as log:
-            child = run.spawn([sys.executable, "-c", child_code], masks["server"], log)
-            assert child.wait(timeout=10) == 0
-            child.stdin.close()
-        inherited = json.loads((folder / "affinity.json").read_text())
-        assert inherited == {"mask": masks["server"], "processors": "4"}
-        # A real protocol rejection must remain reportable, even though the runner stops.
-        if (ROOT / "src/cpp/build/Release/tcpbench.exe").is_file():
-            failed_folder = folder / f"failed-trial-{time.time_ns()}"
-            failed_folder.mkdir()
-            scenario = {"mode": "aggregate", "frame_bytes": 1, "connections": 1,
-                        "duration": .1, "warmup": 0, "window": 1, "rate": 100,
-                        "seed": 42, "corpus": str(first), "phase": "failure-check", "pair": 0}
-            try:
-                run.trial(failed_folder, run.binaries(), masks, scenario, "cpp", "cpp", 1)
-            except run.TrialFailure as failure:
-                saved = json.loads((Path(failure.summary["path"]) / "summary.json").read_text())
-                assert saved == failure.summary and saved["runner_error"]
-                assert saved["result"]["valid"] is False
-                assert "runner_failure" in report_tool.exclusion_reasons(saved)
-            else:
-                raise AssertionError("Invalid frame size obtained a successful trial")
-    print(json.dumps({"status": "passed", "checks": [
-        "deterministic corpus", "oracle metadata", "truncation",
-        "report gates and raw retention", "overload evidence retained",
-        "corpus/build/CPU pair identity", "54-trial campaign dispatch",
-        "SMT separation", "affinity at child startup", "failed-trial persistence"]}))
+    with tempfile.TemporaryDirectory(dir=ROOT / "results") as temporary:
+        folder = Path(temporary)
+        for name, check in [("corpus", corpus_checks), ("report", report_checks), ("runner", runner_checks)]:
+            (folder / name).mkdir()
+            check(folder / name)
+            print(json.dumps({"check": name, "status": "passed"}), flush=True)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,8 @@
+{"regression": "processing-deadline-and-independent-progress", "passed": true}
+{"regression": "stage-pause-offset-reset-and-tail-gates", "passed": true}
+{"regression": "normal-processing-budget", "mode": "aggregate", "acknowledged": false, "elapsed_seconds": 0.037118500003998633, "passed": true}
+{"regression": "normal-processing-budget", "mode": "retain-reuse", "acknowledged": false, "elapsed_seconds": 0.036173099993902724, "passed": true}
+{"regression": "normal-processing-budget", "mode": "retain-allocate", "acknowledged": false, "elapsed_seconds": 0.04095740000047954, "passed": true}
+{"regression": "interruptible-pause", "shutdown": false, "passed": true}
+{"regression": "interruptible-pause", "shutdown": true, "passed": true}
+{"regression": "owned-peak-and-quiet-eof", "peak_bytes": 2096, "passed": true}

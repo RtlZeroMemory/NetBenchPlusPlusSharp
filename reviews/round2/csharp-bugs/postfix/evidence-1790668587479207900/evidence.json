@@ -1,0 +1,76 @@
+{
+  "binary_sha256": "cb2e213e9089d240236fcfa52dede69c8ef1bd4fe064d65592123c237f570fdd",
+  "cases": [
+    {
+      "case": "aggregate-cpu",
+      "elapsed": 0.10546510000131093,
+      "peak": 0
+    },
+    {
+      "case": "aggregate-pause",
+      "elapsed": 0.11087790000601672,
+      "peak": 0
+    },
+    {
+      "case": "aggregate-shutdown-pause",
+      "elapsed": 0.04316649999964284
+    },
+    {
+      "case": "retain-reuse-cpu",
+      "elapsed": 0.1045592000009492,
+      "peak": 6422528
+    },
+    {
+      "case": "retain-reuse-pause",
+      "elapsed": 0.11789419999695383,
+      "peak": 0
+    },
+    {
+      "case": "retain-reuse-shutdown-pause",
+      "elapsed": 0.060490200005006045
+    },
+    {
+      "case": "retain-allocate-cpu",
+      "elapsed": 0.10506240000540856,
+      "peak": 6422528
+    },
+    {
+      "case": "retain-allocate-pause",
+      "elapsed": 0.11834339999768417,
+      "peak": 0
+    },
+    {
+      "case": "retain-allocate-shutdown-pause",
+      "elapsed": 0.04735249999794178
+    },
+    {
+      "case": "transport-idle-pause",
+      "elapsed": 0.10487750000174856,
+      "peak": 0
+    },
+    {
+      "case": "retain-reuse-failed-parse-capacity",
+      "peak": 263912,
+      "errors": {
+        "json_syntax": 1
+      }
+    },
+    {
+      "case": "retain-reuse-capacity-quiet-end-eof",
+      "peak": 3536,
+      "errors": {}
+    },
+    {
+      "case": "retain-allocate-failed-parse-capacity",
+      "peak": 263912,
+      "errors": {
+        "json_syntax": 1
+      }
+    },
+    {
+      "case": "retain-allocate-capacity-quiet-end-eof",
+      "peak": 3536,
+      "errors": {}
+    }
+  ]
+}

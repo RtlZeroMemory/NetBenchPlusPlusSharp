@@ -4,14 +4,13 @@ from __future__ import annotations
 import argparse
 import json
 import socket
-import struct
 import subprocess
 import sys
 import threading
 import time
 from pathlib import Path
 
-from protocol import ACK, TOTAL, WIRE, ROOT, command, exact, frame
+from protocol import ACK, WIRE, ROOT, Summary, command, exact, frame
 sys.path.insert(0, str(ROOT / "tools"))
 import corpus
 
@@ -44,18 +43,13 @@ class Peer:
             thread.start()
 
     def serve(self, sock):
-        batches = size = records = 0
-        digest = corpus.OFFSET
-        counts, sums = [0] * 64, [0] * 64
-        stalled = False
+        summary, stalled = Summary(), False
         try:
             while not self.stop.is_set():
                 length, version, kind, seq = WIRE.unpack(exact(sock, 16))
                 body = exact(sock, length)
                 if kind == 1:
-                    batches = size = records = 0
-                    digest, counts, sums = corpus.OFFSET, [0] * 64, [0] * 64
-                    reply = b""
+                    summary, reply = Summary(), b""
                 elif kind == 2:
                     result = corpus.process(body)
                     if self.fault == "drop":
@@ -70,12 +64,7 @@ class Peer:
                         time.sleep(1.2)  # After T0+drain, before T1+drain (1.4 seconds).
                     if self.fault == "overload":
                         time.sleep(0.05)
-                    batches += 1
-                    size += len(body)
-                    records += result["records"]
-                    digest = corpus.fnv(struct.pack(">QQQ", seq, result["records"], result["digest"]), digest)
-                    counts = [a + b for a, b in zip(counts, result["counts"])]
-                    sums = [a + b for a, b in zip(sums, result["sums"])]
+                    summary.add(seq, body, result)
                     reply = ACK.pack(result["records"], result["digest"] ^ (1 if self.fault == "corrupt" else 0))
                     if self.fault == "wrong-sequence":
                         seq += 1
@@ -83,8 +72,7 @@ class Peer:
                         sock.sendall(WIRE.pack(0xffffffff, 1, kind | 0x8000, seq))
                         return
                 elif kind == 3:
-                    reply = TOTAL.pack(batches + (1 if self.fault == "wrong-summary" else 0),
-                                       size, records, digest, *counts, *sums)
+                    reply = summary.pack(1 if self.fault == "wrong-summary" else 0)
                 else:
                     return
                 sock.sendall(frame(kind | 0x8000, seq, reply))
@@ -107,43 +95,64 @@ class Peer:
             thread.join(2)
 
 
+FAILING = ["drop", "withhold", "withhold-short-drain", "corrupt", "wrong-sequence",
+           "oversized-response", "wrong-summary"]
+
+
 def run(binary, fault, folder):
-    peer = Peer(fault)
+    peer = Peer("withhold" if fault == "withhold-short-drain" else fault)
     output = folder / f"{fault}.json"
+    rate = {"overload": "1000", "ack-inside-drain": "1", "withhold-short-drain": "100", "closed": "0"}.get(fault, "50")
+    duration = "0.1" if fault == "withhold-short-drain" else "0.4"
+    drain = "0.5" if fault == "withhold-short-drain" else "1"
     args = command(binary) + ["client", "--port", str(peer.port), "--mode", "aggregate",
         "--corpus", str(ROOT / "tests/fixtures/golden.bin"), "--connections", "1",
-        "--warmup", "0", "--duration", "0.4", "--rate", "1000" if fault == "overload" else "1" if fault == "ack-inside-drain" else "50",
-        "--window", "1" if fault == "overload" else "16", "--drain-seconds", "1",
-        "--output", str(output)]
+        "--warmup", "0", "--duration", duration, "--rate", rate,
+        "--window", "1" if fault == "overload" else "8" if fault == "withhold-short-drain" else "16",
+        "--drain-seconds", drain, "--output", str(output)]
     try:
         completed = subprocess.run(args, cwd=ROOT, capture_output=True, text=True, timeout=15)
     finally:
         peer.close()
     (folder / f"{fault}.log").write_text(completed.stdout + completed.stderr, encoding="utf-8")
-    if fault in ["drop", "withhold", "corrupt", "wrong-sequence", "oversized-response", "wrong-summary"]:
-        assert completed.returncode != 0, f"Fault {fault} obtained successful client exit"
-        data = json.loads(output.read_text(encoding="utf-8-sig"))
-        assert data.get("valid") is False or data.get("success") is False, f"Fault {fault} marked valid"
-        assert data["offered"] == 20, "Failed run lost intended scheduled demand"
-        assert data["offered"] == data["admitted"] + data["rejected"]
+    data = json.loads(output.read_text(encoding="utf-8-sig"))
+    counts, cohort = data["counts"], data["cohort"]
+    # Accounting identities hold for every run, healthy or failed.
+    assert counts["offered"] == counts["admitted"] + counts["rejected"], counts
+    assert counts["admitted"] == counts["acknowledged"] + counts["failed"] + counts["unresolved"], counts
+    assert counts["timedout"] <= counts["unresolved"], counts
+    assert sum(h["count"] for h in data["latency"]["by_size"]) == counts["acknowledged"]
+    assert data["latency"]["scheduled"]["count"] == counts["acknowledged"]
+    if fault in FAILING:
+        assert completed.returncode != 0 and data["valid"] is False, f"Fault {fault} marked valid"
+        if fault != "withhold-short-drain":
+            assert counts["offered"] == 20, "Failed run lost intended scheduled demand"
         if fault in ["drop", "corrupt", "wrong-sequence", "oversized-response"]:
-            assert data["aborted_schedule_rejected"] > 0
-            assert data["generator_adequate"] is False
+            assert counts["aborted_schedule_rejected"] > 0, counts
+        if fault == "corrupt":
+            assert counts["failed"] >= 1, counts
         if fault == "withhold":
-            assert data["timedout"] > 0 and data["unresolved"] > 0
-            assert data["drain_seconds"] >= .9 and data["cohort_seconds"] >= 1.3
+            assert counts["timedout"] > 0 and counts["unresolved"] > 0
+            assert cohort["drain_seconds"] >= .9 and cohort["seconds"] >= 1.3
+        if fault == "withhold-short-drain":
+            # Failed waiting is visible in the cohort and drain intervals, not hidden.
+            assert counts["acknowledged"] == 0 and counts["timedout"] > 0, counts
+            assert cohort["drain_limit_seconds"] == .5 and cohort["drain_seconds"] >= .45, cohort
+            assert abs(cohort["seconds"] - data["window"]["seconds"] - cohort["drain_seconds"]) < .002, cohort
     else:
-        assert completed.returncode == 0, completed.stdout + completed.stderr
-        data = json.loads(output.read_text(encoding="utf-8-sig"))
-        assert data["completed_frames"] > 0
+        assert completed.returncode == 0 and data["valid"], completed.stdout + completed.stderr
+        assert counts["acknowledged"] > 0
         if fault == "overload":
-            assert data["rejected"] > 0, "Overload admission failures disappeared"
-            assert data["offered"] == data["admitted"] + data["rejected"], "Offered demand mismatch"
+            assert counts["rejected"] > 0, "Overload admission failures disappeared"
+            assert data["misses"]["over_1ms"] >= counts["rejected"], "Rejected demand must count as misses"
         if fault == "pause":
-            assert data["latency_ns"]["max"] >= 80_000_000, "Injected 100ms pause invisible"
+            assert data["latency"]["scheduled"]["max_ns"] >= 80_000_000, "Injected 100ms pause invisible"
         if fault == "ack-inside-drain":
-            assert data["acknowledged"] == 1 and data["unresolved"] == 0
-            assert data["cohort_seconds"] >= 1.15 and data["drain_seconds"] >= .75
+            assert counts["acknowledged"] == 1 and counts["unresolved"] == 0
+            assert cohort["seconds"] >= 1.15 and cohort["drain_seconds"] >= .75
+        if fault == "closed":
+            assert data["load_model"] == "closed-loop" and counts["rejected"] == 0
+            assert data["generator"]["late_over_1ms"] == 0 and data["generator"]["lateness"]["count"] == 0
     return {"fault": fault, "exit_code": completed.returncode, "status": "passed"}
 
 
@@ -154,7 +163,7 @@ def main():
     binary = args.client.resolve()
     folder = ROOT / "results/measurement" / binary.stem
     folder.mkdir(parents=True, exist_ok=True)
-    for fault in ["none", "pause", "overload", "drop", "withhold", "corrupt", "wrong-sequence", "oversized-response", "wrong-summary", "ack-inside-drain"]:
+    for fault in ["none", "closed", "pause", "overload", *FAILING, "ack-inside-drain"]:
         print(json.dumps(run(binary, fault, folder)), flush=True)
 
 

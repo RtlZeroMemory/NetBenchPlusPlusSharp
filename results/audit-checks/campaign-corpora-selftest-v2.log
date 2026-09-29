@@ -1,0 +1,25 @@
+== easy64k-easy-536870912-65536-101
+{"event":"selftest","valid":true,"checks":24814,"canonical_digest":3660725836179230917}
+
+{"event":"selftest","valid":true,"checks":100438,"canonical_digest":3660725836179230917}
+
+== hard64k-hard-536870912-65536-203
+{"event":"selftest","valid":true,"checks":25231,"canonical_digest":3660725836179230917}
+
+{"event":"selftest","valid":true,"checks":100855,"canonical_digest":3660725836179230917}
+
+== hardmix-hard-1073741824-1048576-202
+{"event":"selftest","valid":true,"checks":17527,"canonical_digest":3660725836179230917}
+
+{"event":"selftest","valid":true,"checks":93151,"canonical_digest":3660725836179230917}
+
+== mixed64k-mixed-268435456-65536-42
+{"event":"selftest","valid":true,"checks":12514,"canonical_digest":3660725836179230917}
+
+{"event":"selftest","valid":true,"checks":88138,"canonical_digest":3660725836179230917}
+
+== mixed1m-mixed-268435456-1048576-42
+{"event":"selftest","valid":true,"checks":976,"canonical_digest":3660725836179230917}
+
+{"event":"selftest","valid":true,"checks":76600,"canonical_digest":3660725836179230917}
+

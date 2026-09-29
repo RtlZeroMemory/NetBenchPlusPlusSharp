@@ -1,0 +1,11 @@
+{
+  "semantic_checks": 363,
+  "lifetime_checks": 44,
+  "final_edge_checks": 66,
+  "process_metadata": {
+    "returncode": 0,
+    "valid": true,
+    "fixture": "F:\\SocketServerClient\\reviews\\csharp-protocol\\wrong-bucket.bin",
+    "expected": "reject category metadata mismatch"
+  }
+}

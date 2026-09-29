@@ -1,0 +1,61 @@
+{
+  "binary_sha256": "7e1957923dcdcd1cbb71e72e9373286677473681ec2cddea1500e2f8e144a329",
+  "binary_unchanged": true,
+  "message_bytes_per_batch": 1000,
+  "records_per_batch": 1,
+  "batches": 2,
+  "cases": [
+    {
+      "mode": "retain-allocate",
+      "args": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "server",
+        "--port",
+        "59952",
+        "--control-stdin",
+        "1",
+        "--mode",
+        "retain-allocate",
+        "--max-frame",
+        "4096",
+        "--max-connections",
+        "1",
+        "--retain-batches",
+        "1",
+        "--retain-bytes",
+        "1048576",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\round2\\cpp-bugs\\postfix-7e195792\\capacity\\retain-allocate-capacity.json"
+      ],
+      "completed_frames": 2,
+      "reported_peak_owned_storage_per_connection": 2096,
+      "reported_peak_retained_canonical_per_connection": 1038
+    },
+    {
+      "mode": "retain-reuse",
+      "args": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "server",
+        "--port",
+        "59956",
+        "--control-stdin",
+        "1",
+        "--mode",
+        "retain-reuse",
+        "--max-frame",
+        "4096",
+        "--max-connections",
+        "1",
+        "--retain-batches",
+        "1",
+        "--retain-bytes",
+        "1048576",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\round2\\cpp-bugs\\postfix-7e195792\\capacity\\retain-reuse-capacity.json"
+      ],
+      "completed_frames": 2,
+      "reported_peak_owned_storage_per_connection": 2096,
+      "reported_peak_retained_canonical_per_connection": 1038
+    }
+  ]
+}

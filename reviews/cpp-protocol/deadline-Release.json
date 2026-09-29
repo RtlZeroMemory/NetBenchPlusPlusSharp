@@ -1,0 +1,117 @@
+{
+  "scenario": "deadline",
+  "binary": "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+  "deadline_ms": 100,
+  "pause_ms": 500,
+  "elapsed_seconds": 0.5085901000056765,
+  "ack": [
+    0,
+    14695981039346656037
+  ],
+  "metrics": {
+    "kind": "server",
+    "language": "cpp",
+    "mode": "aggregate",
+    "valid": true,
+    "duration_seconds": 0.531624,
+    "implementation": "cpp23",
+    "compiler": "MSVC 195136260",
+    "cplusplus": 202400,
+    "build_configuration": "Release",
+    "windows_sdk": "10.0.26100.0",
+    "simdjson": "3.12.3",
+    "simdjson_implementation": "icelake",
+    "qpc_frequency": 10000000,
+    "sanitized": false,
+    "native_allocation_counters": null,
+    "native_allocation_note": "Use ETW heap diagnostic for full native allocation/free accounting; ordinary runs report process memory",
+    "resource_scope": "process-lifetime including setup warmup and shutdown; not measured-cohort CPU",
+    "cpu_seconds": 0,
+    "private_bytes": 5046272,
+    "peak_commit_bytes": 5185536,
+    "working_set_bytes": 9887744,
+    "peak_working_set_bytes": 9900032,
+    "affinity_mask": 65535,
+    "accepted_connections": 1,
+    "excess_connections": 0,
+    "graceful_connections": 1,
+    "peak_connections": 1,
+    "completed_frames": 1,
+    "completed_payload_bytes": 2,
+    "completed_records": 0,
+    "receive_operations": 5,
+    "send_operations": 2,
+    "received_protocol_bytes": 66,
+    "sent_protocol_bytes": 48,
+    "workers": 4,
+    "max_frame": 65536,
+    "input_capacity_per_connection": 65600,
+    "peak_retained_canonical_per_connection": 0,
+    "peak_owned_storage_per_connection": 0,
+    "socket_buffer_requested": 262144,
+    "socket_send_buffer_effective": 262144,
+    "socket_receive_buffer_effective": 262144,
+    "processing_samples": 1,
+    "processing_sample_ns_total": 11900,
+    "diagnostic_faults": true,
+    "rejection_reasons": {},
+    "stage_sample_every": 1024,
+    "stage_scope": "last epoch per connection, reset at Begin and merged at connection cleanup; receive includes waiting from header issue; aggregate decode includes categorization; retained visit excludes eviction revisit",
+    "receive_elapsed_ns": {
+      "count": 1,
+      "p50_ns": 30655,
+      "p90_ns": 30655,
+      "p99_ns": 30655,
+      "p999_ns": 30655,
+      "max_ns": 30600,
+      "overflow_60s": 0,
+      "buckets": [
+        [
+          30655,
+          1
+        ]
+      ]
+    },
+    "processing_elapsed_ns": {
+      "count": 1,
+      "p50_ns": 11903,
+      "p90_ns": 11903,
+      "p99_ns": 11903,
+      "p999_ns": 11903,
+      "max_ns": 11900,
+      "overflow_60s": 0,
+      "buckets": [
+        [
+          11903,
+          1
+        ]
+      ]
+    },
+    "decode_materialize_ns": {
+      "count": 1,
+      "p50_ns": 5103,
+      "p90_ns": 5103,
+      "p99_ns": 5103,
+      "p999_ns": 5103,
+      "max_ns": 5100,
+      "overflow_60s": 0,
+      "buckets": [
+        [
+          5103,
+          1
+        ]
+      ]
+    },
+    "retained_visit_ns": {
+      "count": 0,
+      "p50_ns": null,
+      "p90_ns": null,
+      "p99_ns": null,
+      "p999_ns": null,
+      "max_ns": 0,
+      "overflow_60s": 0,
+      "buckets": []
+    },
+    "fatal": ""
+  }
+}

@@ -1,0 +1,150 @@
+{
+  "binary_sha256": "60899c2ca28565d3a85b4b7609a1eefd0f57a49684929c897c1eefe69b3ba8c7",
+  "binary_unchanged": true,
+  "cases": [
+    {
+      "name": "partial-read-control",
+      "partial_body": true,
+      "args": [
+        "dotnet",
+        "F:\\SocketServerClient\\src\\dotnet\\bin\\Release\\net11.0\\Bench.dll",
+        "server",
+        "--port",
+        "57275",
+        "--max-frame",
+        "4096",
+        "--max-connections",
+        "1",
+        "--frame-timeout-ms",
+        "100",
+        "--idle-timeout-ms",
+        "100",
+        "--pause-every",
+        "1",
+        "--pause-ms",
+        "900",
+        "--control-stdin",
+        "1",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\round2\\csharp-bugs\\partial-read-control.json"
+      ],
+      "first_state_at_initial_read": "closed",
+      "initial_read_seconds": 0.10390980000374839,
+      "connection_closed_seconds": 0.10529980000137584,
+      "second_connection_state": "accepted",
+      "errors": {
+        "deadline": 1
+      },
+      "completed": 0,
+      "rejected_connections": 0
+    },
+    {
+      "name": "processing-pause-0",
+      "partial_body": false,
+      "args": [
+        "dotnet",
+        "F:\\SocketServerClient\\src\\dotnet\\bin\\Release\\net11.0\\Bench.dll",
+        "server",
+        "--port",
+        "57278",
+        "--max-frame",
+        "4096",
+        "--max-connections",
+        "1",
+        "--frame-timeout-ms",
+        "100",
+        "--idle-timeout-ms",
+        "100",
+        "--pause-every",
+        "1",
+        "--pause-ms",
+        "900",
+        "--control-stdin",
+        "1",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\round2\\csharp-bugs\\processing-pause-0.json"
+      ],
+      "first_state_at_initial_read": "still_open",
+      "initial_read_seconds": 0.35723209999559913,
+      "connection_closed_seconds": 0.9104978999966988,
+      "second_connection_state": "rejected",
+      "errors": {
+        "deadline": 1
+      },
+      "completed": 1,
+      "rejected_connections": 1
+    },
+    {
+      "name": "processing-pause-1",
+      "partial_body": false,
+      "args": [
+        "dotnet",
+        "F:\\SocketServerClient\\src\\dotnet\\bin\\Release\\net11.0\\Bench.dll",
+        "server",
+        "--port",
+        "57281",
+        "--max-frame",
+        "4096",
+        "--max-connections",
+        "1",
+        "--frame-timeout-ms",
+        "100",
+        "--idle-timeout-ms",
+        "100",
+        "--pause-every",
+        "1",
+        "--pause-ms",
+        "900",
+        "--control-stdin",
+        "1",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\round2\\csharp-bugs\\processing-pause-1.json"
+      ],
+      "first_state_at_initial_read": "still_open",
+      "initial_read_seconds": 0.3582254000066314,
+      "connection_closed_seconds": 0.9079660999996122,
+      "second_connection_state": "rejected",
+      "errors": {
+        "deadline": 1
+      },
+      "completed": 1,
+      "rejected_connections": 1
+    },
+    {
+      "name": "processing-pause-2",
+      "partial_body": false,
+      "args": [
+        "dotnet",
+        "F:\\SocketServerClient\\src\\dotnet\\bin\\Release\\net11.0\\Bench.dll",
+        "server",
+        "--port",
+        "57284",
+        "--max-frame",
+        "4096",
+        "--max-connections",
+        "1",
+        "--frame-timeout-ms",
+        "100",
+        "--idle-timeout-ms",
+        "100",
+        "--pause-every",
+        "1",
+        "--pause-ms",
+        "900",
+        "--control-stdin",
+        "1",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\round2\\csharp-bugs\\processing-pause-2.json"
+      ],
+      "first_state_at_initial_read": "still_open",
+      "initial_read_seconds": 0.3597100999977556,
+      "connection_closed_seconds": 0.9109795999975177,
+      "second_connection_state": "rejected",
+      "errors": {
+        "deadline": 1
+      },
+      "completed": 1,
+      "rejected_connections": 1
+    }
+  ]
+}

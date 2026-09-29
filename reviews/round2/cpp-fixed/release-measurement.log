@@ -1,0 +1,10 @@
+{"fault": "none", "exit_code": 0, "status": "passed"}
+{"fault": "pause", "exit_code": 0, "status": "passed"}
+{"fault": "overload", "exit_code": 0, "status": "passed"}
+{"fault": "drop", "exit_code": 1, "status": "passed"}
+{"fault": "withhold", "exit_code": 1, "status": "passed"}
+{"fault": "corrupt", "exit_code": 1, "status": "passed"}
+{"fault": "wrong-sequence", "exit_code": 1, "status": "passed"}
+{"fault": "oversized-response", "exit_code": 1, "status": "passed"}
+{"fault": "wrong-summary", "exit_code": 1, "status": "passed"}
+{"fault": "ack-inside-drain", "exit_code": 0, "status": "passed"}

@@ -1,0 +1,32 @@
+{
+  "args": [
+    "dotnet",
+    "F:\\SocketServerClient\\src\\dotnet\\bin\\Release\\net11.0\\Bench.dll",
+    "server",
+    "--port",
+    "60436",
+    "--max-frame",
+    "16777216",
+    "--max-connections",
+    "1",
+    "--frame-timeout-ms",
+    "100",
+    "--idle-timeout-ms",
+    "100",
+    "--control-stdin",
+    "1",
+    "--output",
+    "F:\\SocketServerClient\\reviews\\round2\\csharp-bugs\\cpu-deadline-early.json"
+  ],
+  "records": 170000,
+  "payload_bytes": 15810001,
+  "sent_seconds": 0.005873099995369557,
+  "first_state": "still_open",
+  "observed_seconds": 0.14567459999670973,
+  "second_connection_state": "rejected",
+  "closed_seconds": 0.21412089999648742,
+  "errors": {
+    "deadline": 1
+  },
+  "completed": 1
+}

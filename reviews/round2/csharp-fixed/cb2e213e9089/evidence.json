@@ -1,0 +1,92 @@
+{
+  "binary_sha256": "cb2e213e9089d240236fcfa52dede69c8ef1bd4fe064d65592123c237f570fdd",
+  "protocol_checks": 236,
+  "results": [
+    {
+      "check": "selftest-golden",
+      "status": "passed"
+    },
+    {
+      "check": "selftest-smoke",
+      "status": "passed"
+    },
+    {
+      "check": "failed-drain",
+      "status": "passed"
+    },
+    {
+      "check": "server-regressions",
+      "status": "passed"
+    },
+    {
+      "check": "histogram-probe-frozen",
+      "status": "passed"
+    },
+    {
+      "check": "format",
+      "status": "passed"
+    },
+    {
+      "check": "protocol-aggregate",
+      "passed": 63
+    },
+    {
+      "check": "protocol-retain-reuse",
+      "passed": 63
+    },
+    {
+      "check": "protocol-retain-allocate",
+      "passed": 63
+    },
+    {
+      "fault": "none",
+      "exit_code": 0,
+      "status": "passed"
+    },
+    {
+      "fault": "pause",
+      "exit_code": 0,
+      "status": "passed"
+    },
+    {
+      "fault": "overload",
+      "exit_code": 0,
+      "status": "passed"
+    },
+    {
+      "fault": "drop",
+      "exit_code": 1,
+      "status": "passed"
+    },
+    {
+      "fault": "withhold",
+      "exit_code": 1,
+      "status": "passed"
+    },
+    {
+      "fault": "corrupt",
+      "exit_code": 1,
+      "status": "passed"
+    },
+    {
+      "fault": "wrong-sequence",
+      "exit_code": 1,
+      "status": "passed"
+    },
+    {
+      "fault": "oversized-response",
+      "exit_code": 1,
+      "status": "passed"
+    },
+    {
+      "fault": "wrong-summary",
+      "exit_code": 1,
+      "status": "passed"
+    },
+    {
+      "fault": "ack-inside-drain",
+      "exit_code": 0,
+      "status": "passed"
+    }
+  ]
+}

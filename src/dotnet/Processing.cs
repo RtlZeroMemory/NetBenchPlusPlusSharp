@@ -1,45 +1,63 @@
-using System.Buffers;
 using System.Buffers.Binary;
 using System.Diagnostics;
-using System.Text;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
+using System.Text.Unicode;
 
 namespace TcpBench;
-// Default disables the budget for selftests and processing-only controls.
-// Network processing checks every 1024 rows; an individual JSON token or array resize is not preemptible.
-readonly struct ProcessingBudget(long deadline, CancellationToken stop)
+
+enum Mode
+{
+    Aggregate,
+    RetainReuse,
+    RetainAllocate,
+    Transport
+}
+
+// Cooperative processing budget: shutdown plus the earlier of the frame/idle deadlines.
+// Default (deadline 0, no token) is unlimited, for selftests and processing-only controls.
+readonly struct Budget(long deadline, CancellationToken stop, string reason = "frame_timeout")
 {
     public void Check()
     {
-        stop.ThrowIfCancellationRequested();
+        if (stop.IsCancellationRequested)
+        {
+            throw new BenchException("shutdown");
+        }
+
         if (deadline != 0 && Stopwatch.GetTimestamp() >= deadline)
         {
-            throw new TimeoutException("processing_deadline");
+            throw new BenchException(reason);
         }
     }
 
-    public async ValueTask Pause(int milliseconds)
+    // Diagnostic delay as a budget-checked busy spin, so sub-millisecond pauses are honoured.
+    public void Spin(int milliseconds)
     {
-        long finish = Stopwatch.GetTimestamp() + (long)milliseconds * Stopwatch.Frequency / 1000;
-        while (true)
+        long finish = Stopwatch.GetTimestamp() + milliseconds * Stopwatch.Frequency / 1000;
+        while (Stopwatch.GetTimestamp() < finish)
         {
             Check();
-            long now = Stopwatch.GetTimestamp();
-            if (now >= finish)
-            {
-                return;
-            }
-            long until = deadline == 0 ? finish : Math.Min(finish, deadline);
-            double delayMs = Math.Max(1, Math.Ceiling((double)(until - now) * 1000 / Stopwatch.Frequency));
-            await Task.Delay(TimeSpan.FromMilliseconds(delayMs), stop);
+            Thread.SpinWait(1);
         }
+
+        Check();
     }
 }
+
+// A protocol, validation or accounting failure with a short, stable reason code.
+sealed class BenchException(string reason) : Exception(reason);
 
 static class Digest
 {
     public const ulong Offset = 14695981039346656037UL;
-    public static ulong Byte(ulong h, byte b) => unchecked((h ^ b) * 1099511628211UL);
+    const ulong Prime = 1099511628211UL;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ulong Byte(ulong h, byte b) => unchecked((h ^ b) * Prime);
+
+    // Big-endian bytes of v. A plain loop measured ~20% faster overall than a force-inlined
+    // unrolled form, which pushed the parser past the JIT's inlining budget.
     public static ulong Number(ulong h, ulong v, int width)
     {
         for (int i = width - 1; i >= 0; --i)
@@ -69,6 +87,7 @@ static class Digest
     }
 }
 
+// Owned, canonical record. Offset (chunk * 65,536 + position) and Length index the batch's own text.
 struct Row
 {
     public ulong Id, Timestamp;
@@ -80,47 +99,102 @@ struct Row
 
 sealed class Batch
 {
-    public Row[] Rows = [];
-    public byte[] Text = [];
-    public int Count, TextLength;
-    public ulong StoredDigest;
-    public long CanonicalBytes => 38L * Count + TextLength;
-    public long CapacityBytes => 48L * Rows.Length + Text.Length;
+    // Identical chunked storage in both implementations, so no array reaches the large-object heap
+    // (85,000 bytes): the first chunk grows geometrically from 16 rows / 256 bytes, later chunks are
+    // allocated full (1,024 rows = 48 KiB, 64 KiB of text). A message (at most 4 KiB) never straddles.
+    const int RowChunk = 1024, TextChunk = 65536;
+    readonly List<Row[]> rows = [];
+    readonly List<byte[]> text = [];
+    int textChunk, textUsed;
+    public int Count;
+    public long Canonical;
+    public ulong Digest;
 
-    public void Reset()
+    public long Capacity
     {
-        Count = 0;
-        TextLength = 0;
+        get
+        {
+            long n = 0;
+            foreach (Row[] r in rows)
+            {
+                n += 48L * r.Length;
+            }
+
+            foreach (byte[] t in text)
+            {
+                n += t.Length;
+            }
+
+            return n;
+        }
     }
 
-    public void Add(Row row, ReadOnlySpan<byte> text, long limit)
+    public void Clear()
     {
-        if (CanonicalBytes + 38 + text.Length > limit)
-        {
-            throw new InvalidDataException("retention_capacity");
-        }
-
-        if (Count == Rows.Length)
-        {
-            Array.Resize(ref Rows, Math.Max(1, Math.Min(checked((int)Math.Min(limit / 38, int.MaxValue)), Math.Max(16, Rows.Length * 2))));
-        }
-
-        if (TextLength + text.Length > Text.Length)
-        {
-            Array.Resize(ref Text, Math.Max(TextLength + text.Length, (int)Math.Min(limit, Math.Max(256L, (long)Text.Length * 2))));
-        }
-
-        row.Offset = TextLength;
-        row.Length = text.Length;
-        text.CopyTo(Text.AsSpan(TextLength));
-        TextLength += text.Length;
-        Rows[Count++] = row;
+        Count = textChunk = textUsed = 0;
+        Canonical = 0;
     }
 
-    public ulong Visit(Span<ulong> counts, Span<long> sums, ProcessingBudget budget = default)
+    public void Add(in Row row, ReadOnlySpan<byte> message, long limit)
     {
-        budget.Check();
-        ulong hash = Digest.Offset;
+        if (Canonical > limit || 38 + message.Length > limit - Canonical)
+        {
+            throw new BenchException("retention_capacity");
+        }
+
+        int chunk = Count / RowChunk, slot = Count % RowChunk;
+        if (chunk == rows.Count)
+        {
+            rows.Add(GC.AllocateUninitializedArray<Row>(chunk == 0 ? 16 : RowChunk));
+        }
+        else if (slot == rows[chunk].Length)
+        {
+            rows[chunk] = Grow(rows[chunk], slot, slot * 2);
+        }
+
+        if (text.Count == 0)
+        {
+            text.Add(GC.AllocateUninitializedArray<byte>(Math.Max(256, message.Length)));
+        }
+        else if (textUsed + message.Length > text[textChunk].Length)
+        {
+            byte[] current = text[textChunk];
+            if (current.Length < TextChunk && textUsed + message.Length <= TextChunk)
+            {
+                text[textChunk] = Grow(current, textUsed, Math.Min(TextChunk, Math.Max(current.Length * 2, textUsed + message.Length)));
+            }
+            else
+            {
+                textChunk++;
+                textUsed = 0;
+                if (textChunk == text.Count)
+                {
+                    text.Add(GC.AllocateUninitializedArray<byte>(TextChunk));
+                }
+            }
+        }
+
+        ref Row owned = ref rows[chunk][slot];
+        owned = row;
+        owned.Offset = textChunk * TextChunk + textUsed;
+        owned.Length = message.Length;
+        message.CopyTo(text[textChunk].AsSpan(textUsed));
+        textUsed += message.Length;
+        Count++;
+        Canonical += 38 + message.Length;
+    }
+
+    // Uninitialized like std::vector::reserve; only the used prefix is ever read.
+    static T[] Grow<T>(T[] old, int used, int size)
+    {
+        T[] grown = GC.AllocateUninitializedArray<T>(size);
+        old.AsSpan(0, used).CopyTo(grown);
+        return grown;
+    }
+
+    public void Visit(Result result, Budget budget)
+    {
+        result.Clear();
         for (int i = 0; i < Count; i++)
         {
             if ((i & 1023) == 0)
@@ -128,38 +202,59 @@ sealed class Batch
                 budget.Check();
             }
 
-            ref Row row = ref Rows[i];
-            hash = Digest.Row(hash, row, Text.AsSpan(row.Offset, row.Length));
-            if (!counts.IsEmpty)
-            {
-                int bucket = row.Kind * 4 + (int)(row.Flags & 3);
-                counts[bucket]++;
-                sums[bucket] += row.Value;
-            }
+            ref Row row = ref rows[i / RowChunk][i % RowChunk];
+            // An empty message right after an exactly full chunk points one chunk past the last.
+            result.Add(row, row.Length == 0 ? default : text[row.Offset / TextChunk].AsSpan(row.Offset % TextChunk, row.Length));
         }
 
         budget.Check();
-        return hash;
-    }
-
-    public void Verify(ProcessingBudget budget = default)
-    {
-        if (Visit([], [], budget) != StoredDigest)
-        {
-            throw new InvalidDataException("retained_integrity");
-        }
     }
 }
 
-sealed class Summary
+// Per-batch result: record count, canonical digest and the 64 category buckets.
+sealed class Result
 {
-    public ulong Batches;
-    public ulong Bytes;
-    public ulong Records;
-    public ulong Hash = Digest.Offset;
+    public ulong Records, Hash = Digest.Offset;
     public readonly ulong[] Counts = new ulong[64];
     public readonly long[] Sums = new long[64];
-    public void Reset()
+
+    public void Clear()
+    {
+        Records = 0;
+        Hash = Digest.Offset;
+        Array.Clear(Counts);
+        Array.Clear(Sums);
+    }
+
+    public void Add(in Row row, ReadOnlySpan<byte> message)
+    {
+        if (Records == Summary.RecordLimit)
+        {
+            throw new BenchException("epoch_record_limit");
+        }
+
+        Records++;
+        int bucket = row.Kind * 4 + (int)(row.Flags & 3);
+        Counts[bucket]++;
+        Sums[bucket] += row.Value;
+        Hash = Digest.Row(Hash, row, message);
+    }
+
+    public bool Matches(ulong records, ulong hash, ReadOnlySpan<ulong> counts, ReadOnlySpan<long> sums) =>
+        Records == records && Hash == hash && Counts.AsSpan().SequenceEqual(counts) && Sums.AsSpan().SequenceEqual(sums);
+}
+
+// Per-connection epoch summary returned by End.
+sealed class Summary
+{
+    public const ulong RecordLimit = 1_000_000_000;
+    public static readonly ulong[] NoCounts = new ulong[64];
+    public static readonly long[] NoSums = new long[64];
+    public ulong Batches, Bytes, Records, Hash = Digest.Offset;
+    public readonly ulong[] Counts = new ulong[64];
+    public readonly long[] Sums = new long[64];
+
+    public void Clear()
     {
         Batches = Bytes = Records = 0;
         Hash = Digest.Offset;
@@ -167,21 +262,21 @@ sealed class Summary
         Array.Clear(Sums);
     }
 
-    public void Add(ulong sequence, int bytes, ulong records, ulong digest, ReadOnlySpan<ulong> counts, ReadOnlySpan<long> sums)
+    public void Check(ulong records)
     {
-        if (records > 1_000_000_000UL - Records)
+        if (records > RecordLimit - Records)
         {
-            throw new InvalidDataException("epoch_record_limit");
+            throw new BenchException("epoch_record_limit");
         }
+    }
 
-        checked
-        {
-            Batches++;
-            Bytes += (ulong)bytes;
-            Records += records;
-        }
-
-        Hash = Digest.Number(Digest.Number(Digest.Number(Hash, sequence, 8), records, 8), digest, 8);
+    public void Add(ulong sequence, int bytes, ulong records, ulong hash, ReadOnlySpan<ulong> counts, ReadOnlySpan<long> sums)
+    {
+        Check(records);
+        Batches++;
+        Bytes += (ulong)bytes;
+        Records += records;
+        Hash = Digest.Number(Digest.Number(Digest.Number(Hash, sequence, 8), records, 8), hash, 8);
         for (int i = 0; i < 64; i++)
         {
             Counts[i] += counts[i];
@@ -202,233 +297,206 @@ sealed class Summary
         }
     }
 
-    public void Verify(ReadOnlySpan<byte> body)
+    public bool Matches(ReadOnlySpan<byte> body)
     {
         Span<byte> expected = stackalloc byte[1056];
         Write(expected);
-        if (!body.SequenceEqual(expected))
-        {
-            throw new InvalidDataException("end_summary_mismatch");
-        }
+        return body.SequenceEqual(expected);
     }
 }
 
 sealed class Processor
 {
-    readonly string mode;
+    readonly Mode mode;
     readonly int retainBatches;
     readonly long retainBytes;
-    readonly Queue<Batch> retained = new();
-    Batch? spare;
+    readonly Queue<Batch> live = new();
+    readonly Stack<Batch> spare = new(); // reuse mode: evicted storage awaiting reuse
     public readonly Summary Epoch = new();
-    readonly ulong[] counts = new ulong[64];
-    readonly long[] sums = new long[64];
-    public long RetainedBytes { get; private set; }
-    public long PeakRetainedBytes { get; private set; }
-    public long PeakOwnedCapacityBytes { get; private set; }
+    public readonly Result Last = new();
+    readonly Result check = new(); // retained-batch revisits
+    readonly byte[] messageScratch = new byte[6 * 4096]; // larger than the 4,096-byte limit: CopyString rejects an exact fit when unescaping
+    public long Retained { get; private set; }
+    public long PeakRetained { get; private set; }
+    public long PeakOwned { get; private set; }
     public long LastDecodeTicks { get; private set; }
     public long LastVisitTicks { get; private set; }
 
-    public long OwnedCapacityBytes
-    {
-        get
-        {
-            long bytes = spare?.CapacityBytes ?? 0;
-            foreach (Batch batch in retained)
-            {
-                bytes += batch.CapacityBytes;
-            }
-
-            return bytes;
-        }
-    }
-
-    public Processor(string mode, int retainBatches, long retainBytes)
+    public Processor(Mode mode, int retainBatches, long retainBytes)
     {
         this.mode = mode;
         this.retainBatches = retainBatches;
         this.retainBytes = retainBytes;
     }
 
-    public (ulong Records, ulong Hash) Process(ReadOnlySpan<byte> payload, ulong sequence, bool sampleStages = false, ProcessingBudget budget = default)
+    internal Batch[] LiveBatches() => [.. live]; // selftest hook
+
+    public long OwnedCapacity(Batch? scratch = null)
+    {
+        long bytes = scratch?.Capacity ?? 0;
+        foreach (Batch b in live)
+        {
+            bytes += b.Capacity;
+        }
+
+        foreach (Batch b in spare)
+        {
+            bytes += ReferenceEquals(b, scratch) ? 0 : b.Capacity;
+        }
+
+        return bytes;
+    }
+
+    // Validates, processes and commits one batch, or throws with no committed change.
+    public Result Process(ReadOnlySpan<byte> payload, ulong sequence, Budget budget = default, bool sample = false)
     {
         budget.Check();
-        long decodeStart = sampleStages ? Stopwatch.GetTimestamp() : 0;
-        Array.Clear(counts);
-        Array.Clear(sums);
-        // Scratch is never a committed batch, even when reuse recycles a previously evicted buffer.
-        Batch? staged = mode switch
+        long start = sample ? Stopwatch.GetTimestamp() : 0;
+        Result r = Last;
+        if (mode is Mode.Aggregate or Mode.Transport)
         {
-            "retain-reuse" => spare ?? new Batch(),
-            "retain-allocate" => new Batch(),
-            _ => null
-        };
-        staged?.Reset();
-        try
-        {
-            ulong records, hash;
-            if (mode == "transport")
+            if (mode == Mode.Transport)
             {
-                records = 0;
-                hash = (ulong)payload.Length;
+                r.Clear();
+                r.Hash = (ulong)payload.Length;
             }
             else
             {
-                (records, hash) = Parse(payload, staged, budget);
+                Parse(payload, null, r, budget);
             }
 
-            if (sampleStages)
+            if (sample)
             {
-                LastDecodeTicks = Stopwatch.GetTimestamp() - decodeStart;
+                LastDecodeTicks = Stopwatch.GetTimestamp() - start;
                 LastVisitTicks = 0;
             }
 
-            if (records > 1_000_000_000UL - Epoch.Records)
-            {
-                throw new InvalidDataException("epoch_record_limit");
-            }
+            Epoch.Check(r.Records);
+            budget.Check();
+            Epoch.Add(sequence, payload.Length, r.Records, r.Hash, r.Counts, r.Sums);
+            return r;
+        }
 
-            ObserveOwnedCapacity(staged);
-            if (staged != null)
-            {
-                long visitStart = sampleStages ? Stopwatch.GetTimestamp() : 0;
-                Array.Clear(counts);
-                Array.Clear(sums);
-                hash = staged.Visit(counts, sums, budget);
-                staged.StoredDigest = hash;
-                int evictions = 0;
-                long remainingBytes = RetainedBytes;
-                // Validate every planned eviction before mutating committed retention or epoch state.
-                foreach (Batch old in retained)
-                {
-                    if (retained.Count - evictions < retainBatches && remainingBytes + staged.CanonicalBytes <= retainBytes)
-                    {
-                        break;
-                    }
-
-                    old.Verify(budget);
-                    remainingBytes -= old.CanonicalBytes;
-                    evictions++;
-                }
-
-                budget.Check();
-                // Commit is deliberately uninterrupted: cancellation must not leave half an eviction applied.
-                spare = null;
-                for (int i = 0; i < evictions; i++)
-                {
-                    Batch old = retained.Dequeue();
-                    RetainedBytes -= old.CanonicalBytes;
-                    if (mode == "retain-reuse")
-                    {
-                        spare = old;
-                    }
-                }
-
-                retained.Enqueue(staged);
-                RetainedBytes += staged.CanonicalBytes;
-                staged = null;
-                PeakRetainedBytes = Math.Max(PeakRetainedBytes, RetainedBytes);
-                if (sampleStages)
-                {
-                    LastVisitTicks = Stopwatch.GetTimestamp() - visitStart;
-                }
-            }
-            else
-            {
-                budget.Check();
-            }
-
-            Epoch.Add(sequence, payload.Length, records, hash, counts, sums);
-            return (records, hash);
+        // Scratch is never committed state; allocate mode always starts from fresh arrays.
+        Batch scratch = mode == Mode.RetainReuse && spare.Count > 0 ? spare.Peek() : new Batch();
+        scratch.Clear();
+        try
+        {
+            Parse(payload, scratch, r, budget);
         }
         finally
         {
-            // A rejected/cancelled parse can grow scratch before failing. Include it before it is released.
-            ObserveOwnedCapacity(staged);
+            // Committed batches plus incoming scratch, including a failed parse's growth.
+            PeakOwned = Math.Max(PeakOwned, OwnedCapacity(scratch));
         }
-    }
 
-    void ObserveOwnedCapacity(Batch? staged)
-    {
-        long bytes = OwnedCapacityBytes;
-        if (staged != null && !ReferenceEquals(staged, spare))
+        long decoded = sample ? Stopwatch.GetTimestamp() : 0;
+        scratch.Visit(r, budget);
+        scratch.Digest = r.Hash;
+        // Verify every planned eviction before any committed state changes.
+        int evict = 0;
+        long remaining = Retained;
+        foreach (Batch old in live)
         {
-            bytes += staged.CapacityBytes;
+            if (live.Count - evict < retainBatches && scratch.Canonical <= retainBytes - remaining)
+            {
+                break;
+            }
+
+            old.Visit(check, budget);
+            if (check.Hash != old.Digest)
+            {
+                throw new BenchException("retained_integrity");
+            }
+
+            remaining -= old.Canonical;
+            evict++;
         }
 
-        PeakOwnedCapacityBytes = Math.Max(PeakOwnedCapacityBytes, bytes);
+        Epoch.Check(r.Records);
+        budget.Check();
+        // Commit: no failure point from here on.
+        if (spare.Count > 0 && ReferenceEquals(spare.Peek(), scratch))
+        {
+            spare.Pop();
+        }
+
+        for (int i = 0; i < evict; i++)
+        {
+            Batch old = live.Dequeue();
+            if (mode == Mode.RetainReuse)
+            {
+                spare.Push(old);
+            }
+        }
+
+        live.Enqueue(scratch);
+        Retained = remaining + scratch.Canonical;
+        PeakRetained = Math.Max(PeakRetained, Retained);
+        Epoch.Add(sequence, payload.Length, r.Records, r.Hash, r.Counts, r.Sums);
+        if (sample)
+        {
+            LastDecodeTicks = decoded - start;
+            LastVisitTicks = Stopwatch.GetTimestamp() - decoded;
+        }
+
+        return r;
     }
 
-    public void VerifyRetained(ProcessingBudget budget = default)
+    public void VerifyRetained(Budget budget = default)
     {
         budget.Check();
-        foreach (Batch batch in retained)
+        foreach (Batch b in live)
         {
-            batch.Verify(budget);
-        }
-
-        budget.Check();
-    }
-
-    internal void VerifyCategories(ReadOnlySpan<ulong> expectedCounts, ReadOnlySpan<long> expectedSums)
-    {
-        if (!counts.AsSpan().SequenceEqual(expectedCounts) || !sums.AsSpan().SequenceEqual(expectedSums))
-        {
-            throw new InvalidDataException("process_oracle");
+            b.Visit(check, budget);
+            if (check.Hash != b.Digest)
+            {
+                throw new BenchException("retained_integrity");
+            }
         }
     }
 
-    (ulong, ulong) Parse(ReadOnlySpan<byte> input, Batch? batch, ProcessingBudget budget)
+    void Parse(ReadOnlySpan<byte> input, Batch? batch, Result r, Budget budget)
     {
-        var reader = new Utf8JsonReader(input, new JsonReaderOptions
-        {
-            MaxDepth = 4,
-            CommentHandling = JsonCommentHandling.Disallow,
-            AllowTrailingCommas = false
-        });
+        r.Clear();
+        // Defaults reject comments and trailing commas; depth 4 with the root array at depth 1.
+        var reader = new Utf8JsonReader(input, new JsonReaderOptions { MaxDepth = 4 });
         if (!reader.Read() || reader.TokenType != JsonTokenType.StartArray)
         {
-            throw new InvalidDataException("json_root");
+            throw new BenchException("json_root");
         }
 
-        Span<byte> message = stackalloc byte[4096];
-        Span<byte> name = stackalloc byte[64];
-        Span<byte> kind = stackalloc byte[6];
-        ulong hash = Digest.Offset, records = 0;
+        Span<byte> nameScratch = stackalloc byte[16];
+        Span<byte> messageScratch = this.messageScratch; // reused; stackalloc would re-zero 4 KiB per frame
+        ulong parsed = 0;
         while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
         {
-            if ((records & 1023) == 0)
+            if ((parsed++ & 1023) == 0)
             {
                 budget.Check();
             }
 
             if (reader.TokenType != JsonTokenType.StartObject)
             {
-                throw new InvalidDataException("json_record");
+                throw new BenchException("json_record");
             }
 
             Row row = default;
-            int seen = 0, messageLength = 0;
+            scoped ReadOnlySpan<byte> message = default;
+            int seen = 0;
             while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
             {
-                if (reader.TokenType != JsonTokenType.PropertyName)
+                // Names compare decoded, so escapes cannot hide a duplicate or unknown field. An unescaped
+                // name equal to a field name is plain ASCII: match it in place, else decode and validate.
+                int bit = reader.ValueIsEscaped ? 0 : FieldBit(reader.ValueSpan);
+                if (bit == 0)
                 {
-                    throw new InvalidDataException("json_property");
+                    bit = FieldBit(nameScratch[..Copy(ref reader, nameScratch, "json_fields")]);
                 }
 
-                int nameLength = Decode(ref reader, name);
-                ReadOnlySpan<byte> field = name[..nameLength];
-                int bit = field.SequenceEqual("id"u8) ? 1
-                    : field.SequenceEqual("timestamp_ns"u8) ? 2
-                    : field.SequenceEqual("source"u8) ? 4
-                    : field.SequenceEqual("kind"u8) ? 8
-                    : field.SequenceEqual("value_milli"u8) ? 16
-                    : field.SequenceEqual("flags"u8) ? 32
-                    : field.SequenceEqual("message"u8) ? 64
-                    : 0;
                 if (bit == 0 || (seen & bit) != 0 || !reader.Read())
                 {
-                    throw new InvalidDataException("json_fields");
+                    throw new BenchException("json_fields");
                 }
 
                 seen |= bit;
@@ -444,203 +512,142 @@ sealed class Processor
                         row.Source = (uint)Unsigned(ref reader, uint.MaxValue);
                         break;
                     case 8:
-                        if (reader.TokenType != JsonTokenType.String || Decode(ref reader, kind) != 6 ||
-                            !kind[..4].SequenceEqual("kind"u8) || kind[4] < '0' || kind[4] > '1' || kind[5] < '0' || kind[5] > '9')
+                        int kind = reader.TokenType == JsonTokenType.String && !reader.ValueIsEscaped ? Kind(reader.ValueSpan) : -1;
+                        if (kind < 0)
                         {
-                            throw new InvalidDataException("json_kind");
+                            kind = reader.TokenType == JsonTokenType.String ? Kind(nameScratch[..Copy(ref reader, nameScratch, "json_kind")]) : -1;
                         }
 
-                        row.Kind = (byte)((kind[4] - '0') * 10 + kind[5] - '0');
-                        if (row.Kind > 15)
-                        {
-                            throw new InvalidDataException("json_kind");
-                        }
-
+                        row.Kind = kind >= 0 ? (byte)kind : throw new BenchException("json_kind");
                         break;
                     case 16:
-                        IntegerLexeme(ref reader, true);
-                        if (!reader.TryGetInt64(out row.Value) || row.Value < -1_000_000 || row.Value > 1_000_000)
-                        {
-                            throw new InvalidDataException("json_value_range");
-                        }
-
+                        row.Value = Signed(ref reader);
                         break;
                     case 32:
                         row.Flags = (uint)Unsigned(ref reader, uint.MaxValue);
                         break;
-                    case 64:
+                    default:
                         if (reader.TokenType != JsonTokenType.String)
                         {
-                            throw new InvalidDataException("json_message");
+                            throw new BenchException("json_message");
                         }
 
-                        messageLength = Decode(ref reader, message);
+                        // Without escapes the raw bytes are the decoded text: validate them in place
+                        // (Read() does not check string UTF-8) instead of copying through the scratch.
+                        message = reader.ValueIsEscaped ? messageScratch[..Copy(ref reader, messageScratch, "json_message_length")] : reader.ValueSpan;
+                        if (!reader.ValueIsEscaped && !Utf8.IsValid(message))
+                        {
+                            throw new BenchException("json_string");
+                        }
+
+                        if (message.Length > 4096)
+                        {
+                            throw new BenchException("json_message_length");
+                        }
                         break;
                 }
             }
 
-            if (seen != 127 || reader.TokenType != JsonTokenType.EndObject)
+            if (seen != 127)
             {
-                throw new InvalidDataException("json_missing_field");
-            }
-
-            if (++records > 1_000_000_000)
-            {
-                throw new InvalidDataException("epoch_record_limit");
+                throw new BenchException("json_fields");
             }
 
             if (batch != null)
             {
-                batch.Add(row, message[..messageLength], retainBytes);
+                batch.Add(row, message, retainBytes);
             }
             else
             {
-                hash = Digest.Row(hash, row, message[..messageLength]);
-                int bucket = row.Kind * 4 + (int)(row.Flags & 3);
-                counts[bucket]++;
-                sums[bucket] += row.Value;
+                r.Add(row, message);
             }
         }
 
         if (reader.TokenType != JsonTokenType.EndArray || reader.Read())
         {
-            throw new InvalidDataException("json_trailing");
+            throw new BenchException("json_trailing");
         }
-
-        return (records, hash);
     }
 
-    static void IntegerLexeme(ref Utf8JsonReader reader, bool signed)
+    static int FieldBit(ReadOnlySpan<byte> name) => name.Length switch
     {
-        if (reader.TokenType != JsonTokenType.Number)
+        2 when name.SequenceEqual("id"u8) => 1,
+        12 when name.SequenceEqual("timestamp_ns"u8) => 2,
+        6 when name.SequenceEqual("source"u8) => 4,
+        4 when name.SequenceEqual("kind"u8) => 8,
+        11 when name.SequenceEqual("value_milli"u8) => 16,
+        5 when name.SequenceEqual("flags"u8) => 32,
+        7 when name.SequenceEqual("message"u8) => 64,
+        _ => 0
+    };
+
+    static int Kind(ReadOnlySpan<byte> k) =>
+        k.Length != 6 || !k.StartsWith("kind"u8) || k[4] is not ((byte)'0' or (byte)'1') || k[5] < '0' || k[5] > '9' || (k[4] == '1' && k[5] > '5')
+            ? -1
+            : (k[4] - '0') * 10 + k[5] - '0';
+
+    // Read() validates neither string UTF-8 nor surrogate escapes; CopyString unescapes, rejects
+    // lone surrogates and invalid UTF-8, and fails when the decoded text exceeds the scratch.
+    // Only escaped or unmatched strings are copied; unescaped ones are used in place (+13-17% on EASY content).
+    static int Copy(ref Utf8JsonReader reader, scoped Span<byte> scratch, string tooLong)
+    {
+        try
         {
-            throw new InvalidDataException("json_integer");
+            return reader.CopyString(scratch);
+        }
+        catch (ArgumentException)
+        {
+            throw new BenchException(tooLong);
+        }
+        catch (InvalidOperationException)
+        {
+            throw new BenchException("json_string");
+        }
+    }
+
+    // Strict JSON integer lexeme: digits only, no leading zero, no fraction or exponent.
+    // Only a 20th digit can overflow 64 bits.
+    static bool Digits(ReadOnlySpan<byte> s, out ulong value)
+    {
+        value = 0;
+        if (s.IsEmpty || s.Length > 20 || (s[0] == '0' && s.Length > 1))
+        {
+            return false;
         }
 
-        ReadOnlySpan<byte> token = reader.ValueSpan;
-        int i = signed && token[0] == '-' ? 1 : 0;
-        if (i == token.Length)
+        for (int i = 0; i < s.Length; i++)
         {
-            throw new InvalidDataException("json_integer");
-        }
-
-        for (; i < token.Length; i++)
-        {
-            if (token[i] < '0' || token[i] > '9')
+            uint d = (uint)(s[i] - '0');
+            if (d > 9 || (i == 19 && value > (ulong.MaxValue - d) / 10))
             {
-                throw new InvalidDataException("json_integer");
+                return false;
             }
+
+            value = value * 10 + d;
         }
+
+        return true;
     }
 
     static ulong Unsigned(ref Utf8JsonReader reader, ulong max)
     {
-        IntegerLexeme(ref reader, false);
-        if (!reader.TryGetUInt64(out ulong value) || value > max)
+        if (reader.TokenType != JsonTokenType.Number || !Digits(reader.ValueSpan, out ulong v) || v > max)
         {
-            throw new InvalidDataException("json_unsigned_range");
+            throw new BenchException("json_unsigned");
         }
 
-        return value;
+        return v;
     }
 
-    static int Hex(ReadOnlySpan<byte> value)
+    static long Signed(ref Utf8JsonReader reader)
     {
-        int n = 0;
-        foreach (byte b in value)
+        ReadOnlySpan<byte> s = reader.ValueSpan;
+        bool negative = !s.IsEmpty && s[0] == '-';
+        if (reader.TokenType != JsonTokenType.Number || !Digits(negative ? s[1..] : s, out ulong v) || v > 1_000_000)
         {
-            int digit = b switch
-            {
-                >= (byte)'0' and <= (byte)'9' => b - '0',
-                >= (byte)'a' and <= (byte)'f' => b - 'a' + 10,
-                >= (byte)'A' and <= (byte)'F' => b - 'A' + 10,
-                _ => -1
-            };
-            if (digit < 0)
-            {
-                throw new InvalidDataException("json_escape");
-            }
-
-            n = (n << 4) | digit;
+            throw new BenchException("json_value_range");
         }
 
-        return n;
-    }
-
-    static int Decode(ref Utf8JsonReader reader, scoped Span<byte> target)
-    {
-        ReadOnlySpan<byte> raw = reader.ValueSpan;
-        // Utf8JsonReader exposes raw strings. Explicitly reject surrogate substitutions before unescaping.
-        if (reader.ValueIsEscaped)
-        {
-            for (int i = 0; i < raw.Length; i++)
-            {
-                if (raw[i] != '\\')
-                {
-                    continue;
-                }
-
-                if (++i >= raw.Length)
-                {
-                    throw new InvalidDataException("json_escape");
-                }
-
-                if (raw[i] != 'u')
-                {
-                    continue;
-                }
-
-                if (i + 4 >= raw.Length)
-                {
-                    throw new InvalidDataException("json_escape");
-                }
-
-                int code = Hex(raw.Slice(i + 1, 4));
-                i += 4;
-                if (code is >= 0xDC00 and <= 0xDFFF)
-                {
-                    throw new InvalidDataException("json_surrogate");
-                }
-
-                if (code is >= 0xD800 and <= 0xDBFF)
-                {
-                    if (i + 6 >= raw.Length || raw[i + 1] != '\\' || raw[i + 2] != 'u')
-                    {
-                        throw new InvalidDataException("json_surrogate");
-                    }
-
-                    int low = Hex(raw.Slice(i + 3, 4));
-                    if (low < 0xDC00 || low > 0xDFFF)
-                    {
-                        throw new InvalidDataException("json_surrogate");
-                    }
-
-                    i += 6;
-                }
-            }
-        }
-
-        int length;
-        try
-        {
-            length = reader.CopyString(target);
-        }
-        catch (ArgumentException)
-        {
-            throw new InvalidDataException("json_string_length");
-        }
-
-        ReadOnlySpan<byte> decoded = target[..length];
-        while (!decoded.IsEmpty)
-        {
-            if (Rune.DecodeFromUtf8(decoded, out _, out int consumed) != OperationStatus.Done)
-            {
-                throw new InvalidDataException("json_utf8");
-            }
-
-            decoded = decoded[consumed..];
-        }
-
-        return length;
+        return negative ? -(long)v : (long)v;
     }
 }

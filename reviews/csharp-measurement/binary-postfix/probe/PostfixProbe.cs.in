@@ -1,0 +1,45 @@
+using System.Reflection;
+using System.Text.Json;
+
+var assembly = Assembly.LoadFrom(Path.GetFullPath(args[0]));
+var type = assembly.GetType("TcpBench.Histogram", throwOnError: true)!;
+var histogram = Activator.CreateInstance(type, nonPublic: true)!;
+var add = type.GetMethod("Record")!;
+var export = type.GetMethod("Export")!;
+var stageExport = type.GetMethod("ExportStages")!;
+void Check(bool value, string label) { if (!value) throw new Exception(label); }
+JsonElement Snapshot(MethodInfo method) => JsonSerializer.SerializeToElement(method.Invoke(histogram, null));
+var checkpoints = new List<object>();
+for (int count = 1; count <= 1_000_000; count++)
+{
+    add.Invoke(histogram, [1024L]);
+    if (count is not (1 or 9999 or 10000 or 999999 or 1000000)) continue;
+    var stages = Snapshot(stageExport);
+    var raw = Snapshot(export);
+    foreach (string alias in new[] { "p99_ns", "p99" })
+        Check(count < 10_000 ? stages.GetProperty(alias).ValueKind == JsonValueKind.Null : stages.GetProperty(alias).GetInt64() == 1027, alias);
+    foreach (string alias in new[] { "p999_ns", "p999" })
+        Check(count < 1_000_000 ? stages.GetProperty(alias).ValueKind == JsonValueKind.Null : stages.GetProperty(alias).GetInt64() == 1027, alias);
+    Check(stages.GetProperty("count").GetInt64() == count && stages.GetProperty("max_ns").GetInt64() == 1024, "stage count/max");
+    Check(raw.GetProperty("p99_ns").GetInt64() == 1027 && raw.GetProperty("p999_ns").GetInt64() == 1027, "raw client percentiles unchanged");
+    Check(stages.GetProperty("buckets").GetRawText() == raw.GetProperty("buckets").GetRawText(), "stage export preserves raw bucket counts");
+    checkpoints.Add(new { count, p99 = stages.GetProperty("p99_ns").ValueKind == JsonValueKind.Null ? (long?)null : 1027L,
+        p999 = stages.GetProperty("p999_ns").ValueKind == JsonValueKind.Null ? (long?)null : 1027L });
+}
+var metricType = assembly.GetType("TcpBench.ConnectionMetrics", throwOnError: true)!;
+var sizeClass = metricType.GetMethod("SizeClass")!;
+int[] upper = [4096, 65536, 262144, 1048576, 16777216];
+var sizeChecks = new List<object>();
+for (int i = 0; i < upper.Length; i++)
+{
+    int lower = i == 0 ? 1 : upper[i - 1] + 1;
+    foreach (int value in new[] { lower, upper[i] })
+    {
+        Check((int)sizeClass.Invoke(null, [value])! == i, "inclusive size class " + value);
+        sizeChecks.Add(new { payload_bytes = value, expected_class = i });
+    }
+}
+var metrics = Activator.CreateInstance(metricType, nonPublic: true)!;
+var sizes = (System.Collections.IDictionary)metricType.GetField("Sizes")!.GetValue(metrics)!;
+Check(sizes.Count == 5, "all empty size classes preserved");
+Console.WriteLine(JsonSerializer.Serialize(new { status = "passed", checkpoints, sizeChecks }));

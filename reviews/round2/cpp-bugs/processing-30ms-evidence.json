@@ -1,0 +1,120 @@
+{
+  "binary_sha256": "62773a9936616bc8d0a0b3abfade96bb904ef70fba447b0fb8f0697fda265f79",
+  "cases": [
+    {
+      "mode": "aggregate",
+      "args": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "server",
+        "--port",
+        "60655",
+        "--control-stdin",
+        "1",
+        "--mode",
+        "aggregate",
+        "--max-frame",
+        "16777216",
+        "--max-connections",
+        "1",
+        "--workers",
+        "1",
+        "--socket-buffer",
+        "16777216",
+        "--frame-timeout-ms",
+        "30",
+        "--idle-timeout-ms",
+        "5000",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\round2\\cpp-bugs\\processing-aggregate-30ms.json"
+      ],
+      "deadline_ms": 30,
+      "payload_bytes": 15640001,
+      "send_completed": true,
+      "send_seconds": 0.004228200006764382,
+      "read_state": "closed",
+      "data_to_reply_or_close_seconds": 0.03729610000300454,
+      "completed_frames": 0,
+      "completed_records": 0,
+      "rejection_reasons": {
+        "frame_timeout": 1
+      }
+    },
+    {
+      "mode": "retain-reuse",
+      "args": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "server",
+        "--port",
+        "60657",
+        "--control-stdin",
+        "1",
+        "--mode",
+        "retain-reuse",
+        "--max-frame",
+        "16777216",
+        "--max-connections",
+        "1",
+        "--workers",
+        "1",
+        "--socket-buffer",
+        "16777216",
+        "--frame-timeout-ms",
+        "30",
+        "--idle-timeout-ms",
+        "5000",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\round2\\cpp-bugs\\processing-retain-reuse-30ms.json"
+      ],
+      "deadline_ms": 30,
+      "payload_bytes": 15640001,
+      "send_completed": true,
+      "send_seconds": 0.013064699996903073,
+      "read_state": "closed",
+      "data_to_reply_or_close_seconds": 0.07052829999884125,
+      "completed_frames": 1,
+      "completed_records": 170000,
+      "rejection_reasons": {
+        "frame_timeout": 1
+      }
+    },
+    {
+      "mode": "retain-allocate",
+      "args": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "server",
+        "--port",
+        "60659",
+        "--control-stdin",
+        "1",
+        "--mode",
+        "retain-allocate",
+        "--max-frame",
+        "16777216",
+        "--max-connections",
+        "1",
+        "--workers",
+        "1",
+        "--socket-buffer",
+        "16777216",
+        "--frame-timeout-ms",
+        "30",
+        "--idle-timeout-ms",
+        "5000",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\round2\\cpp-bugs\\processing-retain-allocate-30ms.json"
+      ],
+      "deadline_ms": 30,
+      "payload_bytes": 15640001,
+      "send_completed": true,
+      "send_seconds": 0.006200800002261531,
+      "read_state": "closed",
+      "data_to_reply_or_close_seconds": 0.0773856000014348,
+      "completed_frames": 1,
+      "completed_records": 170000,
+      "rejection_reasons": {
+        "frame_timeout": 1
+      }
+    }
+  ],
+  "binary_unchanged": true
+}

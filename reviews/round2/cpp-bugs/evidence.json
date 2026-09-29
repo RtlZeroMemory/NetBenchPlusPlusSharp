@@ -1,0 +1,114 @@
+{
+  "binary_sha256": "62773a9936616bc8d0a0b3abfade96bb904ef70fba447b0fb8f0697fda265f79",
+  "binary_unchanged": true,
+  "cases": [
+    {
+      "name": "partial-read-control",
+      "args": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "server",
+        "--port",
+        "56320",
+        "--control-stdin",
+        "1",
+        "--max-frame",
+        "4096",
+        "--max-connections",
+        "1",
+        "--workers",
+        "1",
+        "--idle-timeout-ms",
+        "100",
+        "--frame-timeout-ms",
+        "100",
+        "--pause-every",
+        "1",
+        "--pause-ms",
+        "900",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\round2\\cpp-bugs\\partial-read-control.json"
+      ],
+      "state_after_initial_read": "closed",
+      "initial_read_seconds": 0.10596280000027036,
+      "second_connection_state": "accepted",
+      "data_to_close_observed_seconds": 0.157661500001268,
+      "completed_frames": 0,
+      "excess_connections": 0,
+      "rejection_reasons": {
+        "frame_timeout": 1,
+        "shutdown": 1
+      }
+    },
+    {
+      "name": "processing-pause",
+      "args": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "server",
+        "--port",
+        "56324",
+        "--control-stdin",
+        "1",
+        "--max-frame",
+        "4096",
+        "--max-connections",
+        "1",
+        "--workers",
+        "1",
+        "--idle-timeout-ms",
+        "100",
+        "--frame-timeout-ms",
+        "100",
+        "--pause-every",
+        "1",
+        "--pause-ms",
+        "900",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\round2\\cpp-bugs\\processing-pause.json"
+      ],
+      "state_after_initial_read": "still_open",
+      "initial_read_seconds": 0.35858729999745265,
+      "second_connection_state": "rejected",
+      "final_connection_state": "closed",
+      "data_to_close_observed_seconds": 0.9049797999978182,
+      "completed_frames": 0,
+      "excess_connections": 1,
+      "rejection_reasons": {
+        "frame_timeout": 1
+      }
+    },
+    {
+      "name": "shutdown-during-pause",
+      "args": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "server",
+        "--port",
+        "56330",
+        "--control-stdin",
+        "1",
+        "--max-frame",
+        "4096",
+        "--max-connections",
+        "1",
+        "--workers",
+        "1",
+        "--idle-timeout-ms",
+        "5000",
+        "--frame-timeout-ms",
+        "5000",
+        "--pause-every",
+        "1",
+        "--pause-ms",
+        "900",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\round2\\cpp-bugs\\shutdown-during-pause.json"
+      ],
+      "stop_to_exit_seconds": 0.8731139000010444,
+      "data_to_exit_seconds": 0.9233705000006012,
+      "completed_frames": 0,
+      "excess_connections": 0,
+      "rejection_reasons": {
+        "shutdown": 1
+      }
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "binary_sha256": "cb2e213e9089d240236fcfa52dede69c8ef1bd4fe064d65592123c237f570fdd",
+  "cases": [
+    { "mode": "retain-reuse", "cancellation_ms": 2.8645, "retained_before": 2, "retained_after_cancel": 2, "committed_retry_bytes": 78 },
+    { "mode": "retain-allocate", "cancellation_ms": 1.067, "retained_before": 2, "retained_after_cancel": 2, "committed_retry_bytes": 78 }
+  ],
+  "initial_probe_limitation": "The first harness used CancelAfter(5 ms); verification completed before its timer fired. The final harness uses one joined thread and a 1 ms local monotonic spin to request cancellation, without product changes. It asserts incoming category count=2 to establish that the incoming visit completed before cancellation, then checks retained identity/order, canonical bytes and full epoch state are unchanged."
+}

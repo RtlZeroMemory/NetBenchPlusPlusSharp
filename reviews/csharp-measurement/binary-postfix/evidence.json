@@ -1,0 +1,202 @@
+{
+  "binary_sha256": "60899c2ca28565d3a85b4b7609a1eefd0f57a49684929c897c1eefe69b3ba8c7",
+  "metadata": [
+    {
+      "name": "bad-sum-aggregate-warmup-0",
+      "exit_code": 2,
+      "error": "process_oracle"
+    },
+    {
+      "name": "bad-sum-aggregate-warmup-0.2",
+      "exit_code": 2,
+      "error": "process_oracle"
+    },
+    {
+      "name": "bad-count-aggregate-warmup-0",
+      "exit_code": 2,
+      "error": "process_oracle"
+    },
+    {
+      "name": "bad-count-aggregate-warmup-0.2",
+      "exit_code": 2,
+      "error": "process_oracle"
+    },
+    {
+      "name": "bad-sum-retain-reuse-warmup-0",
+      "exit_code": 2,
+      "error": "process_oracle"
+    },
+    {
+      "name": "bad-sum-retain-reuse-warmup-0.2",
+      "exit_code": 2,
+      "error": "process_oracle"
+    },
+    {
+      "name": "bad-count-retain-reuse-warmup-0",
+      "exit_code": 2,
+      "error": "process_oracle"
+    },
+    {
+      "name": "bad-count-retain-reuse-warmup-0.2",
+      "exit_code": 2,
+      "error": "process_oracle"
+    },
+    {
+      "name": "bad-sum-retain-allocate-warmup-0",
+      "exit_code": 2,
+      "error": "process_oracle"
+    },
+    {
+      "name": "bad-sum-retain-allocate-warmup-0.2",
+      "exit_code": 2,
+      "error": "process_oracle"
+    },
+    {
+      "name": "bad-count-retain-allocate-warmup-0",
+      "exit_code": 2,
+      "error": "process_oracle"
+    },
+    {
+      "name": "bad-count-retain-allocate-warmup-0.2",
+      "exit_code": 2,
+      "error": "process_oracle"
+    },
+    {
+      "name": "valid-aggregate-warmup-0",
+      "exit_code": 0,
+      "completed_frames": 16736,
+      "completed_records": 16736
+    },
+    {
+      "name": "valid-aggregate-warmup-0.03",
+      "exit_code": 0,
+      "completed_frames": 19126,
+      "completed_records": 19126
+    },
+    {
+      "name": "valid-retain-reuse-warmup-0",
+      "exit_code": 0,
+      "completed_frames": 14044,
+      "completed_records": 14044
+    },
+    {
+      "name": "valid-retain-reuse-warmup-0.03",
+      "exit_code": 0,
+      "completed_frames": 18262,
+      "completed_records": 18262
+    },
+    {
+      "name": "valid-retain-allocate-warmup-0",
+      "exit_code": 0,
+      "completed_frames": 12854,
+      "completed_records": 12854
+    },
+    {
+      "name": "valid-retain-allocate-warmup-0.03",
+      "exit_code": 0,
+      "completed_frames": 17784,
+      "completed_records": 17784
+    },
+    {
+      "name": "valid-transport-warmup-0",
+      "exit_code": 0,
+      "completed_frames": 65864,
+      "completed_records": 0
+    },
+    {
+      "name": "valid-transport-warmup-0.03",
+      "exit_code": 0,
+      "completed_frames": 90864,
+      "completed_records": 0
+    }
+  ],
+  "timing": [
+    {
+      "name": "withhold",
+      "exit_code": 1,
+      "observed_after_window_seconds": 0.5703255000029458,
+      "valid": false,
+      "generator_adequate": false,
+      "offered": 10,
+      "admitted": 8,
+      "acknowledged": 0,
+      "timedout": 8,
+      "unresolved": 8,
+      "cohort_seconds": 0.6156637,
+      "drain_seconds": 0.5156637,
+      "drain_limit_seconds": 0.5
+    },
+    {
+      "name": "partial-withhold",
+      "exit_code": 1,
+      "observed_after_window_seconds": 0.5704182999965269,
+      "valid": false,
+      "generator_adequate": false,
+      "offered": 10,
+      "admitted": 9,
+      "acknowledged": 1,
+      "timedout": 8,
+      "unresolved": 8,
+      "cohort_seconds": 0.6125375,
+      "drain_seconds": 0.5125375,
+      "drain_limit_seconds": 0.5
+    },
+    {
+      "name": "delayed-end",
+      "exit_code": 0,
+      "observed_after_window_seconds": 0.3096346000005724,
+      "valid": true,
+      "generator_adequate": true,
+      "offered": 10,
+      "admitted": 10,
+      "acknowledged": 10,
+      "timedout": 0,
+      "unresolved": 0,
+      "cohort_seconds": 0.1000005,
+      "drain_seconds": 5e-07,
+      "drain_limit_seconds": 0.5
+    }
+  ],
+  "size_classes": {
+    "payload_lengths": [
+      4096,
+      4097,
+      65536,
+      65537,
+      262144,
+      262145,
+      1048576,
+      1048577
+    ],
+    "size_class_counts": [
+      1,
+      2,
+      2,
+      2,
+      1
+    ],
+    "acknowledged": 8,
+    "raw_p999_preserved": true
+  },
+  "server_stages": [
+    {
+      "mode": "aggregate",
+      "total_frames": 3072,
+      "final_epoch_processing_samples": 1,
+      "stage_p99": null,
+      "stage_p999": null
+    },
+    {
+      "mode": "retain-reuse",
+      "total_frames": 3072,
+      "final_epoch_processing_samples": 1,
+      "stage_p99": null,
+      "stage_p999": null
+    }
+  ],
+  "historical_evidence_unchanged": {
+    "F:\\SocketServerClient\\reviews\\csharp-measurement\\evidence-all.json": "9a91392296b1075fe4f6faf44b8924de08c90213881b3c35b532afdc3e8bda4d",
+    "F:\\SocketServerClient\\reviews\\csharp-measurement\\bad-sum.bin": "8e61bcd04e9cc78e35b4b7a51e57c47d6cc497939110d091edbe96b401ea13df",
+    "F:\\SocketServerClient\\reviews\\csharp-measurement\\cs-withhold-0.1-100.json": "322ef80eacff65337980f48fed7024dd4ffc78ea85a3ab22753e6ae7a6130e75"
+  }
+}

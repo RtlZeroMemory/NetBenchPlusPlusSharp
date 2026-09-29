@@ -1,4 +1,9 @@
-"""Windows loopback macrobenchmark orchestration; Python never sends timed data."""
+"""Run a declared benchmark matrix on Windows loopback. Python never sends timed data.
+
+Each trial starts a fresh server and client under disjoint physical-core masks. Within a phase,
+repetitions interleave the cells and randomize server order. Paced rates can be declared as a
+fraction of the slower server's median closed-loop capacity measured earlier in the campaign.
+"""
 from __future__ import annotations
 
 import argparse
@@ -14,75 +19,60 @@ import statistics
 import subprocess
 import sys
 import time
+from ctypes import wintypes
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
-import corpus
+import corpus  # noqa: E402
+import report  # noqa: E402
 
-
-class TrialFailure(RuntimeError):
-    """A failed trial still carries its persisted result for campaign reporting."""
-
-    def __init__(self, summary):
-        super().__init__(summary["runner_error"])
-        self.summary = summary
-
-
-def binaries():
-    cs = ROOT / "src/dotnet/bin/Release/net11.0/Bench.dll"
-    native = ROOT / "src/cpp/build/Release/tcpbench.exe"
-    for path in [cs, native]:
-        if not path.is_file():
-            raise FileNotFoundError(f"Build first: missing {path}")
-    return {"csharp": cs, "cpp": native}
+BINARIES = {"cpp": ROOT / "src/cpp/build/Release/tcpbench.exe",
+            "csharp": ROOT / "src/dotnet/bin/Release/net11.0/Bench.dll"}
+DEFAULTS = {"duration": 30, "warmup": 10, "connections": 16, "window": 64, "rate": 0, "arrival": "steady",
+            "socket_buffer": 262144, "retain_batches": 8, "retain_bytes": 67108864, "drain": 30,
+            "inflight_bytes": 67108864, "client": "cpp", "servers": ["cpp", "csharp"], "client_cores": "client",
+            "pause_every": 0, "pause_ms": 0, "io_cap": 0, "kind": "tcp", "server_env": {}}
+kernel = ctypes.WinDLL("kernel32", use_last_error=True) if os.name == "nt" else None
 
 
 def command(binary: Path):
     return ["dotnet", str(binary)] if binary.suffix == ".dll" else [str(binary)]
 
 
-def cpu_masks(server_cores=4):
-    """One logical CPU from each physical core; this host has one CPU group."""
-    if os.name != "nt":
+def sha256(path: Path):
+    with path.open("rb") as stream:
+        return hashlib.file_digest(stream, "sha256").hexdigest()
+
+
+def cpu_layout(server_cores: int):
+    """One logical CPU per physical core. Physical core 0, which services most interrupts, is left
+    to Windows and the runner; the server takes the next cores and the client the rest. SMT
+    siblings are never shared between roles."""
+    if kernel is None:
         raise RuntimeError("This runner targets native Windows, not WSL")
-    from ctypes import wintypes
-    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
     kernel.GetLogicalProcessorInformation.argtypes = [ctypes.c_void_p, ctypes.POINTER(wintypes.DWORD)]
-    kernel.GetLogicalProcessorInformation.restype = wintypes.BOOL
     length = wintypes.DWORD()
     kernel.GetLogicalProcessorInformation(None, ctypes.byref(length))
-    if not length.value:
-        raise ctypes.WinError(ctypes.get_last_error())
     buffer = ctypes.create_string_buffer(length.value)
     if not kernel.GetLogicalProcessorInformation(buffer, ctypes.byref(length)):
         raise ctypes.WinError(ctypes.get_last_error())
 
     class Info(ctypes.Structure):
-        _fields_ = [("mask", ctypes.c_size_t), ("relationship", wintypes.DWORD),
-                    ("data", ctypes.c_ulonglong * 2)]
+        _fields_ = [("mask", ctypes.c_size_t), ("relationship", wintypes.DWORD), ("data", ctypes.c_ulonglong * 2)]
 
-    if ctypes.sizeof(Info) != 32:
-        raise RuntimeError("Use 64-bit Python")
-    cores = []
-    for offset in range(0, length.value, ctypes.sizeof(Info)):
-        item = Info.from_buffer_copy(buffer, offset)
-        if item.relationship == 0:
-            cores.append(int(item.mask))
-    cores.sort()
+    cores = sorted(int(Info.from_buffer_copy(buffer, o).mask) for o in range(0, length.value, ctypes.sizeof(Info))
+                   if Info.from_buffer_copy(buffer, o).relationship == 0)
     if len(cores) < server_cores + 2:
-        raise RuntimeError("Need server cores, at least one client core and one spare core")
-    logical = [mask & -mask for mask in cores]
-    server = sum(logical[:server_cores])
-    client = sum(logical[server_cores:-1])
-    return {"physical_core_masks": cores, "server": server, "client": client,
-            "spare": logical[-1], "server_cores": server_cores}
+        raise RuntimeError("Need a spare core, the server cores and at least one client core")
+    lowest = [mask & -mask for mask in cores]
+    return {"physical_core_masks": cores, "spare": lowest[0], "server": sum(lowest[1:1 + server_cores]),
+            "client": sum(lowest[1 + server_cores:]), "server_cores": server_cores}
 
 
-def spawn(args, mask, log, env=None):
-    """Children inherit affinity, so runtime initialization sees its CPU budget."""
-    from ctypes import wintypes
-    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+def spawn(args, mask, log, stdin=subprocess.PIPE, extra_env=None):
+    """Children inherit the runner's affinity at creation, so runtimes initialize inside their
+    budget; DOTNET_PROCESSOR_COUNT matches the mask."""
     kernel.GetCurrentProcess.restype = wintypes.HANDLE
     kernel.GetProcessAffinityMask.argtypes = [wintypes.HANDLE, ctypes.POINTER(ctypes.c_size_t), ctypes.POINTER(ctypes.c_size_t)]
     kernel.SetProcessAffinityMask.argtypes = [wintypes.HANDLE, ctypes.c_size_t]
@@ -91,270 +81,277 @@ def spawn(args, mask, log, env=None):
     if not kernel.GetProcessAffinityMask(handle, ctypes.byref(previous), ctypes.byref(system)):
         raise ctypes.WinError(ctypes.get_last_error())
     if mask & ~system.value or not kernel.SetProcessAffinityMask(handle, mask):
-        raise RuntimeError(f"Cannot apply requested CPU mask {mask:#x}")
-    child_env = os.environ.copy()
-    child_env["DOTNET_PROCESSOR_COUNT"] = str(mask.bit_count())
-    if env:
-        child_env.update(env)
+        raise RuntimeError(f"Cannot apply CPU mask {mask:#x}")
+    env = os.environ | {"DOTNET_PROCESSOR_COUNT": str(mask.bit_count())} | (extra_env or {})
     try:
-        return subprocess.Popen(args, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT,
-                                stdin=subprocess.PIPE, env=child_env)
+        return subprocess.Popen(args, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT, stdin=stdin, env=env)
     finally:
-        if not kernel.SetProcessAffinityMask(handle, previous.value):
-            raise ctypes.WinError(ctypes.get_last_error())
+        kernel.SetProcessAffinityMask(handle, previous.value)
 
 
-def wait_ready(process, port, timeout=30):
+class ProcessorTimes(ctypes.Structure):
+    _fields_ = [("idle", ctypes.c_longlong), ("kernel", ctypes.c_longlong), ("user", ctypes.c_longlong),
+                ("dpc", ctypes.c_longlong), ("interrupt", ctypes.c_longlong), ("interrupts", ctypes.c_ulong)]
+
+
+def cpu_busy_seconds():
+    """Busy seconds per logical CPU (kernel time includes idle time)."""
+    data = (ProcessorTimes * os.cpu_count())()
+    status = ctypes.WinDLL("ntdll").NtQuerySystemInformation(8, ctypes.byref(data), ctypes.sizeof(data), None)
+    if status:
+        raise OSError(f"NtQuerySystemInformation failed: {status:#x}")
+    return [(t.kernel + t.user - t.idle) / 1e7 for t in data]
+
+
+def sibling_cpus(masks, role):
+    """Logical CPUs that share a physical core with the role's CPUs but are not in its mask."""
+    return [cpu for cpu in range(os.cpu_count()) for core in masks["physical_core_masks"]
+            if core & masks[role] and core >> cpu & 1 and not masks[role] >> cpu & 1]
+
+
+def process_cpu_seconds(process):
+    """Lifetime user+kernel CPU of an exited child, from its still-open process handle."""
+    times = [wintypes.FILETIME() for _ in range(4)]
+    handle = wintypes.HANDLE(int(process._handle))
+    if not kernel.GetProcessTimes(handle, *[ctypes.byref(t) for t in times]):
+        return None
+    return sum(((t.dwHighDateTime << 32) | t.dwLowDateTime) / 1e7 for t in times[2:])
+
+
+def read_json(path: Path):
+    try:
+        return json.loads(path.read_text(encoding="utf-8-sig"))
+    except (OSError, ValueError) as error:
+        return {"valid": False, "error": f"missing or invalid {path.name}: {error}"}
+
+
+def wait_ready(process, log: Path, timeout=60):
     until = time.monotonic() + timeout
     while time.monotonic() < until:
         if process.poll() is not None:
-            raise RuntimeError(f"Server exited {process.returncode} before readiness")
-        try:
-            with socket.create_connection(("127.0.0.1", port), timeout=0.25):
-                return
-        except OSError:
-            time.sleep(0.05)
-    raise TimeoutError("Server readiness timeout")
+            raise RuntimeError(f"server exited {process.returncode} before readiness")
+        if '"ready"' in log.read_text(encoding="utf-8", errors="replace"):
+            return
+        time.sleep(0.05)
+    raise TimeoutError("server readiness timeout")
 
 
-def sha256(path):
-    with path.open("rb") as stream:
-        return hashlib.file_digest(stream, "sha256").hexdigest()
-
-
-def environment_details():
-    commands = {"dotnet": ["dotnet", "--info"], "cmake": ["cmake", "--version"],
-                "power_plan": ["powercfg", "/getactivescheme"],
-                "cpu_memory": ["powershell", "-NoProfile", "-Command",
-                    "[pscustomobject]@{CPU=@(Get-CimInstance Win32_Processor | Select-Object Name,NumberOfCores,NumberOfLogicalProcessors,MaxClockSpeed,L2CacheSize,L3CacheSize);MemoryBytes=(Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory} | ConvertTo-Json -Depth 4"]}
-    runtime_settings = ["TieredCompilation", "TieredPGO", "ReadyToRun", "gcServer",
-                        "gcConcurrent", "GCHeapHardLimit", "GCHeapCount", "GCStress"]
-    output = {"runtime_environment": {
-        prefix + name: os.environ.get(prefix + name)
-        for prefix in ["DOTNET_", "COMPlus_"] for name in runtime_settings}}
-    for name, args in commands.items():
-        try:
-            item = subprocess.run(args, capture_output=True, text=True, errors="replace", timeout=30)
-            output[name] = {"exit_code": item.returncode, "stdout": item.stdout, "stderr": item.stderr}
-        except (OSError, subprocess.TimeoutExpired) as error:
-            output[name] = {"unavailable": str(error)}
-    paths = [ROOT / "global.json", ROOT / "docs/contract.md", ROOT / ".clang-format", ROOT / ".editorconfig"]
-    for pattern in ["src/dotnet/*.cs", "src/dotnet/*.csproj", "src/cpp/*.cpp", "src/cpp/*.hpp", "src/cpp/CMakeLists.txt", "bench/*.py", "tools/*.py"]:
-        paths.extend(ROOT.glob(pattern))
-    output["source_sha256"] = {str(p.relative_to(ROOT)): sha256(p) for p in sorted(set(paths)) if p.is_file()}
-    return output
-
-
-def result_value(result, *names, default=None):
-    for name in names:
-        if name in result:
-            return result[name]
-    return default
-
-
-def trial(folder, executables, masks, scenario, server_name, client_name, ordinal):
-    destination = folder / f"{ordinal:04d}-{scenario['mode']}-{server_name}-{client_name}"
+def trial(folder: Path, ordinal: int, cell: dict, server: str, masks: dict, corpus_info: dict):
+    """One fresh server/client (or processing-only) trial. Failures are recorded, never dropped."""
+    destination = folder / f"{ordinal:04d}-{cell['name']}-{server}"
+    if destination.exists():  # left by an interrupted run: keep it as evidence
+        destination.rename(destination.with_name(f"{destination.name}-interrupted-{time.time_ns()}"))
     destination.mkdir()
-    with socket.socket() as temporary:
-        temporary.bind(("127.0.0.1", 0))
-        port = temporary.getsockname()[1]
-    manifest = dict(scenario, server=server_name, client=client_name, masks=masks,
-                    binaries={k: {"path": str(v), "sha256": sha256(v)} for k, v in executables.items()})
-    canonical = json.dumps(manifest, sort_keys=True, separators=(",", ":")).encode()
-    manifest_hash = hashlib.sha256(canonical).hexdigest()
-    (destination / "manifest.json").write_bytes(canonical)
-    # Keep server alive beyond the client's own drain bound; termination is runner cleanup.
-    server_args = command(executables[server_name]) + ["server", "--port", str(port),
-        "--mode", scenario["mode"], "--max-frame", str(scenario["frame_bytes"]),
-        "--max-connections", str(scenario["connections"] + 1), "--workers", str(masks["server_cores"]),
-        "--manifest-hash", manifest_hash, "--control-stdin", "1",
-        "--output", str(destination / "server.json")]
-    client_args = command(executables[client_name]) + ["client", "--port", str(port),
-        "--corpus", scenario["corpus"], "--mode", scenario["mode"],
-        "--connections", str(scenario["connections"]), "--duration", str(scenario["duration"]),
-        "--warmup", str(scenario["warmup"]), "--window", str(scenario["window"]),
-        "--rate", str(scenario["rate"]), "--arrival", scenario.get("arrival", "steady"),
-        "--seed", str(scenario["seed"]),
-        "--manifest-hash", manifest_hash, "--output", str(destination / "client.json")]
-    (destination / "commands.json").write_text(json.dumps({"server": server_args, "client": client_args}, indent=2), encoding="utf-8")
-    started = time.monotonic()
-    error = None
-    with (destination / "server.log").open("w", encoding="utf-8") as server_log:
-        server = spawn(server_args, masks["server"], server_log)
-        client = None
-        try:
-            wait_ready(server, port)
-            with (destination / "client.log").open("w", encoding="utf-8") as client_log:
-                client = spawn(client_args, masks["client"], client_log)
-                timeout = 2 * scenario["warmup"] + scenario["duration"] + 120
-                code = client.wait(timeout=timeout)
-            if code:
-                raise RuntimeError(f"Client exited {code}; inspect {destination}")
-            result = json.loads((destination / "client.json").read_text(encoding="utf-8-sig"))
-            if result.get("valid") is False or result.get("success") is False:
-                raise RuntimeError(f"Invalid result: {destination}")
-        except Exception as failure:
-            error = str(failure)
-        finally:
-            if client is not None and client.poll() is None:
-                client.kill()
-                client.wait()
-            if client is not None and client.stdin:
-                client.stdin.close()
-            if server.poll() is None:
+    builds = {name: sha256(path) for name, path in BINARIES.items()}
+    manifest = {"cell": cell, "server": server, "masks": masks, "builds": builds, "corpus_sha256": corpus_info["sha256"]}
+    manifest_hash = hashlib.sha256(json.dumps(manifest, sort_keys=True).encode()).hexdigest()
+    (destination / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    client_mask = masks["client"] | (masks["spare"] if cell["client_cores"] == "client+spare" else 0)
+    error, started, busy_before, own_cpu = None, time.monotonic(), cpu_busy_seconds(), 0.0
+    if cell["kind"] == "process":
+        args = command(BINARIES[server]) + ["process", "--corpus", corpus_info["path"], "--mode", cell["mode"],
+                                            "--duration", str(cell["duration"]), "--warmup", str(cell["warmup"]),
+                                            "--retain-batches", str(cell["retain_batches"]),
+                                            "--retain-bytes", str(cell["retain_bytes"]),
+                                            "--output", str(destination / "server.json")]
+        (destination / "commands.json").write_text(json.dumps({"process": args}, indent=2), encoding="utf-8")
+        # Single-threaded work under the server's CPU mask, so each runtime keeps its server
+        # configuration (with one CPU, .NET would fall back to workstation GC).
+        with (destination / "server.log").open("w", encoding="utf-8") as log:
+            process = spawn(args, masks["server"], log, stdin=subprocess.DEVNULL, extra_env=cell["server_env"])
+            if process.wait(timeout=cell["duration"] * 10 + cell["warmup"] * 10 + 300):
+                error = f"process control exited {process.returncode}"
+            own_cpu += process_cpu_seconds(process) or 0
+        outputs = {"client": None, "server": read_json(destination / "server.json")}
+    else:
+        with socket.socket() as reserve:
+            reserve.bind(("127.0.0.1", 0))
+            port = reserve.getsockname()[1]
+        server_args = command(BINARIES[server]) + [
+            "server", "--port", str(port), "--mode", cell["mode"], "--max-frame", str(corpus_info["max_frame_bytes"]),
+            "--max-connections", str(cell["connections"]), "--workers", str(masks["server_cores"]),
+            "--retain-batches", str(cell["retain_batches"]), "--retain-bytes", str(cell["retain_bytes"]),
+            "--socket-buffer", str(cell["socket_buffer"]), "--pause-every", str(cell["pause_every"]),
+            "--pause-ms", str(cell["pause_ms"]), "--io-cap", str(cell["io_cap"]),
+            "--manifest-hash", manifest_hash, "--control-stdin", "1",
+            "--output", str(destination / "server.json")]
+        client_args = command(BINARIES[cell["client"]]) + [
+            "client", "--port", str(port), "--corpus", corpus_info["path"], "--mode", cell["mode"],
+            "--connections", str(cell["connections"]), "--duration", str(cell["duration"]),
+            "--warmup", str(cell["warmup"]), "--window", str(cell["window"]), "--rate", str(cell["rate"]),
+            "--arrival", cell["arrival"], "--seed", str(cell["seed"]), "--socket-buffer", str(cell["socket_buffer"]),
+            "--inflight-bytes", str(cell["inflight_bytes"]), "--drain-seconds", str(cell["drain"]),
+            "--io-cap", str(cell["io_cap"]), "--manifest-hash", manifest_hash,
+            "--output", str(destination / "client.json")]
+        (destination / "commands.json").write_text(json.dumps({"server": server_args, "client": client_args, "server_env": cell["server_env"]}, indent=2),
+                                                   encoding="utf-8")
+        server_log = destination / "server.log"
+        with server_log.open("w", encoding="utf-8") as slog:
+            process = spawn(server_args, masks["server"], slog, extra_env=cell["server_env"])
+            client = None
+            try:
+                wait_ready(process, server_log)
+                with (destination / "client.log").open("w", encoding="utf-8") as clog:
+                    client = spawn(client_args, client_mask, clog, stdin=subprocess.DEVNULL)
+                    code = client.wait(timeout=2 * cell["warmup"] + cell["duration"] + 2 * cell["drain"] + 120)
+                if code:
+                    error = f"client exited {code}"
+            except Exception as failure:  # recorded with the trial, never silently dropped
+                error = str(failure)
+            finally:
+                if client is not None and client.poll() is None:
+                    client.kill()
+                    client.wait()
+                own_cpu += process_cpu_seconds(client) or 0 if client is not None else 0
                 try:
-                    server.stdin.write(b"stop\n")
-                    server.stdin.flush()
-                    server.stdin.close()
-                    server.wait(timeout=30)
-                except (BrokenPipeError, OSError, subprocess.TimeoutExpired):
-                    server.kill()
-                    server.wait()
-                    error = error or f"Server did not shut down cleanly; inspect {destination}"
-            if server.returncode:
-                error = error or f"Server exited {server.returncode}; inspect {destination}"
-    outputs = {}
-    for role in ["client", "server"]:
-        try:
-            outputs[role] = json.loads((destination / f"{role}.json").read_text(encoding="utf-8-sig"))
-        except (OSError, ValueError) as failure:
-            outputs[role] = {"valid": False, "error": str(failure)}
-            error = error or f"Missing or invalid {role} result: {destination}"
-    if outputs["server"].get("valid") is False:
-        error = error or f"Invalid server result: {destination}"
-    summary = {"path": str(destination), "scenario": scenario, "server": server_name,
-               "client": client_name, "elapsed_seconds": time.monotonic() - started,
-               "builds": {name: info["sha256"] for name, info in manifest["binaries"].items()},
-               "cpu_masks": masks, "runner_error": error,
+                    process.stdin.write(b"stop\n")
+                    process.stdin.close()
+                    process.wait(timeout=60)
+                except (OSError, subprocess.TimeoutExpired):
+                    process.kill()
+                    process.wait()
+                    error = error or "server did not stop cleanly"
+                if process.returncode:
+                    error = error or f"server exited {process.returncode}"
+                own_cpu += process_cpu_seconds(process) or 0
+        outputs = {"client": read_json(destination / "client.json"), "server": read_json(destination / "server.json")}
+    elapsed = time.monotonic() - started
+    busy = [after - before for after, before in zip(cpu_busy_seconds(), busy_before)]
+    background = max(0.0, sum(busy) - own_cpu)
+    # Foreign work on the idle SMT siblings of the server's cores shares those cores.
+    siblings = sibling_cpus(masks, "server")
+    sibling_busy = sum(busy[cpu] for cpu in siblings) / max(1e-9, time.monotonic() - started) / max(1, len(siblings))
+    for role, output in outputs.items():
+        if output and output.get("valid") is False:
+            error = error or f"invalid {role} result: {output.get('error')}"
+    summary = {"ordinal": ordinal, "path": str(destination), "cell": cell, "server": server,
+               "client": cell["client"] if cell["kind"] == "tcp" else None, "builds": builds, "masks": masks,
+               "corpus": corpus_info, "elapsed_seconds": elapsed, "background_cpu_seconds": background,
+               "server_sibling_busy_fraction": sibling_busy,
+               "logical_cpus": os.cpu_count(), "runner_error": error,
                "result": outputs["client"], "server_result": outputs["server"]}
     (destination / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
-    print(json.dumps({"trial": ordinal, "mode": scenario["mode"], "server": server_name,
-                      "client": client_name, "rate": scenario["rate"], "result": str(destination / "client.json")}), flush=True)
-    if error:
-        raise TrialFailure(summary)
+    print(json.dumps({"trial": ordinal, "cell": cell["name"], "server": server, "error": error,
+                      "seconds": round(elapsed, 1)}), flush=True)
     return summary
+
+
+def prepare_corpora(matrix):
+    corpora = {}
+    for name, spec in matrix["corpora"].items():
+        path = ROOT / "data" / f"{name}-{spec['profile']}-{spec['bytes']}-{spec['frame_bytes']}-{spec['seed']}.bin"
+        sidecar = path.with_suffix(".json")
+        if not path.exists() or not sidecar.exists():
+            payloads = corpus.generate_payloads(spec["bytes"], spec["frame_bytes"], spec["seed"], spec["profile"],
+                                                spec.get("min_frame_bytes"))
+            info = corpus.write_frames(path, payloads) | spec
+            sidecar.write_text(json.dumps(info, indent=2), encoding="utf-8")
+        info = json.loads(sidecar.read_text(encoding="utf-8"))
+        if sha256(path) != info["sha256"]:
+            raise RuntimeError(f"corpus hash mismatch: {path}")
+        corpora[name] = info | {"name": name, "path": str(path)}
+    return corpora
+
+
+def capacity(results, cell_name):
+    """Slower server's median window frame rate in an earlier closed-loop cell, from valid trials
+    whose client stayed within its CPU budget (so the rate is the server's, not the client's)."""
+    rates = {}
+    for entry in results:
+        r = entry["result"]
+        if (entry["cell"]["name"] == cell_name and not entry["runner_error"]
+                and report.client_cpu(r) <= report.CLIENT_CPU_LIMIT):
+            rates.setdefault(entry["server"], []).append(r["window"]["frames"] / r["window"]["seconds"])
+    if len(rates) < 2:
+        raise RuntimeError(f"no client-adequate capacity trials for both servers in {cell_name}")
+    return min(statistics.median(v) for v in rates.values())
+
+
+def trial_key(phase, cell, repetition, server, builds):
+    """Identity of a planned trial: any change to the resolved cell or binaries is a new trial."""
+    text = json.dumps([phase, cell, repetition, server, builds], sort_keys=True)
+    return hashlib.sha256(text.encode()).hexdigest()
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--suite", choices=["smoke", "first", "pilot", "confirm", "soak"], default="smoke")
-    parser.add_argument("--output", type=Path)
-    parser.add_argument("--duration", type=float)
-    parser.add_argument("--warmup", type=float)
-    parser.add_argument("--corpus-bytes", type=int)
-    parser.add_argument("--server-cores", type=int, default=4)
-    parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--client", choices=["cpp", "csharp"], default="cpp")
-    parser.add_argument("--arrival", choices=["steady", "poisson", "burst"], default="steady")
+    parser.add_argument("--matrix", type=Path, required=True)
+    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--only", nargs="*", help="run only these phases")
+    parser.add_argument("--repetitions", type=int, help="override every phase's repetitions")
+    parser.add_argument("--duration", type=float, help="override every cell's duration (smoke use)")
+    parser.add_argument("--warmup", type=float, help="override every cell's warmup (smoke use)")
+    parser.add_argument("--cooldown", type=float, default=2.0, help="seconds between trials")
+    parser.add_argument("--resume", action="store_true",
+                        help="continue an interrupted campaign in --output; completed trials are kept")
     args = parser.parse_args()
-    if args.duration is not None and (not 0 < args.duration <= 86400):
-        parser.error("duration must be 0..86400 seconds")
-    if args.warmup is not None and not 0 <= args.warmup <= 3600:
-        parser.error("warmup must be 0..3600 seconds")
-    if args.corpus_bytes is not None and args.corpus_bytes <= 0:
-        parser.error("corpus-bytes must be positive")
-    executables, masks = binaries(), cpu_masks(args.server_cores)
-    stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    folder = (args.output or ROOT / "results" / f"{stamp}-{args.suite}").resolve()
-    folder.mkdir(parents=True, exist_ok=False)
-    defaults = {"smoke": (1, 0.2, 1024**2), "first": (30, 5, 256 * 1024**2),
-                "pilot": (30, 5, 256 * 1024**2),
-                "confirm": (120, 30, 2 * 1024**3), "soak": (1800, 30, 2 * 1024**3)}
-    duration, warmup, corpus_size = defaults[args.suite]
-    if args.duration is not None: duration = args.duration
-    if args.warmup is not None: warmup = args.warmup
-    if args.corpus_bytes is not None: corpus_size = args.corpus_bytes
-    manifest = {"suite": args.suite, "started_utc": stamp, "platform": platform.platform(),
-                "python": sys.version, "masks": masks, "arguments": vars(args) | {"output": str(folder)},
-                "environment": environment_details(),
-                "notice": "Shared-host loopback application comparison. Smoke checks correctness; first/pilot are exploratory, not universal language rankings."}
-    (folder / "environment.json").write_text(json.dumps(manifest, indent=2, default=str), encoding="utf-8")
-    modes = ["aggregate", "retain-reuse", "retain-allocate"]
-    if args.suite == "smoke":
-        cells = [(mode, 4096, 4) for mode in modes]
-    elif args.suite == "pilot":
-        cells = [(mode, size, connections) for mode in modes for size in [65536, 1048576] for connections in [1, 16]]
-    else:
-        cells = [("aggregate", 65536, 16), ("aggregate", 1048576, 1),
-                 ("retain-reuse", 65536, 16), ("retain-allocate", 65536, 16)]
-    corpora = {}
-    for size in sorted({cell[1] for cell in cells}):
-        path = ROOT / "data" / f"corpus-{size}-{corpus_size}-{args.seed}.bin"
-        sidecar = path.with_suffix(".json")
-        if not path.exists() or not sidecar.exists():
-            generated = corpus.write_frames(path, corpus.generate_payloads(corpus_size, size, args.seed))
-            generated.update(seed=args.seed, target_frame_bytes=size)
-            sidecar.write_text(json.dumps(generated, indent=2), encoding="utf-8")
-        info = json.loads(sidecar.read_text(encoding="utf-8"))
-        if sha256(path) != info["sha256"]:
-            raise RuntimeError(f"Corpus hash mismatch: {path}")
-        corpora[size] = (path, info)
-    rng, results, ordinal = random.Random(args.seed), [], 0
-
-    def run_cell(cell, rate, repeats=1, phase="measurement", d=duration, w=warmup, client_names=None):
-        nonlocal ordinal
-        mode, size, connections = cell
-        path, info = corpora[size]
-        scenario = {"mode": mode, "frame_bytes": size, "connections": connections,
-                    "duration": d, "warmup": w, "window": 64, "rate": rate,
-                    "seed": args.seed,
-                    "arrival": args.arrival, "corpus": str(path), "corpus_sha256": info["sha256"],
-                    "corpus_payload_bytes": info["payload_bytes"], "phase": phase}
-        entries = []
-        for repetition in range(repeats):
-            clients = client_names or (["cpp", "csharp"] if args.suite == "smoke" else [args.client])
-            pairs = [(s, c) for c in clients
-                     for s in ["csharp", "cpp"]]
-            rng.shuffle(pairs)
-            for server, client in pairs:
-                ordinal += 1
-                try:
-                    summary = trial(folder, executables, masks, scenario | {"pair": repetition}, server, client, ordinal)
-                except TrialFailure as failure:
-                    results.append(failure.summary)
+    matrix = json.loads(args.matrix.read_text(encoding="utf-8"))
+    for path in BINARIES.values():
+        if not path.is_file():
+            raise FileNotFoundError(f"build first: missing {path}")
+    folder = args.output.resolve()
+    folder.mkdir(parents=True, exist_ok=args.resume)
+    previous = json.loads((folder / "results.json").read_text(encoding="utf-8")) if args.resume else []
+    masks = cpu_layout(matrix.get("server_cores", 4))
+    corpora = prepare_corpora(matrix)
+    overrides = {k: v for k, v in [("duration", args.duration), ("warmup", args.warmup)] if v is not None}
+    environment = {"started_utc": dt.datetime.now(dt.timezone.utc).isoformat(), "platform": platform.platform(),
+                   "python": sys.version, "arguments": {k: str(v) for k, v in vars(args).items()},
+                   "masks": masks, "matrix": matrix, "overrides": overrides, "corpora": corpora,
+                   "binaries": {name: {"path": str(p), "sha256": sha256(p)} for name, p in BINARIES.items()},
+                   "runtime_environment": {k: v for k, v in os.environ.items()
+                                           if k.upper().startswith(("DOTNET_", "COMPLUS_", "CORECLR_"))},
+                   "sources": {str(p.relative_to(ROOT)): sha256(p) for pattern in
+                               ["src/dotnet/*.cs", "src/dotnet/*.csproj", "src/cpp/*.cpp", "src/cpp/*.hpp",
+                                "src/cpp/CMakeLists.txt", "bench/*.py", "tools/*.py", "global.json"]
+                               for p in sorted(ROOT.glob(pattern))},
+                   "tools": {}}
+    for name, cmd in {"dotnet": ["dotnet", "--info"], "cmake": ["cmake", "--version"],
+                      "power_plan": ["powercfg", "/getactivescheme"]}.items():
+        done = subprocess.run(cmd, capture_output=True, text=True, errors="replace")
+        environment["tools"][name] = done.stdout[-4000:]
+    name = "environment.json" if not previous else f"environment-resume-{len(previous)}.json"
+    (folder / name).write_text(json.dumps(environment, indent=2), encoding="utf-8")
+    # The seeded order is replayed on resume; completed identical trials are reused, not rerun.
+    builds = {name: sha256(path) for name, path in BINARIES.items()}
+    done = {e["key"]: e for e in previous}
+    if previous:  # results.json is rewritten below; keep the earlier index intact until the end
+        (folder / f"results-before-resume-{len(previous)}.json").write_text(json.dumps(previous, indent=2), encoding="utf-8")
+    rng, results, ordinal = random.Random(matrix.get("seed", 42)), [], 0
+    for phase in matrix["phases"]:
+        # Unselected phases still consume the seeded shuffle, so --only never changes order or ordinals.
+        selected = not args.only or phase["name"] in args.only
+        cells = [DEFAULTS | matrix.get("defaults", {}) | cell | overrides | {"phase": phase["name"]}
+                 for cell in phase["cells"]]
+        for cell in cells:
+            cell.setdefault("seed", matrix.get("seed", 42))
+            if isinstance(cell["rate"], dict) and selected:
+                cell["rate_rule"] = cell["rate"]
+                cell["rate"] = round(capacity(results, cell["rate"]["of"]) * cell["rate"]["fraction"], 3)
+        for repetition in range(args.repetitions or phase.get("repetitions", 1)):
+            order = list(cells)
+            rng.shuffle(order)
+            for cell in order:
+                servers = list(cell["servers"])
+                rng.shuffle(servers)
+                for server in servers:
+                    ordinal += 1
+                    if not selected:
+                        continue
+                    key = trial_key(phase["name"], cell, repetition, server, builds)
+                    if key in done:
+                        results.append(done.pop(key))
+                        continue
+                    entry = trial(folder, ordinal, cell | {"repetition": repetition}, server, masks, corpora[cell["corpus"]])
+                    entry["key"] = key
+                    results.append(entry)
                     (folder / "results.json").write_text(json.dumps(results, indent=2), encoding="utf-8")
-                    raise
-                results.append(summary)
-                entries.append(summary)
-                (folder / "results.json").write_text(json.dumps(results, indent=2), encoding="utf-8")
-        return entries
-
-    if args.suite == "first":
-        capacities = {}
-        for cell in cells:
-            measured = run_cell(cell, 0, repeats=3, phase="closed-loop")
-            capacities[cell] = min(statistics.median(
-                entry["result"]["window_completed_frames"] / entry["result"]["window_seconds"]
-                for entry in measured if entry["server"] == server)
-                for server in ["csharp", "cpp"])
-        alternate = "csharp" if args.client == "cpp" else "cpp"
-        for cell in cells:
-            run_cell(cell, 0, phase="alternate-client", client_names=[alternate])
-        for size, connections in sorted({(cell[1], cell[2]) for cell in cells}):
-            run_cell(("transport", size, connections), 0, phase="transport-control")
-        for cell in cells:
-            if cell[1] == 65536:
-                for ratio in [0.5, 0.9, 1.2]:
-                    run_cell(cell, max(1, capacities[cell] * ratio), phase="scheduled-exploration")
-    for cell in cells if args.suite != "first" else []:
-        if args.suite in ["confirm", "soak"]:
-            pilot = run_cell(cell, 0, phase="calibration", d=30, w=5)
-            capacities = []
-            for entry in pilot:
-                result = entry["result"]
-                frames = result_value(result, "window_completed_frames", "completed_frames")
-                seconds = result_value(result, "window_seconds", "duration_seconds", default=30)
-                if frames is None or frames <= 0:
-                    raise RuntimeError("Calibration result lacks positive completed frame count")
-                capacities.append(frames / seconds)
-            common = min(capacities)
-            for ratio in ([0.5, 0.9, 1.2] if args.suite == "confirm" else [0.7]):
-                run_cell(cell, max(1, common * ratio), repeats=7 if args.suite == "confirm" else 1)
-        else:
-            run_cell(cell, 0)
-            if args.suite == "smoke":
-                run_cell(cell, 100)
-    print(json.dumps({"completed_trials": len(results), "results": str(folder)}))
+                    time.sleep(args.cooldown)
+    if done:  # earlier trials that no longer match the plan are preserved separately, never pooled
+        (folder / f"results-unmatched-{time.time_ns()}.json").write_text(json.dumps(list(done.values()), indent=2),
+                                                                         encoding="utf-8")
+    print(json.dumps({"completed_trials": len(results), "failed": sum(bool(r["runner_error"]) for r in results),
+                      "results": str(folder)}))
 
 
 if __name__ == "__main__":

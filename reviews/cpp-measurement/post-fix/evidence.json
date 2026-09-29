@@ -1,0 +1,4300 @@
+{
+  "binary_sha256": "62773a9936616bc8d0a0b3abfade96bb904ef70fba447b0fb8f0697fda265f79",
+  "clients": [
+    {
+      "name": "aborted-steady-drop",
+      "command": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "client",
+        "--port",
+        "50578",
+        "--corpus",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\post-fix\\empty.bin",
+        "--mode",
+        "transport",
+        "--connections",
+        "1",
+        "--duration",
+        "0.4",
+        "--warmup",
+        "0",
+        "--rate",
+        "100",
+        "--arrival",
+        "steady",
+        "--seed",
+        "42",
+        "--window",
+        "8",
+        "--drain-seconds",
+        "0.5",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\post-fix\\aborted-steady-drop.json"
+      ],
+      "port": 50578,
+      "exit_code": 1,
+      "wall_seconds": 0.10959229999571107,
+      "after_first_request_seconds": 0.0036686999956145883,
+      "peer_data_requests": 1,
+      "result": {
+        "kind": "client",
+        "language": "cpp",
+        "mode": "transport",
+        "success": false,
+        "valid": false,
+        "sustainable": false,
+        "implementation": "cpp23",
+        "compiler": "MSVC 195136260",
+        "cplusplus": 202400,
+        "build_configuration": "Release",
+        "windows_sdk": "10.0.26100.0",
+        "simdjson": "3.12.3",
+        "simdjson_implementation": "icelake",
+        "qpc_frequency": 10000000,
+        "sanitized": false,
+        "native_allocation_counters": null,
+        "native_allocation_note": "Use ETW heap diagnostic for full native allocation/free accounting; ordinary runs report process memory",
+        "resource_scope": "process-lifetime including setup warmup and shutdown; not measured-cohort CPU",
+        "cpu_seconds": 0.015625,
+        "private_bytes": 4706304,
+        "peak_commit_bytes": 4788224,
+        "working_set_bytes": 9912320,
+        "peak_working_set_bytes": 9912320,
+        "affinity_mask": 65535,
+        "duration_seconds": 0.4,
+        "window_seconds": 0.4,
+        "cohort_seconds": 0.4,
+        "drain_seconds": 0,
+        "configured_drain_seconds": 0.5,
+        "drain_limit_seconds": 0.5,
+        "cohort_scope": "T0 through max(window end, data-worker finish), excluding End control",
+        "offered": 40,
+        "admitted": 1,
+        "first_send_started": 1,
+        "acknowledged": 0,
+        "completed_frames": 0,
+        "rejected": 39,
+        "generator_late_rejected": 0,
+        "aborted_schedule_rejected": 39,
+        "scheduler_late_count": 0,
+        "scheduler_late_over_1ms": 0,
+        "generator_adequate": false,
+        "pacing": "process-local high-resolution waitable timer plus <=200us spin",
+        "failed": 0,
+        "timedout": 0,
+        "unresolved": 1,
+        "completed_records": 0,
+        "completed_payload_bytes": 0,
+        "window_completed_frames": 0,
+        "window_records": 0,
+        "window_payload_bytes": 0,
+        "window_frames_per_second": 0,
+        "window_records_per_second": 0,
+        "window_payload_bytes_per_second": 0,
+        "cohort_frames_per_second": 0,
+        "queue_high_water": 1,
+        "inflight_bytes_high_water": 2,
+        "deadline_misses_1ms": 40,
+        "deadline_misses_5ms": 40,
+        "deadline_misses_10ms": 40,
+        "rate": 100,
+        "arrival": "steady",
+        "load_model": "scheduled",
+        "connections": 1,
+        "window": 8,
+        "inflight_bytes_limit": 67108864,
+        "unique_payload_bytes": 2,
+        "corpus_frames": 1,
+        "data_request_protocol_bytes": 0,
+        "data_ack_protocol_bytes": 0,
+        "native_client_threads": 3,
+        "cursor_rule": "connection-local start=index; advance=connections per offered request; persists across phases",
+        "seed": 42,
+        "io_counter_scope": "process-lifetime including controls and warmup",
+        "send_operations": 4,
+        "receive_operations": 2,
+        "sent_protocol_bytes": 66,
+        "received_protocol_bytes": 16,
+        "socket_buffer_requested": 262144,
+        "socket_send_buffer_effective": 262144,
+        "socket_receive_buffer_effective": 262144,
+        "scheduled_latency": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "submitted_latency": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "client_delay": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "scheduler_lateness": {
+          "count": 1,
+          "p50_ns": 5007,
+          "p90_ns": 5007,
+          "p99_ns": 5007,
+          "p999_ns": 5007,
+          "max_ns": 5000,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              5007,
+              1
+            ]
+          ]
+        },
+        "latency_ns": {
+          "p50": null,
+          "p90": null,
+          "p99": null,
+          "p999": null,
+          "max": 0
+        },
+        "size_latency": [
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          }
+        ],
+        "error": "response_eof"
+      }
+    },
+    {
+      "name": "aborted-steady-corrupt",
+      "command": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "client",
+        "--port",
+        "50580",
+        "--corpus",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\post-fix\\empty.bin",
+        "--mode",
+        "transport",
+        "--connections",
+        "1",
+        "--duration",
+        "0.4",
+        "--warmup",
+        "0",
+        "--rate",
+        "100",
+        "--arrival",
+        "steady",
+        "--seed",
+        "42",
+        "--window",
+        "8",
+        "--drain-seconds",
+        "0.5",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\post-fix\\aborted-steady-corrupt.json"
+      ],
+      "port": 50580,
+      "exit_code": 1,
+      "wall_seconds": 0.10595240000111517,
+      "after_first_request_seconds": 0.0034190000005764887,
+      "peer_data_requests": 1,
+      "result": {
+        "kind": "client",
+        "language": "cpp",
+        "mode": "transport",
+        "success": false,
+        "valid": false,
+        "sustainable": false,
+        "implementation": "cpp23",
+        "compiler": "MSVC 195136260",
+        "cplusplus": 202400,
+        "build_configuration": "Release",
+        "windows_sdk": "10.0.26100.0",
+        "simdjson": "3.12.3",
+        "simdjson_implementation": "icelake",
+        "qpc_frequency": 10000000,
+        "sanitized": false,
+        "native_allocation_counters": null,
+        "native_allocation_note": "Use ETW heap diagnostic for full native allocation/free accounting; ordinary runs report process memory",
+        "resource_scope": "process-lifetime including setup warmup and shutdown; not measured-cohort CPU",
+        "cpu_seconds": 0.015625,
+        "private_bytes": 4726784,
+        "peak_commit_bytes": 4812800,
+        "working_set_bytes": 9969664,
+        "peak_working_set_bytes": 9969664,
+        "affinity_mask": 65535,
+        "duration_seconds": 0.4,
+        "window_seconds": 0.4,
+        "cohort_seconds": 0.4,
+        "drain_seconds": 0,
+        "configured_drain_seconds": 0.5,
+        "drain_limit_seconds": 0.5,
+        "cohort_scope": "T0 through max(window end, data-worker finish), excluding End control",
+        "offered": 40,
+        "admitted": 1,
+        "first_send_started": 1,
+        "acknowledged": 0,
+        "completed_frames": 0,
+        "rejected": 39,
+        "generator_late_rejected": 0,
+        "aborted_schedule_rejected": 39,
+        "scheduler_late_count": 0,
+        "scheduler_late_over_1ms": 0,
+        "generator_adequate": false,
+        "pacing": "process-local high-resolution waitable timer plus <=200us spin",
+        "failed": 1,
+        "timedout": 0,
+        "unresolved": 0,
+        "completed_records": 0,
+        "completed_payload_bytes": 0,
+        "window_completed_frames": 0,
+        "window_records": 0,
+        "window_payload_bytes": 0,
+        "window_frames_per_second": 0,
+        "window_records_per_second": 0,
+        "window_payload_bytes_per_second": 0,
+        "cohort_frames_per_second": 0,
+        "queue_high_water": 1,
+        "inflight_bytes_high_water": 2,
+        "deadline_misses_1ms": 40,
+        "deadline_misses_5ms": 40,
+        "deadline_misses_10ms": 40,
+        "rate": 100,
+        "arrival": "steady",
+        "load_model": "scheduled",
+        "connections": 1,
+        "window": 8,
+        "inflight_bytes_limit": 67108864,
+        "unique_payload_bytes": 2,
+        "corpus_frames": 1,
+        "data_request_protocol_bytes": 0,
+        "data_ack_protocol_bytes": 0,
+        "native_client_threads": 3,
+        "cursor_rule": "connection-local start=index; advance=connections per offered request; persists across phases",
+        "seed": 42,
+        "io_counter_scope": "process-lifetime including controls and warmup",
+        "send_operations": 4,
+        "receive_operations": 2,
+        "sent_protocol_bytes": 66,
+        "received_protocol_bytes": 48,
+        "socket_buffer_requested": 262144,
+        "socket_send_buffer_effective": 262144,
+        "socket_receive_buffer_effective": 262144,
+        "scheduled_latency": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "submitted_latency": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "client_delay": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "scheduler_lateness": {
+          "count": 1,
+          "p50_ns": 104959,
+          "p90_ns": 104959,
+          "p99_ns": 104959,
+          "p999_ns": 104959,
+          "max_ns": 104900,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              104959,
+              1
+            ]
+          ]
+        },
+        "latency_ns": {
+          "p50": null,
+          "p90": null,
+          "p99": null,
+          "p999": null,
+          "max": 0
+        },
+        "size_latency": [
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          }
+        ],
+        "error": "ack_mismatch"
+      }
+    },
+    {
+      "name": "aborted-poisson-drop",
+      "command": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "client",
+        "--port",
+        "50582",
+        "--corpus",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\post-fix\\empty.bin",
+        "--mode",
+        "transport",
+        "--connections",
+        "1",
+        "--duration",
+        "0.4",
+        "--warmup",
+        "0",
+        "--rate",
+        "100",
+        "--arrival",
+        "poisson",
+        "--seed",
+        "42",
+        "--window",
+        "8",
+        "--drain-seconds",
+        "0.5",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\post-fix\\aborted-poisson-drop.json"
+      ],
+      "port": 50582,
+      "exit_code": 1,
+      "wall_seconds": 0.11004379999940284,
+      "after_first_request_seconds": 0.003842799997073598,
+      "peer_data_requests": 1,
+      "result": {
+        "kind": "client",
+        "language": "cpp",
+        "mode": "transport",
+        "success": false,
+        "valid": false,
+        "sustainable": false,
+        "implementation": "cpp23",
+        "compiler": "MSVC 195136260",
+        "cplusplus": 202400,
+        "build_configuration": "Release",
+        "windows_sdk": "10.0.26100.0",
+        "simdjson": "3.12.3",
+        "simdjson_implementation": "icelake",
+        "qpc_frequency": 10000000,
+        "sanitized": false,
+        "native_allocation_counters": null,
+        "native_allocation_note": "Use ETW heap diagnostic for full native allocation/free accounting; ordinary runs report process memory",
+        "resource_scope": "process-lifetime including setup warmup and shutdown; not measured-cohort CPU",
+        "cpu_seconds": 0.015625,
+        "private_bytes": 4718592,
+        "peak_commit_bytes": 4800512,
+        "working_set_bytes": 9981952,
+        "peak_working_set_bytes": 9981952,
+        "affinity_mask": 65535,
+        "duration_seconds": 0.4,
+        "window_seconds": 0.4,
+        "cohort_seconds": 0.4,
+        "drain_seconds": 0,
+        "configured_drain_seconds": 0.5,
+        "drain_limit_seconds": 0.5,
+        "cohort_scope": "T0 through max(window end, data-worker finish), excluding End control",
+        "offered": 39,
+        "admitted": 1,
+        "first_send_started": 1,
+        "acknowledged": 0,
+        "completed_frames": 0,
+        "rejected": 38,
+        "generator_late_rejected": 0,
+        "aborted_schedule_rejected": 38,
+        "scheduler_late_count": 0,
+        "scheduler_late_over_1ms": 0,
+        "generator_adequate": false,
+        "pacing": "process-local high-resolution waitable timer plus <=200us spin",
+        "failed": 0,
+        "timedout": 0,
+        "unresolved": 1,
+        "completed_records": 0,
+        "completed_payload_bytes": 0,
+        "window_completed_frames": 0,
+        "window_records": 0,
+        "window_payload_bytes": 0,
+        "window_frames_per_second": 0,
+        "window_records_per_second": 0,
+        "window_payload_bytes_per_second": 0,
+        "cohort_frames_per_second": 0,
+        "queue_high_water": 1,
+        "inflight_bytes_high_water": 2,
+        "deadline_misses_1ms": 39,
+        "deadline_misses_5ms": 39,
+        "deadline_misses_10ms": 39,
+        "rate": 100,
+        "arrival": "poisson",
+        "load_model": "scheduled",
+        "connections": 1,
+        "window": 8,
+        "inflight_bytes_limit": 67108864,
+        "unique_payload_bytes": 2,
+        "corpus_frames": 1,
+        "data_request_protocol_bytes": 0,
+        "data_ack_protocol_bytes": 0,
+        "native_client_threads": 3,
+        "cursor_rule": "connection-local start=index; advance=connections per offered request; persists across phases",
+        "seed": 42,
+        "io_counter_scope": "process-lifetime including controls and warmup",
+        "send_operations": 4,
+        "receive_operations": 2,
+        "sent_protocol_bytes": 66,
+        "received_protocol_bytes": 16,
+        "socket_buffer_requested": 262144,
+        "socket_send_buffer_effective": 262144,
+        "socket_receive_buffer_effective": 262144,
+        "scheduled_latency": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "submitted_latency": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "client_delay": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "scheduler_lateness": {
+          "count": 1,
+          "p50_ns": 227839,
+          "p90_ns": 227839,
+          "p99_ns": 227839,
+          "p999_ns": 227839,
+          "max_ns": 227700,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              227839,
+              1
+            ]
+          ]
+        },
+        "latency_ns": {
+          "p50": null,
+          "p90": null,
+          "p99": null,
+          "p999": null,
+          "max": 0
+        },
+        "size_latency": [
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          }
+        ],
+        "error": "response_eof"
+      }
+    },
+    {
+      "name": "aborted-poisson-corrupt",
+      "command": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "client",
+        "--port",
+        "50584",
+        "--corpus",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\post-fix\\empty.bin",
+        "--mode",
+        "transport",
+        "--connections",
+        "1",
+        "--duration",
+        "0.4",
+        "--warmup",
+        "0",
+        "--rate",
+        "100",
+        "--arrival",
+        "poisson",
+        "--seed",
+        "42",
+        "--window",
+        "8",
+        "--drain-seconds",
+        "0.5",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\post-fix\\aborted-poisson-corrupt.json"
+      ],
+      "port": 50584,
+      "exit_code": 1,
+      "wall_seconds": 0.10875410000153352,
+      "after_first_request_seconds": 0.0033849999963422306,
+      "peer_data_requests": 1,
+      "result": {
+        "kind": "client",
+        "language": "cpp",
+        "mode": "transport",
+        "success": false,
+        "valid": false,
+        "sustainable": false,
+        "implementation": "cpp23",
+        "compiler": "MSVC 195136260",
+        "cplusplus": 202400,
+        "build_configuration": "Release",
+        "windows_sdk": "10.0.26100.0",
+        "simdjson": "3.12.3",
+        "simdjson_implementation": "icelake",
+        "qpc_frequency": 10000000,
+        "sanitized": false,
+        "native_allocation_counters": null,
+        "native_allocation_note": "Use ETW heap diagnostic for full native allocation/free accounting; ordinary runs report process memory",
+        "resource_scope": "process-lifetime including setup warmup and shutdown; not measured-cohort CPU",
+        "cpu_seconds": 0.015625,
+        "private_bytes": 4718592,
+        "peak_commit_bytes": 4804608,
+        "working_set_bytes": 9981952,
+        "peak_working_set_bytes": 9981952,
+        "affinity_mask": 65535,
+        "duration_seconds": 0.4,
+        "window_seconds": 0.4,
+        "cohort_seconds": 0.4,
+        "drain_seconds": 0,
+        "configured_drain_seconds": 0.5,
+        "drain_limit_seconds": 0.5,
+        "cohort_scope": "T0 through max(window end, data-worker finish), excluding End control",
+        "offered": 39,
+        "admitted": 1,
+        "first_send_started": 1,
+        "acknowledged": 0,
+        "completed_frames": 0,
+        "rejected": 38,
+        "generator_late_rejected": 0,
+        "aborted_schedule_rejected": 38,
+        "scheduler_late_count": 0,
+        "scheduler_late_over_1ms": 0,
+        "generator_adequate": false,
+        "pacing": "process-local high-resolution waitable timer plus <=200us spin",
+        "failed": 1,
+        "timedout": 0,
+        "unresolved": 0,
+        "completed_records": 0,
+        "completed_payload_bytes": 0,
+        "window_completed_frames": 0,
+        "window_records": 0,
+        "window_payload_bytes": 0,
+        "window_frames_per_second": 0,
+        "window_records_per_second": 0,
+        "window_payload_bytes_per_second": 0,
+        "cohort_frames_per_second": 0,
+        "queue_high_water": 1,
+        "inflight_bytes_high_water": 2,
+        "deadline_misses_1ms": 39,
+        "deadline_misses_5ms": 39,
+        "deadline_misses_10ms": 39,
+        "rate": 100,
+        "arrival": "poisson",
+        "load_model": "scheduled",
+        "connections": 1,
+        "window": 8,
+        "inflight_bytes_limit": 67108864,
+        "unique_payload_bytes": 2,
+        "corpus_frames": 1,
+        "data_request_protocol_bytes": 0,
+        "data_ack_protocol_bytes": 0,
+        "native_client_threads": 3,
+        "cursor_rule": "connection-local start=index; advance=connections per offered request; persists across phases",
+        "seed": 42,
+        "io_counter_scope": "process-lifetime including controls and warmup",
+        "send_operations": 4,
+        "receive_operations": 2,
+        "sent_protocol_bytes": 66,
+        "received_protocol_bytes": 48,
+        "socket_buffer_requested": 262144,
+        "socket_send_buffer_effective": 262144,
+        "socket_receive_buffer_effective": 262144,
+        "scheduled_latency": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "submitted_latency": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "client_delay": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "scheduler_lateness": {
+          "count": 1,
+          "p50_ns": 3303,
+          "p90_ns": 3303,
+          "p99_ns": 3303,
+          "p999_ns": 3303,
+          "max_ns": 3300,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              3303,
+              1
+            ]
+          ]
+        },
+        "latency_ns": {
+          "p50": null,
+          "p90": null,
+          "p99": null,
+          "p999": null,
+          "max": 0
+        },
+        "size_latency": [
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          }
+        ],
+        "error": "ack_mismatch"
+      }
+    },
+    {
+      "name": "aborted-burst-drop",
+      "command": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "client",
+        "--port",
+        "50586",
+        "--corpus",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\post-fix\\empty.bin",
+        "--mode",
+        "transport",
+        "--connections",
+        "1",
+        "--duration",
+        "0.4",
+        "--warmup",
+        "0",
+        "--rate",
+        "100",
+        "--arrival",
+        "burst",
+        "--seed",
+        "42",
+        "--window",
+        "8",
+        "--drain-seconds",
+        "0.5",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\post-fix\\aborted-burst-drop.json"
+      ],
+      "port": 50586,
+      "exit_code": 1,
+      "wall_seconds": 0.10517509999772301,
+      "after_first_request_seconds": 0.0030769000004511327,
+      "peer_data_requests": 1,
+      "result": {
+        "kind": "client",
+        "language": "cpp",
+        "mode": "transport",
+        "success": false,
+        "valid": false,
+        "sustainable": false,
+        "implementation": "cpp23",
+        "compiler": "MSVC 195136260",
+        "cplusplus": 202400,
+        "build_configuration": "Release",
+        "windows_sdk": "10.0.26100.0",
+        "simdjson": "3.12.3",
+        "simdjson_implementation": "icelake",
+        "qpc_frequency": 10000000,
+        "sanitized": false,
+        "native_allocation_counters": null,
+        "native_allocation_note": "Use ETW heap diagnostic for full native allocation/free accounting; ordinary runs report process memory",
+        "resource_scope": "process-lifetime including setup warmup and shutdown; not measured-cohort CPU",
+        "cpu_seconds": 0.015625,
+        "private_bytes": 4714496,
+        "peak_commit_bytes": 4796416,
+        "working_set_bytes": 9961472,
+        "peak_working_set_bytes": 9961472,
+        "affinity_mask": 65535,
+        "duration_seconds": 0.4,
+        "window_seconds": 0.4,
+        "cohort_seconds": 0.4,
+        "drain_seconds": 0,
+        "configured_drain_seconds": 0.5,
+        "drain_limit_seconds": 0.5,
+        "cohort_scope": "T0 through max(window end, data-worker finish), excluding End control",
+        "offered": 24,
+        "admitted": 1,
+        "first_send_started": 1,
+        "acknowledged": 0,
+        "completed_frames": 0,
+        "rejected": 23,
+        "generator_late_rejected": 0,
+        "aborted_schedule_rejected": 23,
+        "scheduler_late_count": 0,
+        "scheduler_late_over_1ms": 0,
+        "generator_adequate": false,
+        "pacing": "process-local high-resolution waitable timer plus <=200us spin",
+        "failed": 0,
+        "timedout": 0,
+        "unresolved": 1,
+        "completed_records": 0,
+        "completed_payload_bytes": 0,
+        "window_completed_frames": 0,
+        "window_records": 0,
+        "window_payload_bytes": 0,
+        "window_frames_per_second": 0,
+        "window_records_per_second": 0,
+        "window_payload_bytes_per_second": 0,
+        "cohort_frames_per_second": 0,
+        "queue_high_water": 1,
+        "inflight_bytes_high_water": 2,
+        "deadline_misses_1ms": 24,
+        "deadline_misses_5ms": 24,
+        "deadline_misses_10ms": 24,
+        "rate": 100,
+        "arrival": "burst",
+        "load_model": "scheduled",
+        "connections": 1,
+        "window": 8,
+        "inflight_bytes_limit": 67108864,
+        "unique_payload_bytes": 2,
+        "corpus_frames": 1,
+        "data_request_protocol_bytes": 0,
+        "data_ack_protocol_bytes": 0,
+        "native_client_threads": 3,
+        "cursor_rule": "connection-local start=index; advance=connections per offered request; persists across phases",
+        "seed": 42,
+        "io_counter_scope": "process-lifetime including controls and warmup",
+        "send_operations": 4,
+        "receive_operations": 2,
+        "sent_protocol_bytes": 66,
+        "received_protocol_bytes": 16,
+        "socket_buffer_requested": 262144,
+        "socket_send_buffer_effective": 262144,
+        "socket_receive_buffer_effective": 262144,
+        "scheduled_latency": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "submitted_latency": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "client_delay": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "scheduler_lateness": {
+          "count": 1,
+          "p50_ns": 3207,
+          "p90_ns": 3207,
+          "p99_ns": 3207,
+          "p999_ns": 3207,
+          "max_ns": 3200,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              3207,
+              1
+            ]
+          ]
+        },
+        "latency_ns": {
+          "p50": null,
+          "p90": null,
+          "p99": null,
+          "p999": null,
+          "max": 0
+        },
+        "size_latency": [
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          }
+        ],
+        "error": "response_eof"
+      }
+    },
+    {
+      "name": "aborted-burst-corrupt",
+      "command": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "client",
+        "--port",
+        "50588",
+        "--corpus",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\post-fix\\empty.bin",
+        "--mode",
+        "transport",
+        "--connections",
+        "1",
+        "--duration",
+        "0.4",
+        "--warmup",
+        "0",
+        "--rate",
+        "100",
+        "--arrival",
+        "burst",
+        "--seed",
+        "42",
+        "--window",
+        "8",
+        "--drain-seconds",
+        "0.5",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\post-fix\\aborted-burst-corrupt.json"
+      ],
+      "port": 50588,
+      "exit_code": 1,
+      "wall_seconds": 0.10532640000019455,
+      "after_first_request_seconds": 0.00317400000494672,
+      "peer_data_requests": 1,
+      "result": {
+        "kind": "client",
+        "language": "cpp",
+        "mode": "transport",
+        "success": false,
+        "valid": false,
+        "sustainable": false,
+        "implementation": "cpp23",
+        "compiler": "MSVC 195136260",
+        "cplusplus": 202400,
+        "build_configuration": "Release",
+        "windows_sdk": "10.0.26100.0",
+        "simdjson": "3.12.3",
+        "simdjson_implementation": "icelake",
+        "qpc_frequency": 10000000,
+        "sanitized": false,
+        "native_allocation_counters": null,
+        "native_allocation_note": "Use ETW heap diagnostic for full native allocation/free accounting; ordinary runs report process memory",
+        "resource_scope": "process-lifetime including setup warmup and shutdown; not measured-cohort CPU",
+        "cpu_seconds": 0.015625,
+        "private_bytes": 4718592,
+        "peak_commit_bytes": 4804608,
+        "working_set_bytes": 9965568,
+        "peak_working_set_bytes": 9965568,
+        "affinity_mask": 65535,
+        "duration_seconds": 0.4,
+        "window_seconds": 0.4,
+        "cohort_seconds": 0.4,
+        "drain_seconds": 0,
+        "configured_drain_seconds": 0.5,
+        "drain_limit_seconds": 0.5,
+        "cohort_scope": "T0 through max(window end, data-worker finish), excluding End control",
+        "offered": 24,
+        "admitted": 1,
+        "first_send_started": 1,
+        "acknowledged": 0,
+        "completed_frames": 0,
+        "rejected": 23,
+        "generator_late_rejected": 0,
+        "aborted_schedule_rejected": 23,
+        "scheduler_late_count": 0,
+        "scheduler_late_over_1ms": 0,
+        "generator_adequate": false,
+        "pacing": "process-local high-resolution waitable timer plus <=200us spin",
+        "failed": 1,
+        "timedout": 0,
+        "unresolved": 0,
+        "completed_records": 0,
+        "completed_payload_bytes": 0,
+        "window_completed_frames": 0,
+        "window_records": 0,
+        "window_payload_bytes": 0,
+        "window_frames_per_second": 0,
+        "window_records_per_second": 0,
+        "window_payload_bytes_per_second": 0,
+        "cohort_frames_per_second": 0,
+        "queue_high_water": 1,
+        "inflight_bytes_high_water": 2,
+        "deadline_misses_1ms": 24,
+        "deadline_misses_5ms": 24,
+        "deadline_misses_10ms": 24,
+        "rate": 100,
+        "arrival": "burst",
+        "load_model": "scheduled",
+        "connections": 1,
+        "window": 8,
+        "inflight_bytes_limit": 67108864,
+        "unique_payload_bytes": 2,
+        "corpus_frames": 1,
+        "data_request_protocol_bytes": 0,
+        "data_ack_protocol_bytes": 0,
+        "native_client_threads": 3,
+        "cursor_rule": "connection-local start=index; advance=connections per offered request; persists across phases",
+        "seed": 42,
+        "io_counter_scope": "process-lifetime including controls and warmup",
+        "send_operations": 4,
+        "receive_operations": 2,
+        "sent_protocol_bytes": 66,
+        "received_protocol_bytes": 48,
+        "socket_buffer_requested": 262144,
+        "socket_send_buffer_effective": 262144,
+        "socket_receive_buffer_effective": 262144,
+        "scheduled_latency": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "submitted_latency": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "client_delay": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "scheduler_lateness": {
+          "count": 1,
+          "p50_ns": 253439,
+          "p90_ns": 253439,
+          "p99_ns": 253439,
+          "p999_ns": 253439,
+          "max_ns": 253300,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              253439,
+              1
+            ]
+          ]
+        },
+        "latency_ns": {
+          "p50": null,
+          "p90": null,
+          "p99": null,
+          "p999": null,
+          "max": 0
+        },
+        "size_latency": [
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          }
+        ],
+        "error": "ack_mismatch"
+      }
+    },
+    {
+      "name": "ack-inside-drain",
+      "command": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "client",
+        "--port",
+        "50590",
+        "--corpus",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\post-fix\\empty.bin",
+        "--mode",
+        "transport",
+        "--connections",
+        "1",
+        "--duration",
+        "0.1",
+        "--warmup",
+        "0",
+        "--rate",
+        "1",
+        "--arrival",
+        "steady",
+        "--seed",
+        "42",
+        "--window",
+        "8",
+        "--drain-seconds",
+        "0.5",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\post-fix\\ack-inside-drain.json"
+      ],
+      "port": 50590,
+      "exit_code": 0,
+      "wall_seconds": 0.6570203000010224,
+      "after_first_request_seconds": 0.5550696999998763,
+      "peer_data_requests": 1,
+      "result": {
+        "kind": "client",
+        "language": "cpp",
+        "mode": "transport",
+        "success": true,
+        "valid": true,
+        "sustainable": false,
+        "implementation": "cpp23",
+        "compiler": "MSVC 195136260",
+        "cplusplus": 202400,
+        "build_configuration": "Release",
+        "windows_sdk": "10.0.26100.0",
+        "simdjson": "3.12.3",
+        "simdjson_implementation": "icelake",
+        "qpc_frequency": 10000000,
+        "sanitized": false,
+        "native_allocation_counters": null,
+        "native_allocation_note": "Use ETW heap diagnostic for full native allocation/free accounting; ordinary runs report process memory",
+        "resource_scope": "process-lifetime including setup warmup and shutdown; not measured-cohort CPU",
+        "cpu_seconds": 0,
+        "private_bytes": 4710400,
+        "peak_commit_bytes": 4775936,
+        "working_set_bytes": 9908224,
+        "peak_working_set_bytes": 9908224,
+        "affinity_mask": 65535,
+        "duration_seconds": 0.1,
+        "window_seconds": 0.1,
+        "cohort_seconds": 0.550768,
+        "drain_seconds": 0.450768,
+        "configured_drain_seconds": 0.5,
+        "drain_limit_seconds": 0.5,
+        "cohort_scope": "T0 through max(window end, data-worker finish), excluding End control",
+        "offered": 1,
+        "admitted": 1,
+        "first_send_started": 1,
+        "acknowledged": 1,
+        "completed_frames": 1,
+        "rejected": 0,
+        "generator_late_rejected": 0,
+        "aborted_schedule_rejected": 0,
+        "scheduler_late_count": 0,
+        "scheduler_late_over_1ms": 0,
+        "generator_adequate": true,
+        "pacing": "process-local high-resolution waitable timer plus <=200us spin",
+        "failed": 0,
+        "timedout": 0,
+        "unresolved": 0,
+        "completed_records": 0,
+        "completed_payload_bytes": 2,
+        "window_completed_frames": 0,
+        "window_records": 0,
+        "window_payload_bytes": 0,
+        "window_frames_per_second": 0,
+        "window_records_per_second": 0,
+        "window_payload_bytes_per_second": 0,
+        "cohort_frames_per_second": 1.81564651541,
+        "queue_high_water": 1,
+        "inflight_bytes_high_water": 2,
+        "deadline_misses_1ms": 1,
+        "deadline_misses_5ms": 1,
+        "deadline_misses_10ms": 1,
+        "rate": 1,
+        "arrival": "steady",
+        "load_model": "scheduled",
+        "connections": 1,
+        "window": 8,
+        "inflight_bytes_limit": 67108864,
+        "unique_payload_bytes": 2,
+        "corpus_frames": 1,
+        "data_request_protocol_bytes": 18,
+        "data_ack_protocol_bytes": 32,
+        "native_client_threads": 3,
+        "cursor_rule": "connection-local start=index; advance=connections per offered request; persists across phases",
+        "seed": 42,
+        "io_counter_scope": "process-lifetime including controls and warmup",
+        "send_operations": 5,
+        "receive_operations": 4,
+        "sent_protocol_bytes": 82,
+        "received_protocol_bytes": 1120,
+        "socket_buffer_requested": 262144,
+        "socket_send_buffer_effective": 262144,
+        "socket_receive_buffer_effective": 262144,
+        "scheduled_latency": {
+          "count": 1,
+          "p50_ns": 551550975,
+          "p90_ns": 551550975,
+          "p99_ns": 551550975,
+          "p999_ns": 551550975,
+          "max_ns": 550662100,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              551550975,
+              1
+            ]
+          ]
+        },
+        "submitted_latency": {
+          "count": 1,
+          "p50_ns": 551550975,
+          "p90_ns": 551550975,
+          "p99_ns": 551550975,
+          "p999_ns": 551550975,
+          "max_ns": 550463500,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              551550975,
+              1
+            ]
+          ]
+        },
+        "client_delay": {
+          "count": 1,
+          "p50_ns": 198655,
+          "p90_ns": 198655,
+          "p99_ns": 198655,
+          "p999_ns": 198655,
+          "max_ns": 198600,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              198655,
+              1
+            ]
+          ]
+        },
+        "scheduler_lateness": {
+          "count": 1,
+          "p50_ns": 190463,
+          "p90_ns": 190463,
+          "p99_ns": 190463,
+          "p999_ns": 190463,
+          "max_ns": 190400,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              190463,
+              1
+            ]
+          ]
+        },
+        "latency_ns": {
+          "p50": 551550975,
+          "p90": 551550975,
+          "p99": 551550975,
+          "p999": 551550975,
+          "max": 550662100
+        },
+        "size_latency": [
+          {
+            "count": 1,
+            "p50_ns": 551550975,
+            "p90_ns": 551550975,
+            "p99_ns": 551550975,
+            "p999_ns": 551550975,
+            "max_ns": 550662100,
+            "overflow_60s": 0,
+            "buckets": [
+              [
+                551550975,
+                1
+              ]
+            ]
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          }
+        ],
+        "error": ""
+      }
+    },
+    {
+      "name": "withhold",
+      "command": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "client",
+        "--port",
+        "50592",
+        "--corpus",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\post-fix\\empty.bin",
+        "--mode",
+        "transport",
+        "--connections",
+        "1",
+        "--duration",
+        "0.1",
+        "--warmup",
+        "0",
+        "--rate",
+        "100",
+        "--arrival",
+        "steady",
+        "--seed",
+        "42",
+        "--window",
+        "8",
+        "--drain-seconds",
+        "0.5",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\post-fix\\withhold.json"
+      ],
+      "port": 50592,
+      "exit_code": 1,
+      "wall_seconds": 0.7155127999940305,
+      "after_first_request_seconds": 0.6113106999982847,
+      "peer_data_requests": 1,
+      "result": {
+        "kind": "client",
+        "language": "cpp",
+        "mode": "transport",
+        "success": false,
+        "valid": false,
+        "sustainable": false,
+        "implementation": "cpp23",
+        "compiler": "MSVC 195136260",
+        "cplusplus": 202400,
+        "build_configuration": "Release",
+        "windows_sdk": "10.0.26100.0",
+        "simdjson": "3.12.3",
+        "simdjson_implementation": "icelake",
+        "qpc_frequency": 10000000,
+        "sanitized": false,
+        "native_allocation_counters": null,
+        "native_allocation_note": "Use ETW heap diagnostic for full native allocation/free accounting; ordinary runs report process memory",
+        "resource_scope": "process-lifetime including setup warmup and shutdown; not measured-cohort CPU",
+        "cpu_seconds": 0.015625,
+        "private_bytes": 4702208,
+        "peak_commit_bytes": 4784128,
+        "working_set_bytes": 9965568,
+        "peak_working_set_bytes": 9965568,
+        "affinity_mask": 65535,
+        "duration_seconds": 0.1,
+        "window_seconds": 0.1,
+        "cohort_seconds": 0.6067534,
+        "drain_seconds": 0.5067534,
+        "configured_drain_seconds": 0.5,
+        "drain_limit_seconds": 0.5,
+        "cohort_scope": "T0 through max(window end, data-worker finish), excluding End control",
+        "offered": 10,
+        "admitted": 8,
+        "first_send_started": 8,
+        "acknowledged": 0,
+        "completed_frames": 0,
+        "rejected": 2,
+        "generator_late_rejected": 0,
+        "aborted_schedule_rejected": 0,
+        "scheduler_late_count": 0,
+        "scheduler_late_over_1ms": 0,
+        "generator_adequate": false,
+        "pacing": "process-local high-resolution waitable timer plus <=200us spin",
+        "failed": 0,
+        "timedout": 8,
+        "unresolved": 8,
+        "completed_records": 0,
+        "completed_payload_bytes": 0,
+        "window_completed_frames": 0,
+        "window_records": 0,
+        "window_payload_bytes": 0,
+        "window_frames_per_second": 0,
+        "window_records_per_second": 0,
+        "window_payload_bytes_per_second": 0,
+        "cohort_frames_per_second": 0,
+        "queue_high_water": 8,
+        "inflight_bytes_high_water": 16,
+        "deadline_misses_1ms": 10,
+        "deadline_misses_5ms": 10,
+        "deadline_misses_10ms": 10,
+        "rate": 100,
+        "arrival": "steady",
+        "load_model": "scheduled",
+        "connections": 1,
+        "window": 8,
+        "inflight_bytes_limit": 67108864,
+        "unique_payload_bytes": 2,
+        "corpus_frames": 1,
+        "data_request_protocol_bytes": 0,
+        "data_ack_protocol_bytes": 0,
+        "native_client_threads": 3,
+        "cursor_rule": "connection-local start=index; advance=connections per offered request; persists across phases",
+        "seed": 42,
+        "io_counter_scope": "process-lifetime including controls and warmup",
+        "send_operations": 18,
+        "receive_operations": 2,
+        "sent_protocol_bytes": 192,
+        "received_protocol_bytes": 16,
+        "socket_buffer_requested": 262144,
+        "socket_send_buffer_effective": 262144,
+        "socket_receive_buffer_effective": 262144,
+        "scheduled_latency": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "submitted_latency": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "client_delay": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "scheduler_lateness": {
+          "count": 10,
+          "p50_ns": 600,
+          "p90_ns": 116479,
+          "p99_ns": 123647,
+          "p999_ns": 123647,
+          "max_ns": 123500,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              200,
+              1
+            ],
+            [
+              400,
+              1
+            ],
+            [
+              600,
+              3
+            ],
+            [
+              5103,
+              1
+            ],
+            [
+              70143,
+              1
+            ],
+            [
+              111103,
+              1
+            ],
+            [
+              116479,
+              1
+            ],
+            [
+              123647,
+              1
+            ]
+          ]
+        },
+        "latency_ns": {
+          "p50": null,
+          "p90": null,
+          "p99": null,
+          "p999": null,
+          "max": 0
+        },
+        "size_latency": [
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          }
+        ],
+        "error": "drain_timeout"
+      }
+    },
+    {
+      "name": "withhold-after-one",
+      "command": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "client",
+        "--port",
+        "50594",
+        "--corpus",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\post-fix\\empty.bin",
+        "--mode",
+        "transport",
+        "--connections",
+        "1",
+        "--duration",
+        "0.1",
+        "--warmup",
+        "0",
+        "--rate",
+        "100",
+        "--arrival",
+        "steady",
+        "--seed",
+        "42",
+        "--window",
+        "8",
+        "--drain-seconds",
+        "0.5",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\post-fix\\withhold-after-one.json"
+      ],
+      "port": 50594,
+      "exit_code": 1,
+      "wall_seconds": 0.7249146999965888,
+      "after_first_request_seconds": 0.619275099998049,
+      "peer_data_requests": 2,
+      "result": {
+        "kind": "client",
+        "language": "cpp",
+        "mode": "transport",
+        "success": false,
+        "valid": false,
+        "sustainable": false,
+        "implementation": "cpp23",
+        "compiler": "MSVC 195136260",
+        "cplusplus": 202400,
+        "build_configuration": "Release",
+        "windows_sdk": "10.0.26100.0",
+        "simdjson": "3.12.3",
+        "simdjson_implementation": "icelake",
+        "qpc_frequency": 10000000,
+        "sanitized": false,
+        "native_allocation_counters": null,
+        "native_allocation_note": "Use ETW heap diagnostic for full native allocation/free accounting; ordinary runs report process memory",
+        "resource_scope": "process-lifetime including setup warmup and shutdown; not measured-cohort CPU",
+        "cpu_seconds": 0.015625,
+        "private_bytes": 4718592,
+        "peak_commit_bytes": 4800512,
+        "working_set_bytes": 9973760,
+        "peak_working_set_bytes": 9973760,
+        "affinity_mask": 65535,
+        "duration_seconds": 0.1,
+        "window_seconds": 0.1,
+        "cohort_seconds": 0.6150602,
+        "drain_seconds": 0.5150602,
+        "configured_drain_seconds": 0.5,
+        "drain_limit_seconds": 0.5,
+        "cohort_scope": "T0 through max(window end, data-worker finish), excluding End control",
+        "offered": 10,
+        "admitted": 9,
+        "first_send_started": 9,
+        "acknowledged": 1,
+        "completed_frames": 1,
+        "rejected": 1,
+        "generator_late_rejected": 0,
+        "aborted_schedule_rejected": 0,
+        "scheduler_late_count": 0,
+        "scheduler_late_over_1ms": 0,
+        "generator_adequate": false,
+        "pacing": "process-local high-resolution waitable timer plus <=200us spin",
+        "failed": 0,
+        "timedout": 8,
+        "unresolved": 8,
+        "completed_records": 0,
+        "completed_payload_bytes": 2,
+        "window_completed_frames": 1,
+        "window_records": 0,
+        "window_payload_bytes": 2,
+        "window_frames_per_second": 10,
+        "window_records_per_second": 0,
+        "window_payload_bytes_per_second": 20,
+        "cohort_frames_per_second": 1.62585711122,
+        "queue_high_water": 8,
+        "inflight_bytes_high_water": 16,
+        "deadline_misses_1ms": 9,
+        "deadline_misses_5ms": 9,
+        "deadline_misses_10ms": 9,
+        "rate": 100,
+        "arrival": "steady",
+        "load_model": "scheduled",
+        "connections": 1,
+        "window": 8,
+        "inflight_bytes_limit": 67108864,
+        "unique_payload_bytes": 2,
+        "corpus_frames": 1,
+        "data_request_protocol_bytes": 18,
+        "data_ack_protocol_bytes": 32,
+        "native_client_threads": 3,
+        "cursor_rule": "connection-local start=index; advance=connections per offered request; persists across phases",
+        "seed": 42,
+        "io_counter_scope": "process-lifetime including controls and warmup",
+        "send_operations": 20,
+        "receive_operations": 3,
+        "sent_protocol_bytes": 210,
+        "received_protocol_bytes": 48,
+        "socket_buffer_requested": 262144,
+        "socket_send_buffer_effective": 262144,
+        "socket_receive_buffer_effective": 262144,
+        "scheduled_latency": {
+          "count": 1,
+          "p50_ns": 107519,
+          "p90_ns": 107519,
+          "p99_ns": 107519,
+          "p999_ns": 107519,
+          "max_ns": 107300,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              107519,
+              1
+            ]
+          ]
+        },
+        "submitted_latency": {
+          "count": 1,
+          "p50_ns": 95743,
+          "p90_ns": 95743,
+          "p99_ns": 95743,
+          "p999_ns": 95743,
+          "max_ns": 95500,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              95743,
+              1
+            ]
+          ]
+        },
+        "client_delay": {
+          "count": 1,
+          "p50_ns": 11807,
+          "p90_ns": 11807,
+          "p99_ns": 11807,
+          "p999_ns": 11807,
+          "max_ns": 11800,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              11807,
+              1
+            ]
+          ]
+        },
+        "scheduler_lateness": {
+          "count": 10,
+          "p50_ns": 300,
+          "p90_ns": 68607,
+          "p99_ns": 148479,
+          "p999_ns": 148479,
+          "max_ns": 148300,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              300,
+              7
+            ],
+            [
+              3607,
+              1
+            ],
+            [
+              68607,
+              1
+            ],
+            [
+              148479,
+              1
+            ]
+          ]
+        },
+        "latency_ns": {
+          "p50": 107519,
+          "p90": 107519,
+          "p99": 107519,
+          "p999": 107519,
+          "max": 107300
+        },
+        "size_latency": [
+          {
+            "count": 1,
+            "p50_ns": 107519,
+            "p90_ns": 107519,
+            "p99_ns": 107519,
+            "p999_ns": 107519,
+            "max_ns": 107300,
+            "overflow_60s": 0,
+            "buckets": [
+              [
+                107519,
+                1
+              ]
+            ]
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          }
+        ],
+        "error": "drain_timeout"
+      }
+    },
+    {
+      "name": "ack-outside-drain",
+      "command": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "client",
+        "--port",
+        "50596",
+        "--corpus",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\post-fix\\empty.bin",
+        "--mode",
+        "transport",
+        "--connections",
+        "1",
+        "--duration",
+        "0.1",
+        "--warmup",
+        "0",
+        "--rate",
+        "1",
+        "--arrival",
+        "steady",
+        "--seed",
+        "42",
+        "--window",
+        "8",
+        "--drain-seconds",
+        "0.5",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\post-fix\\ack-outside-drain.json"
+      ],
+      "port": 50596,
+      "exit_code": 1,
+      "wall_seconds": 0.7131261999966227,
+      "after_first_request_seconds": 0.6070078999982798,
+      "peer_data_requests": 1,
+      "result": {
+        "kind": "client",
+        "language": "cpp",
+        "mode": "transport",
+        "success": false,
+        "valid": false,
+        "sustainable": false,
+        "implementation": "cpp23",
+        "compiler": "MSVC 195136260",
+        "cplusplus": 202400,
+        "build_configuration": "Release",
+        "windows_sdk": "10.0.26100.0",
+        "simdjson": "3.12.3",
+        "simdjson_implementation": "icelake",
+        "qpc_frequency": 10000000,
+        "sanitized": false,
+        "native_allocation_counters": null,
+        "native_allocation_note": "Use ETW heap diagnostic for full native allocation/free accounting; ordinary runs report process memory",
+        "resource_scope": "process-lifetime including setup warmup and shutdown; not measured-cohort CPU",
+        "cpu_seconds": 0.015625,
+        "private_bytes": 4710400,
+        "peak_commit_bytes": 4792320,
+        "working_set_bytes": 9965568,
+        "peak_working_set_bytes": 9965568,
+        "affinity_mask": 65535,
+        "duration_seconds": 0.1,
+        "window_seconds": 0.1,
+        "cohort_seconds": 0.6030367,
+        "drain_seconds": 0.5030367,
+        "configured_drain_seconds": 0.5,
+        "drain_limit_seconds": 0.5,
+        "cohort_scope": "T0 through max(window end, data-worker finish), excluding End control",
+        "offered": 1,
+        "admitted": 1,
+        "first_send_started": 1,
+        "acknowledged": 0,
+        "completed_frames": 0,
+        "rejected": 0,
+        "generator_late_rejected": 0,
+        "aborted_schedule_rejected": 0,
+        "scheduler_late_count": 0,
+        "scheduler_late_over_1ms": 0,
+        "generator_adequate": false,
+        "pacing": "process-local high-resolution waitable timer plus <=200us spin",
+        "failed": 0,
+        "timedout": 1,
+        "unresolved": 1,
+        "completed_records": 0,
+        "completed_payload_bytes": 0,
+        "window_completed_frames": 0,
+        "window_records": 0,
+        "window_payload_bytes": 0,
+        "window_frames_per_second": 0,
+        "window_records_per_second": 0,
+        "window_payload_bytes_per_second": 0,
+        "cohort_frames_per_second": 0,
+        "queue_high_water": 1,
+        "inflight_bytes_high_water": 2,
+        "deadline_misses_1ms": 1,
+        "deadline_misses_5ms": 1,
+        "deadline_misses_10ms": 1,
+        "rate": 1,
+        "arrival": "steady",
+        "load_model": "scheduled",
+        "connections": 1,
+        "window": 8,
+        "inflight_bytes_limit": 67108864,
+        "unique_payload_bytes": 2,
+        "corpus_frames": 1,
+        "data_request_protocol_bytes": 0,
+        "data_ack_protocol_bytes": 0,
+        "native_client_threads": 3,
+        "cursor_rule": "connection-local start=index; advance=connections per offered request; persists across phases",
+        "seed": 42,
+        "io_counter_scope": "process-lifetime including controls and warmup",
+        "send_operations": 4,
+        "receive_operations": 2,
+        "sent_protocol_bytes": 66,
+        "received_protocol_bytes": 16,
+        "socket_buffer_requested": 262144,
+        "socket_send_buffer_effective": 262144,
+        "socket_receive_buffer_effective": 262144,
+        "scheduled_latency": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "submitted_latency": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "client_delay": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "scheduler_lateness": {
+          "count": 1,
+          "p50_ns": 5103,
+          "p90_ns": 5103,
+          "p99_ns": 5103,
+          "p999_ns": 5103,
+          "max_ns": 5100,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              5103,
+              1
+            ]
+          ]
+        },
+        "latency_ns": {
+          "p50": null,
+          "p90": null,
+          "p99": null,
+          "p999": null,
+          "max": 0
+        },
+        "size_latency": [
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          }
+        ],
+        "error": "drain_timeout"
+      }
+    },
+    {
+      "name": "healthy-waits-until-window-end",
+      "command": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "client",
+        "--port",
+        "50598",
+        "--corpus",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\post-fix\\empty.bin",
+        "--mode",
+        "transport",
+        "--connections",
+        "1",
+        "--duration",
+        "0.4",
+        "--warmup",
+        "0",
+        "--rate",
+        "1",
+        "--arrival",
+        "steady",
+        "--seed",
+        "42",
+        "--window",
+        "8",
+        "--drain-seconds",
+        "0.5",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\post-fix\\healthy-waits-until-window-end.json"
+      ],
+      "port": 50598,
+      "exit_code": 0,
+      "wall_seconds": 0.5097845999989659,
+      "after_first_request_seconds": 0.4038795000014943,
+      "peer_data_requests": 1,
+      "result": {
+        "kind": "client",
+        "language": "cpp",
+        "mode": "transport",
+        "success": true,
+        "valid": true,
+        "sustainable": true,
+        "implementation": "cpp23",
+        "compiler": "MSVC 195136260",
+        "cplusplus": 202400,
+        "build_configuration": "Release",
+        "windows_sdk": "10.0.26100.0",
+        "simdjson": "3.12.3",
+        "simdjson_implementation": "icelake",
+        "qpc_frequency": 10000000,
+        "sanitized": false,
+        "native_allocation_counters": null,
+        "native_allocation_note": "Use ETW heap diagnostic for full native allocation/free accounting; ordinary runs report process memory",
+        "resource_scope": "process-lifetime including setup warmup and shutdown; not measured-cohort CPU",
+        "cpu_seconds": 0.015625,
+        "private_bytes": 4710400,
+        "peak_commit_bytes": 4788224,
+        "working_set_bytes": 9904128,
+        "peak_working_set_bytes": 9904128,
+        "affinity_mask": 65535,
+        "duration_seconds": 0.4,
+        "window_seconds": 0.4,
+        "cohort_seconds": 0.4003088,
+        "drain_seconds": 0.0003088,
+        "configured_drain_seconds": 0.5,
+        "drain_limit_seconds": 0.5,
+        "cohort_scope": "T0 through max(window end, data-worker finish), excluding End control",
+        "offered": 1,
+        "admitted": 1,
+        "first_send_started": 1,
+        "acknowledged": 1,
+        "completed_frames": 1,
+        "rejected": 0,
+        "generator_late_rejected": 0,
+        "aborted_schedule_rejected": 0,
+        "scheduler_late_count": 0,
+        "scheduler_late_over_1ms": 0,
+        "generator_adequate": true,
+        "pacing": "process-local high-resolution waitable timer plus <=200us spin",
+        "failed": 0,
+        "timedout": 0,
+        "unresolved": 0,
+        "completed_records": 0,
+        "completed_payload_bytes": 2,
+        "window_completed_frames": 1,
+        "window_records": 0,
+        "window_payload_bytes": 2,
+        "window_frames_per_second": 2.5,
+        "window_records_per_second": 0,
+        "window_payload_bytes_per_second": 5,
+        "cohort_frames_per_second": 2.49807148881,
+        "queue_high_water": 1,
+        "inflight_bytes_high_water": 2,
+        "deadline_misses_1ms": 0,
+        "deadline_misses_5ms": 0,
+        "deadline_misses_10ms": 0,
+        "rate": 1,
+        "arrival": "steady",
+        "load_model": "scheduled",
+        "connections": 1,
+        "window": 8,
+        "inflight_bytes_limit": 67108864,
+        "unique_payload_bytes": 2,
+        "corpus_frames": 1,
+        "data_request_protocol_bytes": 18,
+        "data_ack_protocol_bytes": 32,
+        "native_client_threads": 3,
+        "cursor_rule": "connection-local start=index; advance=connections per offered request; persists across phases",
+        "seed": 42,
+        "io_counter_scope": "process-lifetime including controls and warmup",
+        "send_operations": 5,
+        "receive_operations": 4,
+        "sent_protocol_bytes": 82,
+        "received_protocol_bytes": 1120,
+        "socket_buffer_requested": 262144,
+        "socket_send_buffer_effective": 262144,
+        "socket_receive_buffer_effective": 262144,
+        "scheduled_latency": {
+          "count": 1,
+          "p50_ns": 174591,
+          "p90_ns": 174591,
+          "p99_ns": 174591,
+          "p999_ns": 174591,
+          "max_ns": 174300,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              174591,
+              1
+            ]
+          ]
+        },
+        "submitted_latency": {
+          "count": 1,
+          "p50_ns": 114943,
+          "p90_ns": 114943,
+          "p99_ns": 114943,
+          "p999_ns": 114943,
+          "max_ns": 114800,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              114943,
+              1
+            ]
+          ]
+        },
+        "client_delay": {
+          "count": 1,
+          "p50_ns": 59519,
+          "p90_ns": 59519,
+          "p99_ns": 59519,
+          "p999_ns": 59519,
+          "max_ns": 59500,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              59519,
+              1
+            ]
+          ]
+        },
+        "scheduler_lateness": {
+          "count": 1,
+          "p50_ns": 47871,
+          "p90_ns": 47871,
+          "p99_ns": 47871,
+          "p999_ns": 47871,
+          "max_ns": 47800,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              47871,
+              1
+            ]
+          ]
+        },
+        "latency_ns": {
+          "p50": 174591,
+          "p90": 174591,
+          "p99": 174591,
+          "p999": 174591,
+          "max": 174300
+        },
+        "size_latency": [
+          {
+            "count": 1,
+            "p50_ns": 174591,
+            "p90_ns": 174591,
+            "p99_ns": 174591,
+            "p999_ns": 174591,
+            "max_ns": 174300,
+            "overflow_60s": 0,
+            "buckets": [
+              [
+                174591,
+                1
+              ]
+            ]
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          }
+        ],
+        "error": ""
+      }
+    },
+    {
+      "name": "overload-drain",
+      "command": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "client",
+        "--port",
+        "50601",
+        "--corpus",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\post-fix\\empty.bin",
+        "--mode",
+        "transport",
+        "--connections",
+        "1",
+        "--duration",
+        "0.4",
+        "--warmup",
+        "0",
+        "--rate",
+        "1000",
+        "--arrival",
+        "steady",
+        "--seed",
+        "42",
+        "--window",
+        "8",
+        "--drain-seconds",
+        "2",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\post-fix\\overload-drain.json"
+      ],
+      "port": 50601,
+      "exit_code": 0,
+      "wall_seconds": 0.6899978000001283,
+      "after_first_request_seconds": 0.5856777000008151,
+      "peer_data_requests": 23,
+      "result": {
+        "kind": "client",
+        "language": "cpp",
+        "mode": "transport",
+        "success": true,
+        "valid": true,
+        "sustainable": false,
+        "implementation": "cpp23",
+        "compiler": "MSVC 195136260",
+        "cplusplus": 202400,
+        "build_configuration": "Release",
+        "windows_sdk": "10.0.26100.0",
+        "simdjson": "3.12.3",
+        "simdjson_implementation": "icelake",
+        "qpc_frequency": 10000000,
+        "sanitized": false,
+        "native_allocation_counters": null,
+        "native_allocation_note": "Use ETW heap diagnostic for full native allocation/free accounting; ordinary runs report process memory",
+        "resource_scope": "process-lifetime including setup warmup and shutdown; not measured-cohort CPU",
+        "cpu_seconds": 0,
+        "private_bytes": 4714496,
+        "peak_commit_bytes": 4792320,
+        "working_set_bytes": 9908224,
+        "peak_working_set_bytes": 9908224,
+        "affinity_mask": 65535,
+        "duration_seconds": 0.4,
+        "window_seconds": 0.4,
+        "cohort_seconds": 0.5815221,
+        "drain_seconds": 0.1815221,
+        "configured_drain_seconds": 2,
+        "drain_limit_seconds": 2,
+        "cohort_scope": "T0 through max(window end, data-worker finish), excluding End control",
+        "offered": 400,
+        "admitted": 23,
+        "first_send_started": 23,
+        "acknowledged": 23,
+        "completed_frames": 23,
+        "rejected": 377,
+        "generator_late_rejected": 0,
+        "aborted_schedule_rejected": 0,
+        "scheduler_late_count": 0,
+        "scheduler_late_over_1ms": 0,
+        "generator_adequate": true,
+        "pacing": "process-local high-resolution waitable timer plus <=200us spin",
+        "failed": 0,
+        "timedout": 0,
+        "unresolved": 0,
+        "completed_records": 0,
+        "completed_payload_bytes": 46,
+        "window_completed_frames": 15,
+        "window_records": 0,
+        "window_payload_bytes": 30,
+        "window_frames_per_second": 37.5,
+        "window_records_per_second": 0,
+        "window_payload_bytes_per_second": 75,
+        "cohort_frames_per_second": 39.5513773251,
+        "queue_high_water": 8,
+        "inflight_bytes_high_water": 16,
+        "deadline_misses_1ms": 400,
+        "deadline_misses_5ms": 400,
+        "deadline_misses_10ms": 400,
+        "rate": 1000,
+        "arrival": "steady",
+        "load_model": "scheduled",
+        "connections": 1,
+        "window": 8,
+        "inflight_bytes_limit": 67108864,
+        "unique_payload_bytes": 2,
+        "corpus_frames": 1,
+        "data_request_protocol_bytes": 414,
+        "data_ack_protocol_bytes": 736,
+        "native_client_threads": 3,
+        "cursor_rule": "connection-local start=index; advance=connections per offered request; persists across phases",
+        "seed": 42,
+        "io_counter_scope": "process-lifetime including controls and warmup",
+        "send_operations": 49,
+        "receive_operations": 26,
+        "sent_protocol_bytes": 478,
+        "received_protocol_bytes": 1824,
+        "socket_buffer_requested": 262144,
+        "socket_send_buffer_effective": 262144,
+        "socket_receive_buffer_effective": 262144,
+        "scheduled_latency": {
+          "count": 23,
+          "p50_ns": 201326591,
+          "p90_ns": 202375167,
+          "p99_ns": 202375167,
+          "p999_ns": 202375167,
+          "max_ns": 202363800,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              25755647,
+              1
+            ],
+            [
+              50200575,
+              1
+            ],
+            [
+              74448895,
+              1
+            ],
+            [
+              98828287,
+              1
+            ],
+            [
+              123207679,
+              1
+            ],
+            [
+              147324927,
+              1
+            ],
+            [
+              171966463,
+              1
+            ],
+            [
+              196083711,
+              1
+            ],
+            [
+              200802303,
+              2
+            ],
+            [
+              201326591,
+              3
+            ],
+            [
+              201850879,
+              6
+            ],
+            [
+              202375167,
+              4
+            ]
+          ]
+        },
+        "submitted_latency": {
+          "count": 23,
+          "p50_ns": 201326591,
+          "p90_ns": 202375167,
+          "p99_ns": 202375167,
+          "p999_ns": 202375167,
+          "max_ns": 202350100,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              25755647,
+              1
+            ],
+            [
+              50200575,
+              1
+            ],
+            [
+              74186751,
+              1
+            ],
+            [
+              98566143,
+              1
+            ],
+            [
+              122421247,
+              1
+            ],
+            [
+              147324927,
+              1
+            ],
+            [
+              171442175,
+              1
+            ],
+            [
+              195559423,
+              1
+            ],
+            [
+              200802303,
+              2
+            ],
+            [
+              201326591,
+              6
+            ],
+            [
+              201850879,
+              3
+            ],
+            [
+              202375167,
+              4
+            ]
+          ]
+        },
+        "client_delay": {
+          "count": 23,
+          "p50_ns": 83711,
+          "p90_ns": 247295,
+          "p99_ns": 665599,
+          "p999_ns": 665599,
+          "max_ns": 665400,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              4007,
+              1
+            ],
+            [
+              4207,
+              1
+            ],
+            [
+              4303,
+              1
+            ],
+            [
+              4511,
+              1
+            ],
+            [
+              5503,
+              1
+            ],
+            [
+              10431,
+              1
+            ],
+            [
+              12831,
+              1
+            ],
+            [
+              13727,
+              1
+            ],
+            [
+              41727,
+              1
+            ],
+            [
+              42623,
+              1
+            ],
+            [
+              53119,
+              1
+            ],
+            [
+              83711,
+              1
+            ],
+            [
+              121599,
+              1
+            ],
+            [
+              150015,
+              1
+            ],
+            [
+              170495,
+              1
+            ],
+            [
+              174591,
+              1
+            ],
+            [
+              175103,
+              1
+            ],
+            [
+              231423,
+              1
+            ],
+            [
+              233983,
+              1
+            ],
+            [
+              235519,
+              1
+            ],
+            [
+              247295,
+              1
+            ],
+            [
+              437247,
+              1
+            ],
+            [
+              665599,
+              1
+            ]
+          ]
+        },
+        "scheduler_lateness": {
+          "count": 400,
+          "p50_ns": 95743,
+          "p90_ns": 297983,
+          "p99_ns": 657407,
+          "p999_ns": 718847,
+          "max_ns": 718400,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              0,
+              73
+            ],
+            [
+              100,
+              16
+            ],
+            [
+              200,
+              5
+            ],
+            [
+              300,
+              18
+            ],
+            [
+              400,
+              2
+            ],
+            [
+              500,
+              3
+            ],
+            [
+              600,
+              2
+            ],
+            [
+              1103,
+              2
+            ],
+            [
+              2207,
+              1
+            ],
+            [
+              4911,
+              2
+            ],
+            [
+              6111,
+              1
+            ],
+            [
+              6607,
+              2
+            ],
+            [
+              8111,
+              1
+            ],
+            [
+              8415,
+              1
+            ],
+            [
+              9823,
+              1
+            ],
+            [
+              12031,
+              2
+            ],
+            [
+              13407,
+              1
+            ],
+            [
+              13823,
+              1
+            ],
+            [
+              14207,
+              1
+            ],
+            [
+              14911,
+              1
+            ],
+            [
+              16031,
+              1
+            ],
+            [
+              17151,
+              1
+            ],
+            [
+              18943,
+              1
+            ],
+            [
+              20415,
+              1
+            ],
+            [
+              20863,
+              1
+            ],
+            [
+              21311,
+              1
+            ],
+            [
+              22911,
+              1
+            ],
+            [
+              23359,
+              1
+            ],
+            [
+              23615,
+              1
+            ],
+            [
+              27135,
+              1
+            ],
+            [
+              27455,
+              1
+            ],
+            [
+              29951,
+              1
+            ],
+            [
+              30463,
+              1
+            ],
+            [
+              34943,
+              1
+            ],
+            [
+              36223,
+              1
+            ],
+            [
+              38655,
+              1
+            ],
+            [
+              40319,
+              1
+            ],
+            [
+              41087,
+              1
+            ],
+            [
+              41215,
+              1
+            ],
+            [
+              45567,
+              1
+            ],
+            [
+              46591,
+              1
+            ],
+            [
+              47231,
+              1
+            ],
+            [
+              47743,
+              1
+            ],
+            [
+              48127,
+              1
+            ],
+            [
+              49919,
+              1
+            ],
+            [
+              50815,
+              1
+            ],
+            [
+              52223,
+              1
+            ],
+            [
+              53119,
+              1
+            ],
+            [
+              53375,
+              1
+            ],
+            [
+              53631,
+              1
+            ],
+            [
+              54911,
+              1
+            ],
+            [
+              59903,
+              1
+            ],
+            [
+              62207,
+              1
+            ],
+            [
+              62463,
+              1
+            ],
+            [
+              63487,
+              1
+            ],
+            [
+              63615,
+              1
+            ],
+            [
+              65407,
+              1
+            ],
+            [
+              67839,
+              1
+            ],
+            [
+              68607,
+              1
+            ],
+            [
+              68863,
+              1
+            ],
+            [
+              69375,
+              1
+            ],
+            [
+              70399,
+              1
+            ],
+            [
+              71679,
+              1
+            ],
+            [
+              74751,
+              1
+            ],
+            [
+              76031,
+              1
+            ],
+            [
+              76287,
+              1
+            ],
+            [
+              77311,
+              1
+            ],
+            [
+              78847,
+              2
+            ],
+            [
+              80127,
+              1
+            ],
+            [
+              82687,
+              2
+            ],
+            [
+              82943,
+              1
+            ],
+            [
+              83711,
+              1
+            ],
+            [
+              83967,
+              1
+            ],
+            [
+              88319,
+              1
+            ],
+            [
+              89599,
+              1
+            ],
+            [
+              89855,
+              1
+            ],
+            [
+              91135,
+              1
+            ],
+            [
+              91903,
+              1
+            ],
+            [
+              92927,
+              1
+            ],
+            [
+              93183,
+              1
+            ],
+            [
+              93439,
+              1
+            ],
+            [
+              95743,
+              1
+            ],
+            [
+              96511,
+              1
+            ],
+            [
+              97535,
+              1
+            ],
+            [
+              98047,
+              1
+            ],
+            [
+              98559,
+              1
+            ],
+            [
+              100095,
+              1
+            ],
+            [
+              100351,
+              1
+            ],
+            [
+              102655,
+              1
+            ],
+            [
+              105215,
+              1
+            ],
+            [
+              110079,
+              1
+            ],
+            [
+              110591,
+              1
+            ],
+            [
+              110847,
+              1
+            ],
+            [
+              113151,
+              1
+            ],
+            [
+              115967,
+              2
+            ],
+            [
+              117503,
+              1
+            ],
+            [
+              119039,
+              1
+            ],
+            [
+              119551,
+              1
+            ],
+            [
+              123647,
+              1
+            ],
+            [
+              124415,
+              2
+            ],
+            [
+              124927,
+              1
+            ],
+            [
+              127487,
+              1
+            ],
+            [
+              129535,
+              1
+            ],
+            [
+              132607,
+              1
+            ],
+            [
+              133631,
+              1
+            ],
+            [
+              134655,
+              1
+            ],
+            [
+              135679,
+              1
+            ],
+            [
+              136703,
+              1
+            ],
+            [
+              137727,
+              1
+            ],
+            [
+              138239,
+              1
+            ],
+            [
+              138751,
+              2
+            ],
+            [
+              139263,
+              1
+            ],
+            [
+              139775,
+              1
+            ],
+            [
+              141311,
+              1
+            ],
+            [
+              142335,
+              2
+            ],
+            [
+              143871,
+              2
+            ],
+            [
+              144895,
+              1
+            ],
+            [
+              145919,
+              1
+            ],
+            [
+              150015,
+              1
+            ],
+            [
+              151039,
+              2
+            ],
+            [
+              151551,
+              1
+            ],
+            [
+              157183,
+              1
+            ],
+            [
+              159231,
+              1
+            ],
+            [
+              162303,
+              3
+            ],
+            [
+              162815,
+              1
+            ],
+            [
+              163839,
+              1
+            ],
+            [
+              164351,
+              1
+            ],
+            [
+              164863,
+              1
+            ],
+            [
+              165887,
+              2
+            ],
+            [
+              166911,
+              1
+            ],
+            [
+              167423,
+              1
+            ],
+            [
+              168959,
+              1
+            ],
+            [
+              169471,
+              1
+            ],
+            [
+              170495,
+              2
+            ],
+            [
+              172031,
+              1
+            ],
+            [
+              173055,
+              1
+            ],
+            [
+              174079,
+              2
+            ],
+            [
+              174591,
+              3
+            ],
+            [
+              176639,
+              1
+            ],
+            [
+              177663,
+              1
+            ],
+            [
+              179711,
+              1
+            ],
+            [
+              180223,
+              1
+            ],
+            [
+              181759,
+              1
+            ],
+            [
+              183295,
+              1
+            ],
+            [
+              186367,
+              1
+            ],
+            [
+              188415,
+              1
+            ],
+            [
+              193535,
+              1
+            ],
+            [
+              196607,
+              2
+            ],
+            [
+              197631,
+              2
+            ],
+            [
+              198655,
+              1
+            ],
+            [
+              200703,
+              1
+            ],
+            [
+              202239,
+              1
+            ],
+            [
+              205311,
+              2
+            ],
+            [
+              206335,
+              1
+            ],
+            [
+              207359,
+              2
+            ],
+            [
+              208383,
+              1
+            ],
+            [
+              209407,
+              1
+            ],
+            [
+              210431,
+              1
+            ],
+            [
+              211967,
+              1
+            ],
+            [
+              217087,
+              1
+            ],
+            [
+              218111,
+              1
+            ],
+            [
+              219647,
+              1
+            ],
+            [
+              221183,
+              2
+            ],
+            [
+              227327,
+              1
+            ],
+            [
+              227839,
+              1
+            ],
+            [
+              228863,
+              1
+            ],
+            [
+              229375,
+              2
+            ],
+            [
+              230911,
+              1
+            ],
+            [
+              232959,
+              1
+            ],
+            [
+              233471,
+              1
+            ],
+            [
+              235007,
+              1
+            ],
+            [
+              237055,
+              1
+            ],
+            [
+              237567,
+              2
+            ],
+            [
+              238079,
+              1
+            ],
+            [
+              238591,
+              1
+            ],
+            [
+              241151,
+              2
+            ],
+            [
+              242175,
+              1
+            ],
+            [
+              243199,
+              1
+            ],
+            [
+              243711,
+              1
+            ],
+            [
+              245247,
+              1
+            ],
+            [
+              246783,
+              1
+            ],
+            [
+              248831,
+              1
+            ],
+            [
+              249343,
+              1
+            ],
+            [
+              249855,
+              1
+            ],
+            [
+              250367,
+              2
+            ],
+            [
+              251903,
+              3
+            ],
+            [
+              253951,
+              1
+            ],
+            [
+              254463,
+              1
+            ],
+            [
+              254975,
+              1
+            ],
+            [
+              255999,
+              1
+            ],
+            [
+              256511,
+              2
+            ],
+            [
+              257023,
+              2
+            ],
+            [
+              259583,
+              1
+            ],
+            [
+              260095,
+              2
+            ],
+            [
+              261119,
+              1
+            ],
+            [
+              262143,
+              1
+            ],
+            [
+              265215,
+              1
+            ],
+            [
+              266239,
+              1
+            ],
+            [
+              271359,
+              1
+            ],
+            [
+              272383,
+              1
+            ],
+            [
+              275455,
+              1
+            ],
+            [
+              277503,
+              1
+            ],
+            [
+              279551,
+              1
+            ],
+            [
+              280575,
+              1
+            ],
+            [
+              285695,
+              1
+            ],
+            [
+              286719,
+              1
+            ],
+            [
+              288767,
+              1
+            ],
+            [
+              289791,
+              1
+            ],
+            [
+              291839,
+              1
+            ],
+            [
+              292863,
+              1
+            ],
+            [
+              293887,
+              1
+            ],
+            [
+              294911,
+              1
+            ],
+            [
+              295935,
+              2
+            ],
+            [
+              297983,
+              1
+            ],
+            [
+              301055,
+              1
+            ],
+            [
+              303103,
+              1
+            ],
+            [
+              304127,
+              2
+            ],
+            [
+              305151,
+              1
+            ],
+            [
+              319487,
+              1
+            ],
+            [
+              352255,
+              1
+            ],
+            [
+              353279,
+              1
+            ],
+            [
+              357375,
+              1
+            ],
+            [
+              361471,
+              1
+            ],
+            [
+              365567,
+              1
+            ],
+            [
+              368639,
+              1
+            ],
+            [
+              382975,
+              1
+            ],
+            [
+              404479,
+              1
+            ],
+            [
+              407551,
+              1
+            ],
+            [
+              409599,
+              1
+            ],
+            [
+              415743,
+              1
+            ],
+            [
+              423935,
+              1
+            ],
+            [
+              425983,
+              1
+            ],
+            [
+              434175,
+              1
+            ],
+            [
+              444415,
+              1
+            ],
+            [
+              449535,
+              1
+            ],
+            [
+              462847,
+              1
+            ],
+            [
+              488447,
+              1
+            ],
+            [
+              500735,
+              1
+            ],
+            [
+              504831,
+              1
+            ],
+            [
+              517119,
+              1
+            ],
+            [
+              528383,
+              1
+            ],
+            [
+              540671,
+              1
+            ],
+            [
+              550911,
+              2
+            ],
+            [
+              557055,
+              1
+            ],
+            [
+              559103,
+              1
+            ],
+            [
+              622591,
+              1
+            ],
+            [
+              624639,
+              1
+            ],
+            [
+              657407,
+              1
+            ],
+            [
+              659455,
+              1
+            ],
+            [
+              688127,
+              1
+            ],
+            [
+              694271,
+              1
+            ],
+            [
+              718847,
+              1
+            ]
+          ]
+        },
+        "latency_ns": {
+          "p50": 201326591,
+          "p90": 202375167,
+          "p99": 202375167,
+          "p999": 202375167,
+          "max": 202363800
+        },
+        "size_latency": [
+          {
+            "count": 23,
+            "p50_ns": 201326591,
+            "p90_ns": 202375167,
+            "p99_ns": 202375167,
+            "p999_ns": 202375167,
+            "max_ns": 202363800,
+            "overflow_60s": 0,
+            "buckets": [
+              [
+                25755647,
+                1
+              ],
+              [
+                50200575,
+                1
+              ],
+              [
+                74448895,
+                1
+              ],
+              [
+                98828287,
+                1
+              ],
+              [
+                123207679,
+                1
+              ],
+              [
+                147324927,
+                1
+              ],
+              [
+                171966463,
+                1
+              ],
+              [
+                196083711,
+                1
+              ],
+              [
+                200802303,
+                2
+              ],
+              [
+                201326591,
+                3
+              ],
+              [
+                201850879,
+                6
+              ],
+              [
+                202375167,
+                4
+              ]
+            ]
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          },
+          {
+            "count": 0,
+            "p50_ns": null,
+            "p90_ns": null,
+            "p99_ns": null,
+            "p999_ns": null,
+            "max_ns": 0,
+            "overflow_60s": 0,
+            "buckets": []
+          }
+        ],
+        "error": ""
+      }
+    }
+  ],
+  "stages": [
+    {
+      "name": "stages-1023-1-epochs",
+      "command": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "server",
+        "--port",
+        "50603",
+        "--max-frame",
+        "4096",
+        "--workers",
+        "1",
+        "--max-connections",
+        "1",
+        "--mode",
+        "retain-reuse",
+        "--pause-every",
+        "1024",
+        "--pause-ms",
+        "50",
+        "--control-stdin",
+        "1",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\post-fix\\stages-1023-1-epochs.json"
+      ],
+      "client_pause_elapsed_seconds": [],
+      "result": {
+        "kind": "server",
+        "language": "cpp",
+        "mode": "retain-reuse",
+        "valid": true,
+        "duration_seconds": 0.0366493,
+        "implementation": "cpp23",
+        "compiler": "MSVC 195136260",
+        "cplusplus": 202400,
+        "build_configuration": "Release",
+        "windows_sdk": "10.0.26100.0",
+        "simdjson": "3.12.3",
+        "simdjson_implementation": "icelake",
+        "qpc_frequency": 10000000,
+        "sanitized": false,
+        "native_allocation_counters": null,
+        "native_allocation_note": "Use ETW heap diagnostic for full native allocation/free accounting; ordinary runs report process memory",
+        "resource_scope": "process-lifetime including setup warmup and shutdown; not measured-cohort CPU",
+        "cpu_seconds": 0.046875,
+        "private_bytes": 4591616,
+        "peak_commit_bytes": 4624384,
+        "working_set_bytes": 9818112,
+        "peak_working_set_bytes": 9818112,
+        "affinity_mask": 65535,
+        "accepted_connections": 1,
+        "excess_connections": 0,
+        "graceful_connections": 1,
+        "peak_connections": 1,
+        "completed_frames": 1023,
+        "completed_payload_bytes": 2046,
+        "completed_records": 0,
+        "receive_operations": 2050,
+        "send_operations": 1025,
+        "received_protocol_bytes": 18478,
+        "sent_protocol_bytes": 33824,
+        "workers": 1,
+        "max_frame": 4096,
+        "input_capacity_per_connection": 4160,
+        "peak_retained_canonical_per_connection": 0,
+        "peak_owned_storage_per_connection": 0,
+        "socket_buffer_requested": 262144,
+        "socket_send_buffer_effective": 262144,
+        "socket_receive_buffer_effective": 262144,
+        "processing_samples": 0,
+        "processing_sample_ns_total": 0,
+        "diagnostic_faults": true,
+        "rejection_reasons": {},
+        "stage_sample_every": 1024,
+        "stage_scope": "last epoch per connection, reset at Begin and merged at connection cleanup; receive includes waiting from header issue; aggregate decode includes categorization; retained visit includes eviction revisit; processing includes injected pause",
+        "receive_elapsed_ns": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "processing_elapsed_ns": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "decode_materialize_ns": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "retained_visit_ns": {
+          "count": 0,
+          "p50_ns": null,
+          "p90_ns": null,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 0,
+          "overflow_60s": 0,
+          "buckets": []
+        },
+        "fatal": ""
+      }
+    },
+    {
+      "name": "stages-1024-2-epochs",
+      "command": [
+        "F:\\SocketServerClient\\src\\cpp\\build\\Release\\tcpbench.exe",
+        "server",
+        "--port",
+        "50605",
+        "--max-frame",
+        "4096",
+        "--workers",
+        "1",
+        "--max-connections",
+        "1",
+        "--mode",
+        "retain-reuse",
+        "--pause-every",
+        "1024",
+        "--pause-ms",
+        "50",
+        "--control-stdin",
+        "1",
+        "--output",
+        "F:\\SocketServerClient\\reviews\\cpp-measurement\\post-fix\\stages-1024-2-epochs.json"
+      ],
+      "client_pause_elapsed_seconds": [
+        0.05320139999821549,
+        0.060570499997993466
+      ],
+      "result": {
+        "kind": "server",
+        "language": "cpp",
+        "mode": "retain-reuse",
+        "valid": true,
+        "duration_seconds": 0.192649,
+        "implementation": "cpp23",
+        "compiler": "MSVC 195136260",
+        "cplusplus": 202400,
+        "build_configuration": "Release",
+        "windows_sdk": "10.0.26100.0",
+        "simdjson": "3.12.3",
+        "simdjson_implementation": "icelake",
+        "qpc_frequency": 10000000,
+        "sanitized": false,
+        "native_allocation_counters": null,
+        "native_allocation_note": "Use ETW heap diagnostic for full native allocation/free accounting; ordinary runs report process memory",
+        "resource_scope": "process-lifetime including setup warmup and shutdown; not measured-cohort CPU",
+        "cpu_seconds": 0.03125,
+        "private_bytes": 4583424,
+        "peak_commit_bytes": 4620288,
+        "working_set_bytes": 9830400,
+        "peak_working_set_bytes": 9830400,
+        "affinity_mask": 65535,
+        "accepted_connections": 1,
+        "excess_connections": 0,
+        "graceful_connections": 1,
+        "peak_connections": 1,
+        "completed_frames": 2048,
+        "completed_payload_bytes": 4096,
+        "completed_records": 0,
+        "receive_operations": 4103,
+        "send_operations": 2052,
+        "received_protocol_bytes": 36992,
+        "sent_protocol_bytes": 67712,
+        "workers": 1,
+        "max_frame": 4096,
+        "input_capacity_per_connection": 4160,
+        "peak_retained_canonical_per_connection": 0,
+        "peak_owned_storage_per_connection": 0,
+        "socket_buffer_requested": 262144,
+        "socket_send_buffer_effective": 262144,
+        "socket_receive_buffer_effective": 262144,
+        "processing_samples": 1,
+        "processing_sample_ns_total": 60433600,
+        "diagnostic_faults": true,
+        "rejection_reasons": {},
+        "stage_sample_every": 1024,
+        "stage_scope": "last epoch per connection, reset at Begin and merged at connection cleanup; receive includes waiting from header issue; aggregate decode includes categorization; retained visit includes eviction revisit; processing includes injected pause",
+        "receive_elapsed_ns": {
+          "count": 1,
+          "p50_ns": 18047,
+          "p90_ns": 18047,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 18000,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              18047,
+              1
+            ]
+          ]
+        },
+        "processing_elapsed_ns": {
+          "count": 1,
+          "p50_ns": 60555263,
+          "p90_ns": 60555263,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 60433600,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              60555263,
+              1
+            ]
+          ]
+        },
+        "decode_materialize_ns": {
+          "count": 1,
+          "p50_ns": 2103,
+          "p90_ns": 2103,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 2100,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              2103,
+              1
+            ]
+          ]
+        },
+        "retained_visit_ns": {
+          "count": 1,
+          "p50_ns": 700,
+          "p90_ns": 700,
+          "p99_ns": null,
+          "p999_ns": null,
+          "max_ns": 700,
+          "overflow_60s": 0,
+          "buckets": [
+            [
+              700,
+              1
+            ]
+          ]
+        },
+        "fatal": ""
+      }
+    }
+  ],
+  "cursor_arithmetic": {
+    "cases": 55000,
+    "scope": "source arithmetic review; post-abort cursor is not exported by binary"
+  }
+}

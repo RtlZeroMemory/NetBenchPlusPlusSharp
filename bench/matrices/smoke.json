@@ -1,0 +1,33 @@
+{
+  "name": "smoke",
+  "purpose": "Interoperability and runner/report checks. Short and unrepeated: not performance evidence.",
+  "seed": 42,
+  "server_cores": 4,
+  "corpora": {
+    "easy-smoke": {"profile": "easy", "bytes": 1048576, "frame_bytes": 16384, "seed": 1},
+    "hard-smoke": {"profile": "hard", "bytes": 2097152, "frame_bytes": 262144, "min_frame_bytes": 4096, "seed": 2}
+  },
+  "defaults": {"duration": 1, "warmup": 0.3, "connections": 4, "window": 8, "drain": 10, "group": "Smoke"},
+  "phases": [
+    {"name": "closed-loop", "repetitions": 1, "cells": [
+      {"name": "easy-aggregate", "title": "EASY aggregate", "corpus": "easy-smoke", "mode": "aggregate"},
+      {"name": "hard-reuse", "title": "HARD retain-reuse", "corpus": "hard-smoke", "mode": "retain-reuse"},
+      {"name": "hard-allocate", "title": "HARD retain-allocate", "corpus": "hard-smoke", "mode": "retain-allocate"},
+      {"name": "transport", "title": "Transport control", "corpus": "hard-smoke", "mode": "transport"},
+      {"name": "easy-aggregate-csclient", "title": "EASY aggregate, C# client", "corpus": "easy-smoke",
+       "mode": "aggregate", "client": "csharp"}
+    ]},
+    {"name": "scheduled", "repetitions": 1, "cells": [
+      {"name": "easy-aggregate-paced", "title": "EASY aggregate at 50%", "corpus": "easy-smoke", "mode": "aggregate",
+       "rate": {"of": "easy-aggregate", "fraction": 0.5}},
+      {"name": "hard-poisson", "title": "HARD allocate Poisson", "corpus": "hard-smoke", "mode": "retain-allocate",
+       "arrival": "poisson", "rate": 400},
+      {"name": "hard-burst", "title": "HARD reuse burst cycle", "corpus": "hard-smoke", "mode": "retain-reuse",
+       "arrival": "burst", "rate": 300, "duration": 6.2, "client": "csharp"}
+    ]},
+    {"name": "controls", "repetitions": 1, "cells": [
+      {"name": "process-hard", "title": "HARD processing only", "kind": "process", "corpus": "hard-smoke",
+       "mode": "retain-reuse", "duration": 0.5, "warmup": 0.2}
+    ]}
+  ]
+}
