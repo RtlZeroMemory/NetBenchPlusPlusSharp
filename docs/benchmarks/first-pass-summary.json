@@ -1,0 +1,234 @@
+[
+  {
+    "workload": "JSON totals \u00b7 64 KiB",
+    "server": "csharp",
+    "median_million_records_s": 8.076132766666667,
+    "record_rates": [
+      8.346902533333333,
+      7.7627522,
+      8.076132766666667
+    ],
+    "median_payload_mib_s": 1418.730066871643,
+    "latency_ms": {
+      "p50": [
+        2.539519,
+        2.719743,
+        2.646015
+      ],
+      "p99": [
+        6.619135,
+        7.012351,
+        6.619135
+      ]
+    },
+    "peak_working_set_mib": 58.12109375,
+    "trials": [
+      "0002-aggregate-csharp-cpp",
+      "0004-aggregate-csharp-cpp",
+      "0005-aggregate-csharp-cpp"
+    ]
+  },
+  {
+    "workload": "JSON totals \u00b7 64 KiB",
+    "server": "cpp",
+    "median_million_records_s": 9.324169133333333,
+    "record_rates": [
+      9.3916734,
+      9.217807366666667,
+      9.324169133333333
+    ],
+    "median_payload_mib_s": 1637.9733536402384,
+    "latency_ms": {
+      "p50": [
+        0.677887,
+        0.761855,
+        0.722943
+      ],
+      "p99": [
+        27.197439,
+        26.476543,
+        26.673151
+      ]
+    },
+    "peak_working_set_mib": 18.890625,
+    "trials": [
+      "0001-aggregate-cpp-cpp",
+      "0003-aggregate-cpp-cpp",
+      "0006-aggregate-cpp-cpp"
+    ]
+  },
+  {
+    "workload": "Retain records \u00b7 reuse",
+    "server": "csharp",
+    "median_million_records_s": 6.825245466666667,
+    "record_rates": [
+      6.5929777666666665,
+      6.825245466666667,
+      6.978788033333333
+    ],
+    "median_payload_mib_s": 1198.9873695055644,
+    "latency_ms": {
+      "p50": [
+        3.284991,
+        3.186687,
+        3.096575
+      ],
+      "p99": [
+        8.028159,
+        7.766015,
+        7.815167
+      ]
+    },
+    "peak_working_set_mib": 71.8046875,
+    "trials": [
+      "0014-retain-reuse-csharp-cpp",
+      "0016-retain-reuse-csharp-cpp",
+      "0017-retain-reuse-csharp-cpp"
+    ]
+  },
+  {
+    "workload": "Retain records \u00b7 reuse",
+    "server": "cpp",
+    "median_million_records_s": 7.635926466666667,
+    "record_rates": [
+      7.634195733333334,
+      7.944668200000001,
+      7.635926466666667
+    ],
+    "median_payload_mib_s": 1341.396180375417,
+    "latency_ms": {
+      "p50": [
+        0.743423,
+        0.698367,
+        0.724991
+      ],
+      "p99": [
+        33.816575,
+        33.816575,
+        34.340863
+      ]
+    },
+    "peak_working_set_mib": 27.9140625,
+    "trials": [
+      "0013-retain-reuse-cpp-cpp",
+      "0015-retain-reuse-cpp-cpp",
+      "0018-retain-reuse-cpp-cpp"
+    ]
+  },
+  {
+    "workload": "Retain records \u00b7 allocate",
+    "server": "csharp",
+    "median_million_records_s": 6.610746633333334,
+    "record_rates": [
+      6.610746633333334,
+      6.553442633333334,
+      6.942977833333333
+    ],
+    "median_payload_mib_s": 1161.3064279556274,
+    "latency_ms": {
+      "p50": [
+        3.284991,
+        3.325951,
+        1.695743
+      ],
+      "p99": [
+        8.060927,
+        8.126463,
+        25.755647
+      ]
+    },
+    "peak_working_set_mib": 109.84375,
+    "trials": [
+      "0020-retain-allocate-csharp-cpp",
+      "0022-retain-allocate-csharp-cpp",
+      "0024-retain-allocate-csharp-cpp"
+    ]
+  },
+  {
+    "workload": "Retain records \u00b7 allocate",
+    "server": "cpp",
+    "median_million_records_s": 7.568814166666667,
+    "record_rates": [
+      7.548203633333333,
+      7.653893233333333,
+      7.568814166666667
+    ],
+    "median_payload_mib_s": 1329.6115900675456,
+    "latency_ms": {
+      "p50": [
+        0.708607,
+        0.686079,
+        0.712703
+      ],
+      "p99": [
+        35.782655,
+        35.782655,
+        36.175871
+      ]
+    },
+    "peak_working_set_mib": 32.203125,
+    "trials": [
+      "0019-retain-allocate-cpp-cpp",
+      "0021-retain-allocate-cpp-cpp",
+      "0023-retain-allocate-cpp-cpp"
+    ]
+  },
+  {
+    "workload": "JSON totals \u00b7 1 MiB*",
+    "server": "csharp",
+    "median_million_records_s": 0.4422466666666667,
+    "record_rates": [
+      0.47699759999999997,
+      0.4422466666666667,
+      0.39501023333333335
+    ],
+    "median_payload_mib_s": 77.69181763331095,
+    "latency_ms": {
+      "p50": [
+        799.014911,
+        845.152255,
+        964.689919
+      ],
+      "p99": [
+        998.244351,
+        998.244351,
+        998.244351
+      ]
+    },
+    "peak_working_set_mib": 43.609375,
+    "trials": [
+      "0008-aggregate-csharp-cpp",
+      "0010-aggregate-csharp-cpp",
+      "0012-aggregate-csharp-cpp"
+    ]
+  },
+  {
+    "workload": "JSON totals \u00b7 1 MiB*",
+    "server": "cpp",
+    "median_million_records_s": 0.47317926666666665,
+    "record_rates": [
+      0.47317926666666665,
+      0.43807796666666665,
+      0.4769983
+    ],
+    "median_payload_mib_s": 83.1245891571045,
+    "latency_ms": {
+      "p50": [
+        765.460479,
+        872.415231,
+        754.974719
+      ],
+      "p99": [
+        998.244351,
+        1002.438655,
+        1000.341503
+      ]
+    },
+    "peak_working_set_mib": 11.734375,
+    "trials": [
+      "0007-aggregate-cpp-cpp",
+      "0009-aggregate-cpp-cpp",
+      "0011-aggregate-cpp-cpp"
+    ]
+  }
+]

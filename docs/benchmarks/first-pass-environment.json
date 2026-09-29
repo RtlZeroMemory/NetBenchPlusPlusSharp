@@ -1,0 +1,98 @@
+{
+  "suite": "first",
+  "started_utc": "20260929T075935Z",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+  "masks": {
+    "physical_core_masks": [
+      3,
+      12,
+      48,
+      192,
+      768,
+      3072,
+      12288,
+      49152
+    ],
+    "server": 85,
+    "client": 5376,
+    "spare": 16384,
+    "server_cores": 4
+  },
+  "arguments": {
+    "suite": "first",
+    "output": "F:\\SocketServerClient\\results\\first-benchmark-20260929",
+    "duration": null,
+    "warmup": null,
+    "corpus_bytes": null,
+    "server_cores": 4,
+    "seed": 42,
+    "client": "cpp",
+    "arrival": "steady"
+  },
+  "environment": {
+    "runtime_environment": {
+      "DOTNET_TieredCompilation": null,
+      "DOTNET_TieredPGO": null,
+      "DOTNET_ReadyToRun": null,
+      "DOTNET_gcServer": null,
+      "DOTNET_gcConcurrent": null,
+      "DOTNET_GCHeapHardLimit": null,
+      "DOTNET_GCHeapCount": null,
+      "DOTNET_GCStress": null,
+      "COMPlus_TieredCompilation": null,
+      "COMPlus_TieredPGO": null,
+      "COMPlus_ReadyToRun": null,
+      "COMPlus_gcServer": null,
+      "COMPlus_gcConcurrent": null,
+      "COMPlus_GCHeapHardLimit": null,
+      "COMPlus_GCHeapCount": null,
+      "COMPlus_GCStress": null
+    },
+    "dotnet": {
+      "exit_code": 0,
+      "stdout": ".NET SDK:\n Version:           11.0.100-preview.7.26381.103\n Commit:            e2c1e00b3d\n Workload version:  11.0.100-manifests.2ce71a7f\n MSBuild version:   18.10.0-1.26381.103+e2c1e00b3\n\nRuntime Environment:\n OS Name:     Windows\n OS Version:  10.0.26200\n OS Platform: Windows\n RID:         win-x64\n Base Path:   C:\\Program Files\\dotnet\\sdk\\11.0.100-preview.7.26381.103\n\n.NET workloads installed:\n [maui-windows]\n   Installation Source: VS 17.13.35818.85, VS 18.10.12217.157\n   Manifest Version:    11.0.0-preview.6.26360.8/11.0.100-preview.6\n   Manifest Path:       C:\\Program Files\\dotnet\\sdk-manifests\\11.0.100-preview.6\\microsoft.net.sdk.maui\\11.0.0-preview.6.26360.8\\WorkloadManifest.json\n   Install Type:              Msi\n\n [maccatalyst]\n   Installation Source: VS 17.13.35818.85, VS 18.10.12217.157\n   Manifest Version:    26.5.11720-net11-p6/11.0.100-preview.6\n   Manifest Path:       C:\\Program Files\\dotnet\\sdk-manifests\\11.0.100-preview.6\\microsoft.net.sdk.maccatalyst\\26.5.11720-net11-p6\\WorkloadManifest.json\n   Install Type:              Msi\n\n [ios]\n   Installation Source: VS 17.13.35818.85, VS 18.10.12217.157\n   Manifest Version:    26.5.11720-net11-p6/11.0.100-preview.6\n   Manifest Path:       C:\\Program Files\\dotnet\\sdk-manifests\\11.0.100-preview.6\\microsoft.net.sdk.ios\\26.5.11720-net11-p6\\WorkloadManifest.json\n   Install Type:              Msi\n\n [android]\n   Installation Source: VS 17.13.35818.85, VS 18.10.12217.157\n   Manifest Version:    37.0.0-preview.6.59/11.0.100-preview.6\n   Manifest Path:       C:\\Program Files\\dotnet\\sdk-manifests\\11.0.100-preview.6\\microsoft.net.sdk.android\\37.0.0-preview.6.59\\WorkloadManifest.json\n   Install Type:              Msi\n\nConfigured to use workload sets when installing new manifests.\nNo workload sets are installed. Run \"dotnet workload restore\" to install a workload set.\n\nHost:\n  Version:      11.0.0-preview.7.26381.103\n  Architecture: x64\n  Commit:       e2c1e00b3d\n\n.NET SDKs installed:\n  8.0.425 [C:\\Program Files\\dotnet\\sdk]\n  9.0.121 [C:\\Program Files\\dotnet\\sdk]\n  9.0.200 [C:\\Program Files\\dotnet\\sdk]\n  10.0.112 [C:\\Program Files\\dotnet\\sdk]\n  10.0.303 [C:\\Program Files\\dotnet\\sdk]\n  10.0.401 [C:\\Program Files\\dotnet\\sdk]\n  11.0.100-preview.7.26381.103 [C:\\Program Files\\dotnet\\sdk]\n\n.NET runtimes installed:\n  Microsoft.AspNetCore.App 6.0.36 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 8.0.13 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 8.0.31 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 9.0.2 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 9.0.20 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 10.0.11 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 10.0.12 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 11.0.0-preview.7.26381.103 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\n  Microsoft.NETCore.App 6.0.36 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\n  Microsoft.NETCore.App 8.0.13 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\n  Microsoft.NETCore.App 8.0.31 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\n  Microsoft.NETCore.App 9.0.2 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\n  Microsoft.NETCore.App 9.0.20 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\n  Microsoft.NETCore.App 10.0.11 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\n  Microsoft.NETCore.App 10.0.12 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\n  Microsoft.NETCore.App 11.0.0-preview.7.26381.103 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\n  Microsoft.WindowsDesktop.App 6.0.36 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\n  Microsoft.WindowsDesktop.App 8.0.13 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\n  Microsoft.WindowsDesktop.App 8.0.31 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\n  Microsoft.WindowsDesktop.App 9.0.2 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\n  Microsoft.WindowsDesktop.App 9.0.20 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\n  Microsoft.WindowsDesktop.App 10.0.11 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\n  Microsoft.WindowsDesktop.App 10.0.12 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\n  Microsoft.WindowsDesktop.App 11.0.0-preview.7.26381.103 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\n\nOther architectures found:\n  x86   [C:\\Program Files (x86)\\dotnet]\n    registered at [HKLM\\SOFTWARE\\dotnet\\Setup\\InstalledVersions\\x86\\InstallLocation]\n\nEnvironment variables:\n  Not set\n\nglobal.json file:\n  F:\\SocketServerClient\\global.json\n\nLearn more:\n  https://aka.ms/dotnet/info\n\nDownload .NET:\n  https://aka.ms/dotnet/download\n",
+      "stderr": ""
+    },
+    "cmake": {
+      "exit_code": 0,
+      "stdout": "cmake version 4.2.3\n\nCMake suite maintained and supported by Kitware (kitware.com/cmake).\n",
+      "stderr": ""
+    },
+    "power_plan": {
+      "exit_code": 0,
+      "stdout": "Power Scheme GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c  (High performance)",
+      "stderr": ""
+    },
+    "cpu_memory": {
+      "exit_code": 0,
+      "stdout": "{\n    \"CPU\":  [\n                {\n                    \"Name\":  \"AMD Ryzen 7 9800X3D 8-Core Processor           \",\n                    \"NumberOfCores\":  8,\n                    \"NumberOfLogicalProcessors\":  16,\n                    \"MaxClockSpeed\":  4700,\n                    \"L2CacheSize\":  8192,\n                    \"L3CacheSize\":  98304\n                }\n            ],\n    \"MemoryBytes\":  66197635072\n}\n",
+      "stderr": ""
+    },
+    "source_sha256": {
+      ".clang-format": "897f4558b3aa9e756e05252e6ab5bed187499e4c29f8adcd2d3f7a2e86022d05",
+      ".editorconfig": "3bbf6ba805f4d7a4afba2d56b11a794970fab96dcbb377c9538c2d101029c2db",
+      "bench\\report.py": "a6d3199f382e6977c789e48618a0d85912c79d5d5ec7dbf066ae54e5080e281e",
+      "bench\\run.py": "cfb95aeed34a37fd55bf48a1b3d68f8b448a87374ebc9b14c3d2ffffe87048c5",
+      "docs\\contract.md": "39b952f241fa83aa1afe50e17aa1b174d04d61926cbb4b3e9aef16b2b12935d0",
+      "global.json": "96f9b8fc4932f60c65c01ba2bf9a8c689a58bac189ac39c3a4ffa24bb1948189",
+      "src\\cpp\\bench.hpp": "c28145efaac2951b0c64c74914598f7b13f95a2abd1243720bdf9a8315f5c1cf",
+      "src\\cpp\\CMakeLists.txt": "e37318163796202fcbace72b5c517d0ac58bc1d8789b4a5b264b903a9e68f314",
+      "src\\cpp\\load.cpp": "2121a4a43974ae5785ac20c17a760eeb2e5ba3c8c84cd5c7359ceb3fc14c7634",
+      "src\\cpp\\main.cpp": "46a39010ead2ed35f07bee87832003a766213d4a1f8236086eb0164300af0d38",
+      "src\\cpp\\processing.cpp": "ad84572b4e7eafb9a42e506814ed70330dd43a044b3d3493e88588e5e14dd978",
+      "src\\cpp\\transport.cpp": "c30ecb871169ff5e8d099500dd5863ab261e438d5c4cf1a639a3ca89394ad420",
+      "src\\dotnet\\Bench.csproj": "e6ec1e80c7842f185fea04c1ec01a3cf21a4a753e8b1187619a3b1b5f592e023",
+      "src\\dotnet\\Corpus.cs": "398487dc10f1772ec8d0939a14411d8ba95c780fe56d6e23034d6b5117699175",
+      "src\\dotnet\\Load.cs": "2e1c8af91586ef67b834ab380168f6a41fbb739a6fa2d93abbbf1ab83e0d5b59",
+      "src\\dotnet\\Processing.cs": "41bf687a0e0130766e352fe902253c6bce7d78b2ab814f42e3b352f1708abc38",
+      "src\\dotnet\\Program.cs": "0632eb9dbe86a9d04e93c9b2cb2ce454201c631ad46e71e68bf17ebb73b2171a",
+      "src\\dotnet\\Reporting.cs": "600d9eacc00593ef50a321af610918e806fa0bf69edce4263b295f8d4a0771f4",
+      "src\\dotnet\\Scheduling.cs": "b4c6df2e2103c61d5049419465f3ec186e5994010452f07b969f960f4e0d43cf",
+      "src\\dotnet\\SelfTest.cs": "733c76e9ca6821af8034fb31fe3ab6cb172e03b95941f1069c7c3c82a95f790e",
+      "src\\dotnet\\Transport.cs": "6debf3ec83b80ac764d9043c9c177477aefcf3bba7100323c69fbd8c2eb1843c",
+      "tools\\corpus.py": "6a4737d9ba19e1aa2ce7a10efe8456d0cc3f061e32f2ebec8bb67f7dc6be403f"
+    }
+  },
+  "notice": "Shared-host loopback application comparison. Smoke checks correctness; first/pilot are exploratory, not universal language rankings."
+}

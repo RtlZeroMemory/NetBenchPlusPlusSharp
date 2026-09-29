@@ -1,0 +1,8 @@
+**/bin/
+**/obj/
+src/cpp/build*/
+**/__pycache__/
+data/*.bin
+results/
+*.nettrace
+*.etl
