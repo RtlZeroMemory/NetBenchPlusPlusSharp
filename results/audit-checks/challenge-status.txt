@@ -1,0 +1,5 @@
+C++ binary unchanged from the final campaign
+release suite passed (18 steps)
+corpus oracle 5/5 (both parsers, all modes)
+frozen; challenge started 2026-09-30T00:58:05Z
+challenge finished 2026-09-30T02:16:53Z

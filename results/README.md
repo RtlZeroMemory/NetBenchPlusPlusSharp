@@ -11,7 +11,9 @@ python bench/report.py results/final-campaign-20260929
 
 | Folder | What it is |
 | --- | --- |
-| [final-campaign-20260929](final-campaign-20260929) | **The final results.** 270 trials, 0 failures, 254 eligible |
+| [fair-2x2-20260930](fair-2x2-20260930) | **Library vs hand-tuned parsers**, both languages, same binaries. 264 trials, 0 failures; 96 eligible after the environment gate, because other work started on the PC ([write-up](../docs/benchmarks/parser-challenge.md)) |
+| [parser-challenge-20260930](parser-challenge-20260930) | Hand-tuned C# against C++ simdjson on a quiet machine. 98 trials, 0 failures; stopped before the paced phases |
+| [final-campaign-20260929](final-campaign-20260929) | **The library campaign.** 270 trials, 0 failures, 254 eligible ([write-up](../docs/benchmarks/results.md)) |
 | [rework-campaign-20260929](rework-campaign-20260929) | The same campaign before the C# optimization, stopped at trial 158 ([note](rework-campaign-20260929/NOTE.md)) |
 | [rework-core-20260929](rework-core-20260929) | An invalid first attempt, where a C# parser bug rejected valid data. Kept as evidence ([note](rework-core-20260929/NOTE.md)) |
 | [diagnostics-csharp-parser-20260929](diagnostics-csharp-parser-20260929) | A/B tests and ablations for the C# optimization ([summary](diagnostics-csharp-parser-20260929/README.md)) |

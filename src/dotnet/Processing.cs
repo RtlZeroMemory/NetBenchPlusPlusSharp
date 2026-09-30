@@ -308,6 +308,7 @@ sealed class Summary
 sealed class Processor
 {
     readonly Mode mode;
+    readonly bool fastParser; // FastJson instead of Utf8JsonReader (--parser fast)
     readonly int retainBatches;
     readonly long retainBytes;
     readonly Queue<Batch> live = new();
@@ -322,14 +323,17 @@ sealed class Processor
     public long LastDecodeTicks { get; private set; }
     public long LastVisitTicks { get; private set; }
 
-    public Processor(Mode mode, int retainBatches, long retainBytes)
+    public Processor(Mode mode, int retainBatches, long retainBytes, bool fastParser = false)
     {
+        this.fastParser = fastParser;
         this.mode = mode;
         this.retainBatches = retainBatches;
         this.retainBytes = retainBytes;
     }
 
     internal Batch[] LiveBatches() => [.. live]; // selftest hook
+
+    internal byte[] Scratch => messageScratch; // selftest hook: fast-parser canaries
 
     public long OwnedCapacity(Batch? scratch = null)
     {
@@ -458,6 +462,12 @@ sealed class Processor
 
     void Parse(ReadOnlySpan<byte> input, Batch? batch, Result r, Budget budget)
     {
+        if (fastParser)
+        {
+            FastJson.Parse(input, batch, r, budget, this.messageScratch, retainBytes);
+            return;
+        }
+
         r.Clear();
         // Defaults reject comments and trailing commas; depth 4 with the root array at depth 1.
         var reader = new Utf8JsonReader(input, new JsonReaderOptions { MaxDepth = 4 });

@@ -18,6 +18,9 @@ from pathlib import Path
 LATENESS_P99_LIMIT_NS = 100_000
 LATE_OVER_1MS_FRACTION = 0.001
 CLIENT_CPU_LIMIT = 0.85
+# Environment gate (added 30 September 2026): CPU used by anything but the trial, as a share of all logical CPUs.
+# Quiet campaigns sit at a median of 4-7% and a 90th percentile of about 11%.
+BACKGROUND_CPU_LIMIT = 0.15
 
 
 def client_cpu(result):
@@ -59,7 +62,8 @@ def row(entry):
                 "records_per_second": s.get("records_per_second"), "mib_per_second": s.get("payload_mib_per_second"),
                 "process_cpu_seconds": res.get("cpu_seconds"), "process_seconds": s.get("seconds"),
                 "allocated_bytes_per_record": (res.get("allocated_bytes") or 0) / max(1, s.get("records") or 0)}
-        out["exclusion"] = "" if out["valid"] else "invalid"
+        out["exclusion"] = ";".join(([] if out["valid"] else ["invalid"]) +
+                                    (["background_cpu_over_15pct"] if out["background_cpu_fraction"] > BACKGROUND_CPU_LIMIT else []))
         return out
     counts, window, latency = r.get("counts", {}), r.get("window", {}), r.get("latency", {})
     scheduled, generator = latency.get("scheduled", {}), r.get("generator", {})
@@ -79,6 +83,8 @@ def row(entry):
     # Transport controls are declared client-bound (methodology): exempt, and read as lower bounds.
     if client_cpu(r) > CLIENT_CPU_LIMIT and cell["mode"] != "transport":
         reasons.append("client_cpu_over_85pct")
+    if out["background_cpu_fraction"] > BACKGROUND_CPU_LIMIT:
+        reasons.append("background_cpu_over_15pct")
     if scheduled_run:
         if undispatched:
             reasons.append("undispatched_demand")
@@ -242,6 +248,7 @@ def main():
               "| Workload | Server | Allocated B/record | Allocations/frame | GC gen0 / gen1 / gen2 | GC pause ms | Owned capacity MiB |",
               "| --- | --- | ---: | ---: | --- | ---: | ---: |"]
     for (group, kind), cells in groups.items():
+        mark = len(lines)  # a bold group row precedes each group's rows (titles repeat across groups)
         for (title, cell), members in cells.items():
             for server in ["cpp", "csharp"]:
                 ok = [r for r in members if r["server"] == server and r["eligible"] and r["kind"] == "tcp"]
@@ -250,6 +257,8 @@ def main():
                     lines.append(f"| {title} | {name[server]} | {span([r['allocated_bytes_per_record'] for r in ok], '{:.1f}')} | "
                                  f"{span([r['allocations_per_frame'] for r in ok], '{:.1f}')} | {gcs} | "
                                  f"{span([r['gc_pause_ms'] for r in ok], '{:.1f}')} | {span([r['owned_capacity_peak_mib'] for r in ok], '{:.1f}')} |")
+        if len(lines) > mark:
+            lines.insert(mark, f"| **{group or 'Ungrouped'}** | | | | | | |")
     lines += ["", "## Load-generator and environment checks", "",
               "Client CPU is the measured-phase share of the client's cores. Lateness is generator dispatch minus intended "
               "time (scheduled only). Strict v1 is the first-pass rule (no arrival over 1 ms late), reported but not used. "
@@ -257,6 +266,7 @@ def main():
               "| Workload | Server | Client CPU % | Client delay p99 ms | Lateness p99 µs | Late >1 ms | Strict v1 pass | Sibling busy % |",
               "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |"]
     for (group, kind), cells in groups.items():
+        mark = len(lines)
         for (title, cell), members in cells.items():
             for server in ["cpp", "csharp"]:
                 m = [r for r in members if r["server"] == server and r["kind"] == "tcp"]
@@ -267,12 +277,15 @@ def main():
                                  f"{span([r['late_over_1ms'] for r in m], '{:,.0f}')} | "
                                  f"{f'{sum(strict)}/{len(strict)}' if strict else '–'} | "
                                  f"{span([100 * (r['server_sibling_busy_fraction'] or 0) for r in m], '{:.1f}')} |")
+        if len(lines) > mark:
+            lines.insert(mark, f"| **{group or 'Ungrouped'}** | | | | | | | |")
     lines += ["", "## Paired C# / C++ ratios", "",
               "Per-repetition ratios, median across eligible pairs; bootstrap 95% interval over pairs from five pairs up "
               "(rough). Throughput ratios are shown only where throughput is not fixed by the offered rate; paced cells "
               "compare p99 latency instead (above 1 means C# was slower).", "",
               "| Workload | Metric | Pairs | Median ratio | Bootstrap interval |", "| --- | --- | ---: | ---: | --- |"]
     for (group, kind), cells in groups.items():
+        mark = len(lines)
         for (title, cell), members in cells.items():
             paced = any(r.get("load_model") == "scheduled" for r in members)
             line = (ratio_line(title, members, "p99_ms", "p99 latency") if paced
@@ -281,6 +294,8 @@ def main():
                     else ratio_line(title, members, "records_per_second", "records/s"))
             if line:
                 lines.append(line)
+        if len(lines) > mark:
+            lines.insert(mark, f"| **{group or 'Ungrouped'}** | | | | |")
     lines += ["", "## Excluded or failed trials", "", "| Trial | Reasons | Runner error |", "| --- | --- | --- |"]
     lines += [f"| {r['path']} | {r['exclusion']} | {r['runner_error'] or ''} |" for r in rows if not r["eligible"]]
     (args.directory / "report.md").write_text("\n".join(lines) + "\n", encoding="utf-8")

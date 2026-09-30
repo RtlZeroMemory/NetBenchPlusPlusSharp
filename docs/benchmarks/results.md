@@ -1,4 +1,6 @@
-# Final results (29-30 September 2026)
+# Library campaign results (29-30 September 2026)
+
+> This campaign compares the standard JSON libraries: safe C# with `System.Text.Json` against C++ with simdjson. A later round put the same hand-tuned parser in both languages and found a tie; see [library vs hand-tuned parsers](parser-challenge.md).
 
 The final campaign ran **270 trials in 4 h 22 min with 0 failures**. All of them reconciled completely. **254 were eligible**; the other 16 were excluded by the pre-declared rule that the load generator must stay under 85% CPU (listed [below](#excluded-trials)). Every number here comes from [`results/final-campaign-20260929`](../../results/final-campaign-20260929/). That folder holds the generated `report.md`, `trials.csv`, `results.json` and one folder per trial with the exact commands and raw JSON. The rules were fixed in advance in the [methodology](methodology.md).
 

@@ -7,13 +7,15 @@ Windows x64 server, client and processing-only control for the shared benchmark.
 From the repository root in PowerShell (Visual Studio 2026 C++ tools, Windows SDK, CMake with the `Visual Studio 18 2026` generator):
 
 ```powershell
-cmake -S src/cpp -B src/cpp/build -G "Visual Studio 18 2026" -A x64
+cmake -S src/cpp -B src/cpp/build -G "Visual Studio 18 2026" -A x64 -DBENCH_ARCH=AVX512
 cmake --build src/cpp/build --config Release
 ./src/cpp/build/Release/tcpbench.exe selftest --corpus tests/fixtures/golden.bin
 ./tests/run_all.ps1
 ```
 
 CMake verifies the vendored simdjson 3.12.3 files against pinned SHA-256 hashes and requires C++23 on x64. Release is `/O2` without `/GL`/`/LTCG`: whole-program optimization measured about 30% slower JSON processing with simdjson on MSVC 19.51. All validation and integrity checks stay enabled in Release.
+
+`BENCH_ARCH` sets MSVC's `/arch` for the whole program and simdjson (`AVX512`, `AVX2` or empty). [bench/build.ps1](../../bench/build.ps1) picks the best one the CPU supports, because the .NET JIT also compiles for the host CPU. It matters for simdjson: without `/arch`, MSVC defines none of the macros simdjson uses to choose its compile-time kernel, so the On-Demand front end becomes the generic fallback (measured 1-2% slower here). Every result records `build.arch`, `build.parser_kernel` and `build.parser_builtin`.
 
 AddressSanitizer build for correctness only (never performance):
 
@@ -32,6 +34,8 @@ Windows ThreadSanitizer is not available; no race-freedom claim is made beyond r
 | [bench.hpp](bench.hpp) | Shared types: options, JSON writer, histogram, epoch/result, owned rows, budget, processor, corpus, resources |
 | [main.cpp](main.cpp) | Option parsing, clocks, JSON writer, histogram, build/resource metadata, socket helpers, global `operator new` counting |
 | [processing.cpp](processing.cpp) | Strict parsing with simdjson On-Demand, canonical digest, retention and eviction, corpus loading, processing-only control, selftest |
+| [fastjson.cpp](fastjson.cpp) | The alternative schema-specific parser (`--parser fast`) and its UTF-8 validator: a line-by-line port of the C# FastJson |
+| [selftest_fuzz.cpp](selftest_fuzz.cpp) | Differential fuzzing: fast parser vs the simdjson path, the validator vs a scalar reference, inputs placed against a no-access guard page |
 | [server.cpp](server.cpp) | IOCP server: one operation per connection, inline synchronous completions, per-frame requeue, deadline scanner, measured interval |
 | [client.cpp](client.cpp) | Load generator: per-connection sender and ACK reader around a lock-free slot ring, closed-loop and scheduled modes, pacing, accounting |
 
@@ -43,3 +47,4 @@ Windows ThreadSanitizer is not available; no race-freedom claim is made beyond r
 - **Allocation counters** count global `operator new` calls and bytes in per-thread cache-line shards; they do not see allocations made outside `operator new` (for example by the OS or `_aligned_malloc`). ASAN builds leave them at zero.
 
 Diagnostic options (`--pause-every/--pause-ms` busy spin, `--io-cap` partial I/O) are documented in the contract and never used in performance cells except the labelled fragmentation stress.
+- **Fast parser.** `--parser fast` swaps simdjson for [fastjson.cpp](fastjson.cpp), a line-by-line port of the C# FastJson, so both languages can run the same algorithm: one UTF-8 validation per frame (Keiser-Lemire), 64-byte string scans, integer key matching, eight-digit integer parsing and speculative 32-byte copies when decoding escapes. The functions C# marks `AggressiveInlining` are `__forceinline` here, and the throw helper is out of line, like the managed `Fail`. It accepts and rejects exactly what the simdjson path does. The selftest fuzzes one against the other with guard pages and scratch canaries, and the whole suite also runs under AddressSanitizer. It needs AVX2 (checked at startup) and uses AVX-512 for the wide scan when the CPU has it. `BENCH_PARSER=fast` makes it the default for the shared test suites.

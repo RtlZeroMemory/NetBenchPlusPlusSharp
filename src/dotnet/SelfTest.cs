@@ -5,8 +5,12 @@ using System.Text.Json;
 namespace TcpBench;
 
 // Mirrors the native selftest case for case; the golden digest is shared by both languages.
-static class SelfTest
+static unsafe partial class SelfTest
 {
+    static bool fast; // parser under test: every check runs for both
+
+    static Processor NewProcessor(Mode mode, int batches, long bytes) => new(mode, batches, bytes, fast);
+
     const string EscapedTimestamp = "\"\\u0074\\u0069\\u006d\\u0065\\u0073\\u0074\\u0061\\u006d\\u0070\\u005f\\u006e\\u0073\"";
     const string Good = """[{"id":18446744073709551615,"timestamp_ns":0,"source":4294967295,"kind":"kind15","value_milli":-0,"flags":3,"message":"a\u0000\uD83D\uDE00"}]""";
     const ulong GoldenDigest = 3660725836179230917UL;
@@ -28,6 +32,20 @@ static class SelfTest
     public static int Run(Options options)
     {
         int checks = 0;
+        foreach (bool parser in new[] { false, true })
+        {
+            fast = parser;
+            checks += Checks(options);
+        }
+
+        checks += Fuzz();
+        JsonOutput.Emit("", new { @event = "selftest", valid = true, checks, canonical_digest = GoldenDigest });
+        return 0;
+    }
+
+    static int Checks(Options options)
+    {
+        int checks = 0;
         void Check(bool ok, string what)
         {
             checks++;
@@ -43,7 +61,7 @@ static class SelfTest
         bool Same(Result r) => r.Matches(reference.Records, reference.Hash, reference.Counts, reference.Sums);
         foreach (Mode mode in new[] { Mode.Aggregate, Mode.RetainReuse, Mode.RetainAllocate })
         {
-            var p = new Processor(mode, 2, 67108864);
+            var p = NewProcessor(mode, 2, 67108864);
             Result Run(string json, Budget budget = default)
             {
                 byte[] input = Encoding.UTF8.GetBytes(json);
@@ -134,7 +152,7 @@ static class SelfTest
             Check(Same(Run(" \r\n" + Good.Replace("\"flags\":3", "\"flags\" : 3 ") + "\t")), "insignificant whitespace");
             // A budget that expires mid-parse stops the parse (checked every 1024 records).
             byte[] many = Encoding.UTF8.GetBytes("[" + string.Join(",", Enumerable.Repeat(record, 100_000)) + "]");
-            var large = new Processor(mode, 8, 1L << 31);
+            var large = NewProcessor(mode, 8, 1L << 31);
             Check(ErrorOf(() => large.Process(many, 1, new Budget(Stopwatch.GetTimestamp() + Stopwatch.Frequency / 500, default))) == "frame_timeout" &&
                   large.Epoch.Batches == 0 && large.Retained == 0, "mid-parse budget expiry");
         }
@@ -142,7 +160,7 @@ static class SelfTest
         {
             // Limits apply to decoded text. CopyString's escaped path rejects an exact fit, so the scratch must
             // exceed the limit; the first case failed with a 4,096-byte scratch.
-            var p = new Processor(Mode.RetainReuse, 2, 67108864);
+            var p = NewProcessor(Mode.RetainReuse, 2, 67108864);
             string With(string message) => Good.Replace("a\\u0000\\uD83D\\uDE00", message);
             string a4095 = new('A', 4095);
             foreach (string ok in new[] { "\\u0041" + a4095, string.Concat(Enumerable.Repeat("\\u0001", 4096)), "A" + a4095 })
@@ -165,13 +183,13 @@ static class SelfTest
                 $"{{\"id\":{i},\"timestamp_ns\":0,\"source\":0,\"kind\":\"kind01\",\"value_milli\":1,\"flags\":{i},\"message\":\"{new string((char)('a' + i % 26), length)}\"}}")) + "]");
             static byte[] WithEmpty(int full) => Encoding.UTF8.GetBytes(Encoding.UTF8.GetString(Records(full, 4096))[..^1] +
                 ",{\"id\":0,\"timestamp_ns\":0,\"source\":0,\"kind\":\"kind00\",\"value_milli\":0,\"flags\":0,\"message\":\"\"}]");
-            var p = new Processor(mode, 1, 67108864);
+            var p = NewProcessor(mode, 1, 67108864);
             byte[][] inputs = [Records(3000, 3000), Records(3000, 3000), Records(1500, 100), WithEmpty(16), WithEmpty(32)];
             long[] capacity = mode == Mode.RetainReuse ? [9_519_104, 19_038_208, 19_038_208] : [9_519_104, 9_519_104, 294_912];
             for (int i = 0; i < inputs.Length; i++)
             {
-                Result expected = new Processor(Mode.Aggregate, 0, 0).Process(inputs[i], 1);
-                Check(new Processor(mode, 1, 67108864).Process(inputs[i], 1).Matches(expected.Records, expected.Hash, expected.Counts, expected.Sums), "fresh chunked batch digest");
+                Result expected = NewProcessor(Mode.Aggregate, 0, 0).Process(inputs[i], 1);
+                Check(NewProcessor(mode, 1, 67108864).Process(inputs[i], 1).Matches(expected.Records, expected.Hash, expected.Counts, expected.Sums), "fresh chunked batch digest");
                 Check(p.Process(inputs[i], p.Epoch.Batches + 1).Matches(expected.Records, expected.Hash, expected.Counts, expected.Sums), "chunked batch digest");
                 p.VerifyRetained();
                 Check(i >= capacity.Length || p.OwnedCapacity() == capacity[i], "chunked capacity");
@@ -181,14 +199,14 @@ static class SelfTest
         foreach (Mode mode in new[] { Mode.RetainReuse, Mode.RetainAllocate })
         {
             // A batch larger than the byte limit fails before commit; retained data survives.
-            var p = new Processor(mode, 8, 200);
+            var p = NewProcessor(mode, 8, 200);
             p.Process(Encoding.UTF8.GetBytes(Good), 1);
             string big = Good.Replace("a\\u0000", new string('x', 170));
             Check(ErrorOf(() => p.Process(Encoding.UTF8.GetBytes(big), 2)) == "retention_capacity" && p.Retained == 44 && p.Epoch.Batches == 1, "oversized batch is atomic");
             p.VerifyRetained();
 
             // Corrupt the second planned eviction: the first must not be evicted either.
-            var q = new Processor(mode, 2, 120);
+            var q = NewProcessor(mode, 2, 120);
             q.Process(Encoding.UTF8.GetBytes(Good), 1);
             q.Process(Encoding.UTF8.GetBytes(Good), 2);
             Batch[] live = q.LiveBatches();
@@ -266,7 +284,7 @@ static class SelfTest
             var corpus = new Corpus(options.Corpus);
             foreach (Mode mode in new[] { Mode.Aggregate, Mode.RetainReuse, Mode.RetainAllocate })
             {
-                var p = new Processor(mode, 8, 67108864);
+                var p = NewProcessor(mode, 8, 67108864);
                 ulong sequence = 0;
                 foreach (CorpusFrame f in corpus.Frames)
                 {
@@ -277,7 +295,6 @@ static class SelfTest
             }
         }
 
-        JsonOutput.Emit("", new { @event = "selftest", valid = true, checks, canonical_digest = reference.Hash });
-        return 0;
+        return checks;
     }
 }

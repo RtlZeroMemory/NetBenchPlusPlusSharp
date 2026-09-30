@@ -76,7 +76,7 @@ static class ProcessControl
     public static int Run(Options o)
     {
         var corpus = new Corpus(o.Corpus);
-        var processor = new Processor(o.Mode, o.RetainBatches, o.RetainBytes);
+        var processor = new Processor(o.Mode, o.RetainBatches, o.RetainBytes, o.FastParser);
         ulong sequence = 0, frames = 0, records = 0, bytes = 0;
         void Cycle()
         {
@@ -144,7 +144,7 @@ static class ProcessControl
                 canonical_bytes = processor.Retained,
                 owned_capacity_peak_bytes = processor.PeakOwned
             },
-            build = Build.Info()
+            build = Build.Info(o.FastParser)
         });
         return 0;
     }

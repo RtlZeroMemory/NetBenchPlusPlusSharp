@@ -63,8 +63,6 @@ Result transport_result(size_t length)
     return r;
 }
 
-namespace
-{
 void add_row(Result &r, const Row &row, std::string_view message)
 {
     require(r.records < epoch_record_limit, "epoch_record_limit");
@@ -72,20 +70,24 @@ void add_row(Result &r, const Row &row, std::string_view message)
     size_t bucket = size_t(row.kind) * 4 + (row.flags & 3);
     ++r.counts[bucket];
     r.sums[bucket] += row.value;
-    hash_byte(r.digest, 0x52);
-    hash_int(r.digest, row.id, 8);
-    hash_int(r.digest, row.timestamp, 8);
-    hash_int(r.digest, row.source, 4);
-    hash_byte(r.digest, row.kind);
-    hash_int(r.digest, uint64_t(row.value), 8);
-    hash_int(r.digest, row.flags, 4);
-    hash_int(r.digest, message.size(), 4);
+    uint64_t h = r.digest; // local accumulator: char data may alias r, so no store per byte
+    hash_byte(h, 0x52);
+    hash_int(h, row.id, 8);
+    hash_int(h, row.timestamp, 8);
+    hash_int(h, row.source, 4);
+    hash_byte(h, row.kind);
+    hash_int(h, uint64_t(row.value), 8);
+    hash_int(h, row.flags, 4);
+    hash_int(h, message.size(), 4);
     for (unsigned char c : message)
     {
-        hash_byte(r.digest, c);
+        hash_byte(h, c);
     }
+    r.digest = h;
 }
 
+namespace
+{
 // Strict JSON integer lexeme: digits only, no leading zero, no fraction or exponent.
 // Only a 20th digit can overflow 64 bits.
 bool digits(std::string_view s, uint64_t &value)
@@ -148,6 +150,9 @@ unsigned field_bit(std::string_view key)
                                    : 0;
 }
 
+
+} // namespace
+
 // Identical chunked storage in both implementations (see Batch).
 void append(Batch &b, const Row &row, std::string_view text, uint64_t limit)
 {
@@ -187,12 +192,11 @@ void append(Batch &b, const Row &row, std::string_view text, uint64_t limit)
     ++b.count;
     b.canonical += 38 + text.size();
 }
-} // namespace
 
-Processor::Processor(Mode m, size_t max_frame, size_t batches, uint64_t bytes)
-    : mode(m), retain_batches(batches), retain_bytes(bytes)
+Processor::Processor(Mode m, size_t max_frame, size_t batches, uint64_t bytes, bool fast)
+    : mode(m), fast_parser(fast), fast_scratch(fast ? fast_scratch_bytes : 0), retain_batches(batches), retain_bytes(bytes)
 {
-    if (mode != Mode::transport)
+    if (mode != Mode::transport && !fast)
     {
         require(parser.allocate(std::max<size_t>(max_frame, 32), 4) == simdjson::SUCCESS,
                 "parser_capacity");
@@ -211,6 +215,10 @@ Processor::Processor(Mode m, size_t max_frame, size_t batches, uint64_t bytes)
 Result Processor::parse(
     const uint8_t *data, size_t length, size_t capacity, Batch *batch, const Budget &budget)
 {
+    if (fast_parser)
+    {
+        return fast_parse(data, length, batch, budget, fast_scratch.data(), retain_bytes);
+    }
     require(!(length >= 3 && data[0] == 0xef && data[1] == 0xbb && data[2] == 0xbf), "json_bom");
     Result r;
     uint64_t parsed = 0;
@@ -466,7 +474,7 @@ Corpus load_corpus(const std::string &path)
 int run_process(const Options &o)
 {
     Corpus corpus = load_corpus(o.corpus);
-    Processor processor(o.mode, corpus.max_frame, o.retain_batches, o.retain_bytes);
+    Processor processor(o.mode, corpus.max_frame, o.retain_batches, o.retain_bytes, o.fast_parser);
     Epoch epoch;
     uint64_t sequence = 0, frames = 0, records = 0, bytes = 0;
     auto cycle = [&] {
@@ -524,7 +532,7 @@ int run_process(const Options &o)
         .num("canonical_bytes", processor.retained)
         .num("owned_capacity_peak_bytes", processor.peak_owned)
         .close();
-    write_build(j);
+    write_build(j, o.fast_parser);
     j.close();
     emit(o, j.take());
     return 0;
@@ -558,7 +566,7 @@ template <class F> std::string error_of(F fn)
 }
 } // namespace
 
-int run_selftest(const std::string &corpus_path)
+uint64_t selftest_pass(const std::string &corpus_path, bool fast)
 {
     uint64_t checks = 0;
     auto check = [&](bool ok, std::string_view what) {
@@ -579,7 +587,7 @@ int run_selftest(const std::string &corpus_path)
     check(reference.digest == 3660725836179230917ull, "cross-language golden digest");
     for (Mode mode : {Mode::aggregate, Mode::retain_reuse, Mode::retain_allocate})
     {
-        Processor p(mode, 65536, 2, 67108864);
+        Processor p(mode, 65536, 2, 67108864, fast);
         Epoch epoch;
         auto run = [&](const std::string &s, const Budget &budget = {}) {
             return apply_text(p, epoch, s, budget);
@@ -666,7 +674,7 @@ int run_selftest(const std::string &corpus_path)
             many += "," + object;
         }
         many += "]";
-        Processor large(mode, many.size(), 8, 1ull << 31);
+        Processor large(mode, many.size(), 8, 1ull << 31, fast);
         Epoch fresh;
         check(error_of([&] {
                   apply_text(large, fresh, many, Budget{nullptr, now() + to_ticks(0.002)});
@@ -676,7 +684,7 @@ int run_selftest(const std::string &corpus_path)
     }
     {
         // Limits apply to decoded text (escaped forms up to six times longer; see the managed selftest).
-        Processor p(Mode::retain_reuse, 65536, 2, 67108864);
+        Processor p(Mode::retain_reuse, 65536, 2, 67108864, fast);
         Epoch epoch;
         const auto with = [&](const std::string &message) {
             std::string s = good;
@@ -718,7 +726,7 @@ int run_selftest(const std::string &corpus_path)
             s.pop_back();
             return s + R"(,{"id":0,"timestamp_ns":0,"source":0,"kind":"kind00","value_milli":0,"flags":0,"message":""}])";
         };
-        Processor p(mode, 16 << 20, 1, 67108864);
+        Processor p(mode, 16 << 20, 1, 67108864, fast);
         Epoch epoch;
         const std::vector<uint64_t> capacity = mode == Mode::retain_reuse ? std::vector<uint64_t>{9519104, 19038208, 19038208}
                                                                            : std::vector<uint64_t>{9519104, 9519104, 294912};
@@ -726,7 +734,7 @@ int run_selftest(const std::string &corpus_path)
         for (const std::string &input :
              {records(3000, 3000), records(3000, 3000), records(1500, 100), with_empty(16), with_empty(32)})
         {
-            Processor aggregate(Mode::aggregate, 16 << 20, 0, 0), fresh(mode, 16 << 20, 1, 67108864);
+            Processor aggregate(Mode::aggregate, 16 << 20, 0, 0, fast), fresh(mode, 16 << 20, 1, 67108864, fast);
             Epoch scratch, fresh_epoch;
             const Result expected = apply_text(aggregate, scratch, input);
             check(apply_text(fresh, fresh_epoch, input) == expected, "fresh chunked batch digest");
@@ -740,7 +748,7 @@ int run_selftest(const std::string &corpus_path)
     for (Mode mode : {Mode::retain_reuse, Mode::retain_allocate})
     {
         // A batch larger than the byte limit fails before commit; retained data survives.
-        Processor p(mode, 65536, 8, 200);
+        Processor p(mode, 65536, 8, 200, fast);
         Epoch epoch;
         apply_text(p, epoch, good);
         std::string big = good;
@@ -752,7 +760,7 @@ int run_selftest(const std::string &corpus_path)
               "oversized batch is atomic");
         p.verify();
         // Corrupt the second planned eviction: the first must not be evicted either.
-        Processor q(mode, 65536, 2, 120);
+        Processor q(mode, 65536, 2, 120, fast);
         Epoch e;
         apply_text(q, e, good);
         apply_text(q, e, good);
@@ -803,7 +811,7 @@ int run_selftest(const std::string &corpus_path)
         const Corpus corpus = load_corpus(corpus_path);
         for (Mode mode : {Mode::aggregate, Mode::retain_reuse, Mode::retain_allocate})
         {
-            Processor p(mode, corpus.max_frame, 8, 67108864);
+            Processor p(mode, corpus.max_frame, 8, 67108864, fast);
             Epoch e;
             for (const Frame &f : corpus.frames)
             {
@@ -814,8 +822,15 @@ int run_selftest(const std::string &corpus_path)
             p.verify();
         }
     }
+    return checks;
+}
+
+// Every check runs once per parser, then the differential fuzzing (selftest_fuzz.cpp).
+int run_selftest(const std::string &corpus_path)
+{
+    const uint64_t checks = selftest_pass(corpus_path, false) + selftest_pass(corpus_path, true) + fuzz_selftest();
     std::cout << "{\"event\":\"selftest\",\"valid\":true,\"checks\":" << checks
-              << ",\"canonical_digest\":" << reference.digest << "}" << std::endl;
+              << ",\"canonical_digest\":3660725836179230917}" << std::endl;
     return 0;
 }
 } // namespace bench

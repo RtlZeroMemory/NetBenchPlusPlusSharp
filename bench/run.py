@@ -32,12 +32,18 @@ BINARIES = {"cpp": ROOT / "src/cpp/build/Release/tcpbench.exe",
 DEFAULTS = {"duration": 30, "warmup": 10, "connections": 16, "window": 64, "rate": 0, "arrival": "steady",
             "socket_buffer": 262144, "retain_batches": 8, "retain_bytes": 67108864, "drain": 30,
             "inflight_bytes": 67108864, "client": "cpp", "servers": ["cpp", "csharp"], "client_cores": "client",
-            "pause_every": 0, "pause_ms": 0, "io_cap": 0, "kind": "tcp", "server_env": {}}
+            "pause_every": 0, "pause_ms": 0, "io_cap": 0, "kind": "tcp", "server_env": {},
+            "csharp_parser": "stj", "cpp_parser": "simdjson"}
 kernel = ctypes.WinDLL("kernel32", use_last_error=True) if os.name == "nt" else None
 
 
 def command(binary: Path):
     return ["dotnet", str(binary)] if binary.suffix == ".dll" else [str(binary)]
+
+
+def parser_args(server, cell):
+    """Always explicit, so a BENCH_PARSER test override can never leak into a campaign."""
+    return ["--parser", cell["csharp_parser"] if server == "csharp" else cell["cpp_parser"]]
 
 
 def sha256(path: Path):
@@ -103,6 +109,22 @@ def cpu_busy_seconds():
     return [(t.kernel + t.user - t.idle) / 1e7 for t in data]
 
 
+def wait_for_quiet(timeout, limit=0.10, window=3.0):
+    """Blocks until the whole machine's CPU use stays under limit for one window, so a trial never starts
+    while other work is running. Raises after timeout seconds; rerun with --resume when the machine is free."""
+    deadline = time.monotonic() + timeout
+    while True:
+        before = cpu_busy_seconds()
+        time.sleep(window)
+        busy = (sum(cpu_busy_seconds()) - sum(before)) / (window * os.cpu_count())
+        if busy <= limit:
+            return
+        if time.monotonic() >= deadline:
+            raise RuntimeError(f"machine not quiet: {busy:.0%} CPU in use by other work; rerun with --resume when it is free")
+        print(json.dumps({"waiting_for_quiet_machine": round(busy, 3)}), flush=True)
+        time.sleep(20)
+
+
 def sibling_cpus(masks, role):
     """Logical CPUs that share a physical core with the role's CPUs but are not in its mask."""
     return [cpu for cpu in range(os.cpu_count()) for core in masks["physical_core_masks"]
@@ -153,7 +175,7 @@ def trial(folder: Path, ordinal: int, cell: dict, server: str, masks: dict, corp
                                             "--duration", str(cell["duration"]), "--warmup", str(cell["warmup"]),
                                             "--retain-batches", str(cell["retain_batches"]),
                                             "--retain-bytes", str(cell["retain_bytes"]),
-                                            "--output", str(destination / "server.json")]
+                                            "--output", str(destination / "server.json")] + parser_args(server, cell)
         (destination / "commands.json").write_text(json.dumps({"process": args}, indent=2), encoding="utf-8")
         # Single-threaded work under the server's CPU mask, so each runtime keeps its server
         # configuration (with one CPU, .NET would fall back to workstation GC).
@@ -174,7 +196,7 @@ def trial(folder: Path, ordinal: int, cell: dict, server: str, masks: dict, corp
             "--socket-buffer", str(cell["socket_buffer"]), "--pause-every", str(cell["pause_every"]),
             "--pause-ms", str(cell["pause_ms"]), "--io-cap", str(cell["io_cap"]),
             "--manifest-hash", manifest_hash, "--control-stdin", "1",
-            "--output", str(destination / "server.json")]
+            "--output", str(destination / "server.json")] + parser_args(server, cell)
         client_args = command(BINARIES[cell["client"]]) + [
             "client", "--port", str(port), "--corpus", corpus_info["path"], "--mode", cell["mode"],
             "--connections", str(cell["connections"]), "--duration", str(cell["duration"]),
@@ -254,17 +276,24 @@ def prepare_corpora(matrix):
 
 
 def capacity(results, cell_name):
-    """Slower server's median window frame rate in an earlier closed-loop cell, from valid trials
-    whose client stayed within its CPU budget (so the rate is the server's, not the client's)."""
-    rates = {}
+    """Slower server's median window frame rate in an earlier closed-loop cell, and its basis. Trials
+    whose client stayed within its CPU budget measure the server; if a server has none (it outran the
+    client), its valid trials only show a rate it sustains at least, so the result is the lowest rate
+    both servers are known to sustain. The basis is recorded in every paced cell."""
+    adequate, bound = {}, {}
     for entry in results:
         r = entry["result"]
-        if (entry["cell"]["name"] == cell_name and not entry["runner_error"]
-                and report.client_cpu(r) <= report.CLIENT_CPU_LIMIT):
-            rates.setdefault(entry["server"], []).append(r["window"]["frames"] / r["window"]["seconds"])
-    if len(rates) < 2:
-        raise RuntimeError(f"no client-adequate capacity trials for both servers in {cell_name}")
-    return min(statistics.median(v) for v in rates.values())
+        if entry["cell"]["name"] == cell_name and not entry["runner_error"] and r.get("valid"):
+            rate = r["window"]["frames"] / r["window"]["seconds"]
+            bound.setdefault(entry["server"], []).append(rate)
+            if report.client_cpu(r) <= report.CLIENT_CPU_LIMIT:
+                adequate.setdefault(entry["server"], []).append(rate)
+    if len(bound) < 2:
+        raise RuntimeError(f"no valid capacity trials for both servers in {cell_name}")
+    rates = {s: (statistics.median(adequate[s]), "capacity") if s in adequate else
+             (statistics.median(bound[s]), "client-bound lower bound") for s in bound}
+    server = min(rates, key=lambda s: rates[s][0])
+    return rates[server][0], f"{server} {rates[server][1]}"
 
 
 def trial_key(phase, cell, repetition, server, builds):
@@ -282,6 +311,8 @@ def main():
     parser.add_argument("--duration", type=float, help="override every cell's duration (smoke use)")
     parser.add_argument("--warmup", type=float, help="override every cell's warmup (smoke use)")
     parser.add_argument("--cooldown", type=float, default=2.0, help="seconds between trials")
+    parser.add_argument("--quiet-wait", type=float, default=0,
+                        help="before each trial, wait up to this many seconds for other CPU use to drop under 10%%")
     parser.add_argument("--resume", action="store_true",
                         help="continue an interrupted campaign in --output; completed trials are kept")
     args = parser.parse_args()
@@ -327,7 +358,8 @@ def main():
             cell.setdefault("seed", matrix.get("seed", 42))
             if isinstance(cell["rate"], dict) and selected:
                 cell["rate_rule"] = cell["rate"]
-                cell["rate"] = round(capacity(results, cell["rate"]["of"]) * cell["rate"]["fraction"], 3)
+                rate, basis = capacity(results, cell["rate"]["of"])
+                cell["rate"], cell["rate_basis"] = round(rate * cell["rate"]["fraction"], 3), basis
         for repetition in range(args.repetitions or phase.get("repetitions", 1)):
             order = list(cells)
             rng.shuffle(order)
@@ -342,6 +374,8 @@ def main():
                     if key in done:
                         results.append(done.pop(key))
                         continue
+                    if args.quiet_wait:
+                        wait_for_quiet(args.quiet_wait)
                     entry = trial(folder, ordinal, cell | {"repetition": repetition}, server, masks, corpora[cell["corpus"]])
                     entry["key"] = key
                     results.append(entry)

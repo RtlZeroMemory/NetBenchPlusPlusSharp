@@ -1,0 +1,6 @@
+release suite passed (20 steps)
+asan suite passed (9 steps, no sanitizer reports)
+corpus oracle 10/10 (both languages, both parsers, all modes)
+smoke 18/18, schema ok
+frozen; fair-2x2 started 2026-09-30T02:55:24Z
+fair-2x2 finished 2026-09-30T06:53:26Z

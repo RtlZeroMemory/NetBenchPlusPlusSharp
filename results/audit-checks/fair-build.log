@@ -1,0 +1,12 @@
+MSBuild version 18.10.1-1.26427.6+3cd27c13e for .NET Framework
+
+  simdjson.cpp
+  simdjson.vcxproj -> F:\SocketServerClient\src\cpp\build-asan\RelWithDebInfo\simdjson.lib
+  main.cpp
+  processing.cpp
+  fastjson.cpp
+  selftest_fuzz.cpp
+  server.cpp
+  client.cpp
+  Generating Code...
+  tcpbench.vcxproj -> F:\SocketServerClient\src\cpp\build-asan\RelWithDebInfo\tcpbench.exe

@@ -46,6 +46,23 @@ An independent review of these changes found one bug, fixed before the final cam
 
 One accepted change in error reason: an unescaped message over 24,576 bytes that is also invalid UTF-8 is now reported as `json_string` rather than `json_message_length`. That is closer to C++, which reports UTF-8 errors first.
 
+## Hand-tuned parsers in both languages (30 September 2026)
+
+Results and method: [library vs hand-tuned parsers](../../docs/benchmarks/parser-challenge.md).
+
+| Step | Outcome |
+| --- | --- |
+| FastJson, a schema-specific strict parser in C# (`--parser fast`) | 1.9x faster than `System.Text.Json` on HARD content; same accept/reject decisions |
+| Line-by-line C++ port, for a fair language comparison | Ties with the C# version (C# at 96-105% of C++) |
+| Differential fuzzing with guard pages and scratch canaries, in both languages | 7 of 7 planted bugs caught in each. One was first missed in C++: kind values whose closing quote is replaced. Both generators now produce that case |
+| Review of the C# parser | No memory-safety or equivalence bug. Applied: scratch size guard, canaries, more fuzz cases, large-frame socket test |
+| Review of the C++ port | No memory-safety or equivalence bug. Found that C++ was built without `/arch`, leaving simdjson's On-Demand front end on its fallback kernel (measured 1-2%). Applied: host-CPU build flag, out-of-line throw helper, `__forceinline` parity, local checksum accumulator |
+| `cpu_budget` regression test | It assumed parsing 16 MB takes longer than 20 ms. The fast parsers beat that, so the test now injects a budget-checked busy spin instead of relying on parser speed |
+| Paced rate rule | A server that outran the load generator has only a lower bound on its capacity; the rule now uses the lowest rate both servers sustain and records the basis |
+| Fair 2x2 campaign | 264 trials, 0 failures. Other work started on the PC during the run (background CPU 55-92%), which invalidated the paced phases. Added an environment gate (background CPU at most 15%) and `--quiet-wait`. The throughput phases ran on a quiet machine and stand |
+
+Still open: the paced and sustained phases for both comparisons on a quiet machine.
+
 ## Methodology changes (declared before any campaign trial)
 
 See [methodology](../../docs/benchmarks/methodology.md): EASY/HARD matrix, controlled comparisons, processing-only and transport controls, generator-adequacy policy v2 (lateness p99 ≤ 100 µs, ≤ 0.1% over 1 ms, no undispatched demand, client CPU ≤ 85%) with the first-pass strict rule still reported, disjoint physical cores, fresh processes, randomized pairs.

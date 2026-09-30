@@ -28,6 +28,8 @@ results/*
 !results/diagnostics-fairness-20260929/
 !results/diagnostics-csharp-parser-20260929/
 !results/audit-checks/
+!results/parser-challenge-20260930/
+!results/fair-2x2-20260930/
 !results/audit-baseline-20260929/
 results/**/[0-9][0-9][0-9][0-9]-*/
 results/**/results.json

@@ -151,7 +151,7 @@ struct Connection
     Connection(Server &s, SOCKET sock)
         : server(s), socket(sock),
           body(std::max<size_t>(32, s.o.max_frame) + simdjson::SIMDJSON_PADDING),
-          processor(s.o.mode, s.o.max_frame, s.o.retain_batches, s.o.retain_bytes)
+          processor(s.o.mode, s.o.max_frame, s.o.retain_batches, s.o.retain_bytes, s.o.fast_parser)
     {
     }
 
@@ -712,7 +712,7 @@ int run_server(const Options &o)
     server.stages.decode.write(j, "decode", true);
     server.stages.visit.write(j, "retained_visit", true);
     j.close();
-    write_build(j);
+    write_build(j, o.fast_parser);
     j.close();
     emit(o, j.take());
     return fatal.empty() ? 0 : 1;

@@ -142,7 +142,7 @@ readonly record struct Resources(long Timestamp, double CpuSeconds, long Allocat
 
 static class Build
 {
-    public static object Info() => new
+    public static object Info(bool fastParser = false) => new
     {
         runtime = RuntimeInformation.FrameworkDescription,
 #if DEBUG
@@ -150,7 +150,8 @@ static class Build
 #else
         configuration = "Release",
 #endif
-        parser = "System.Text.Json Utf8JsonReader",
+        parser = fastParser ? "FastJson (schema-specific, SIMD scanning)" : "System.Text.Json Utf8JsonReader",
+        parser_kernel = fastParser ? (System.Runtime.Intrinsics.Vector512.IsHardwareAccelerated ? "avx512" : "avx2") : "n/a",
         server_gc = GCSettings.IsServerGC,
         gc_concurrent = AppContext.GetData("System.GC.Concurrent")?.ToString(),
         gc_heap_count = GC.GetConfigurationVariables().GetValueOrDefault("HeapCount"),

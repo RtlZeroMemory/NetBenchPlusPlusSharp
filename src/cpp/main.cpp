@@ -111,7 +111,7 @@ Options parse_options(int argc, char **argv)
     {
         allowed = " port mode max-frame max-connections workers manifest-hash idle-timeout-ms "
                   "frame-timeout-ms retain-batches retain-bytes socket-buffer output "
-                  "pause-every pause-ms io-cap control-stdin ";
+                  "pause-every pause-ms io-cap control-stdin parser ";
     }
     else if (o.command == "client")
     {
@@ -120,7 +120,7 @@ Options parse_options(int argc, char **argv)
     }
     else if (o.command == "process")
     {
-        allowed = " corpus mode duration warmup output retain-batches retain-bytes ";
+        allowed = " corpus mode duration warmup output retain-batches retain-bytes parser ";
     }
     else if (o.command == "selftest")
     {
@@ -161,7 +161,16 @@ Options parse_options(int argc, char **argv)
                 "invalid --" + std::string(name));
         value = parsed;
     };
-    std::string mode = "aggregate", manifest(64, '0');
+    std::string mode = "aggregate", manifest(64, '0'), parser = "simdjson";
+    // BENCH_PARSER lets the shared test suites run the fast parser; results record the effective parser.
+    if (const char *env = std::getenv("BENCH_PARSER"); env && std::string_view(env) == "fast")
+    {
+        parser = "fast";
+    }
+    text("parser", parser);
+    require(parser == "simdjson" || parser == "fast", "invalid parser");
+    o.fast_parser = parser == "fast";
+    require(!o.fast_parser || fast_supported(), "--parser fast needs an AVX2 CPU");
     text("mode", mode);
     text("corpus", o.corpus);
     text("output", o.output);
@@ -470,7 +479,12 @@ Resources Resources::sample()
     return r;
 }
 
-void write_build(Json &json)
+void fail(std::string_view reason)
+{
+    throw std::runtime_error(std::string(reason));
+}
+
+void write_build(Json &json, bool fast_parser)
 {
     DWORD_PTR process_mask = 0, system_mask = 0;
     GetProcessAffinityMask(GetCurrentProcess(), &process_mask, &system_mask);
@@ -479,8 +493,10 @@ void write_build(Json &json)
         .num("cplusplus", int64_t(__cplusplus))
         .str("configuration", BENCH_CONFIG)
         .str("windows_sdk", BENCH_WINDOWS_SDK)
-        .str("parser", "simdjson 3.12.3 On-Demand")
-        .str("parser_kernel", simdjson::get_active_implementation()->name())
+        .str("parser", fast_parser ? "FastJson port (schema-specific, SIMD scanning)" : "simdjson 3.12.3 On-Demand")
+        .str("parser_kernel", fast_parser ? fast_kernel() : simdjson::get_active_implementation()->name())
+        .str("parser_builtin", simdjson::builtin_implementation()->name()) // On-Demand front end, fixed at compile time
+        .str("arch", BENCH_ARCH_FLAG)
         .num("qpc_frequency", frequency())
         .num("affinity_mask", uint64_t(process_mask))
 #ifdef BENCH_ASAN

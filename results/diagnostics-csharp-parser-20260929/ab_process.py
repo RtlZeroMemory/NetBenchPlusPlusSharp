@@ -28,8 +28,9 @@ for r in range(rounds):
         key, _, value = env.partition("=")
         if key:
             os.environ[key] = value
+        prefix, _, extra = prefix.partition(" ++ ")  # label=command ++ extra flags after "process"
         args = prefix.split() + ["process", "--corpus", corpus, "--mode", mode,
-                                 "--duration", "10", "--warmup", "5"]
+                                 "--duration", "10", "--warmup", "5"] + extra.split()
         out = HERE / "ab.log"
         with out.open("w") as log:
             p = run.spawn(args, mask, log)

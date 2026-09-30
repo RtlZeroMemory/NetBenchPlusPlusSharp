@@ -1,0 +1,6 @@
+hard64k-hard-536870912-65536-203 aggregate: {"cpp": [1.007, 1.005], "cs-stj": [0.669, 0.667], "cs-fast": [1.111, 1.117]}
+easy64k-easy-536870912-65536-101 aggregate: {"cpp": [4.239, 4.316], "cs-stj": [4.19, 4.225], "cs-fast": [9.377, 9.321]}
+hardmix-hard-1073741824-1048576-202 aggregate: {"cpp": [1.005, 0.994], "cs-fast": [1.134, 1.139]}
+hardmix-hard-1073741824-1048576-202 retain-reuse: {"cpp": [0.73, 0.745], "cs-fast": [0.783, 0.802]}
+hardmix-hard-1073741824-1048576-202 retain-allocate: {"cpp": [0.73, 0.728], "cs-fast": [0.794, 0.793]}
+easy64k-easy-536870912-65536-101 retain-reuse: {"cpp": [3.245, 3.252], "cs-fast": [5.589, 5.469]}

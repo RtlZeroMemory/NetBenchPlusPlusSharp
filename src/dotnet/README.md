@@ -20,12 +20,15 @@ The SDK (`11.0.100-preview.7.26381.103`, [global.json](../../global.json)) and r
 | File | Responsibility |
 | --- | --- |
 | [Program.cs](Program.cs) | Entry point, options (same names, ranges and rules as the native parser), header writer, socket configuration |
-| [Processing.cs](Processing.cs) | Strict parsing, canonical digest, owned batches, retention and eviction, epoch summaries, budget |
+| [Processing.cs](Processing.cs) | Strict parsing with `Utf8JsonReader`, canonical digest, owned batches, retention and eviction, epoch summaries, budget |
+| [FastJson.cs](FastJson.cs) | The alternative schema-specific parser (`--parser fast`): same rules, SIMD string scanning, integer key matching, SWAR integers |
+| [Utf8Check.cs](Utf8Check.cs) | AVX2 UTF-8 validation (the Keiser-Lemire lookup algorithm used by simdjson) for the fast parser |
 | [Server.cs](Server.cs) | Asynchronous server: one loop per connection, per-frame `Task.Yield`, 10 ms deadline scanner, measured interval |
 | [Client.cs](Client.cs) | Load generator: per-connection sender and ACK reader tasks, closed-loop credits, raised-priority generator thread, pacing |
 | [Corpus.cs](Corpus.cs) | Corpus loading and the processing-only control |
 | [Report.cs](Report.cs) | Histogram, JSON output, resource snapshots, build metadata |
-| [SelfTest.cs](SelfTest.cs) | In-process checks, case for case with the native selftest |
+| [SelfTest.cs](SelfTest.cs) | In-process checks, case for case with the native selftest, run once per parser |
+| [SelfTestFuzz.cs](SelfTestFuzz.cs) | Differential fuzzing: fast parser vs `Utf8JsonReader`, `Utf8Check` vs `Utf8.IsValid`, inputs placed against a no-access guard page |
 
 ## Design notes
 
@@ -34,3 +37,4 @@ The SDK (`11.0.100-preview.7.26381.103`, [global.json](../../global.json)) and r
 - **Server.** Receives and sends complete synchronously when data is ready (the runtime's inline completion). After each response the connection awaits `Task.Yield()` so connections take turns on the thread pool. Deadlines are checked at every completion, by a 10 ms scanner that disposes expired sockets, and every 1,024 records during processing. `--workers` is recorded only; the CPU mask (and `DOTNET_PROCESSOR_COUNT`, set by the runner) is the budget.
 - **Client.** Closed loop uses a per-connection `SemaphoreSlim` of `window / connections` credits; scheduled load uses a dedicated highest-priority thread with a high-resolution waitable timer and at most 1 ms of spin, admitting against global `Interlocked` caps. Each request is one gathered `SendAsync` (header and payload). Acknowledgements are read in batches, never past what is owed.
 - **Counters.** `allocated_bytes` is `GC.GetTotalAllocatedBytes(precise: true)` over the interval; `gc` gives collection counts and `GC.GetTotalPauseDuration()` over the same interval. Pause totals are runtime observations, not a latency attribution.
+- **Fast parser.** `--parser fast` swaps `Utf8JsonReader` for [FastJson](FastJson.cs), written for this one schema. It validates UTF-8 once per frame, scans strings 64 bytes at a time for `"`, `\` and control bytes, matches the seven keys with one or two integer compares, parses integers eight digits at a time, and decodes escapes with speculative 32-byte copies. It accepts and rejects exactly what the `Utf8JsonReader` path does. The selftest fuzzes one against the other (60,000 documents, both retention paths) with every input ending at a no-access page, and planted bugs, including a one-byte over-read, are caught. `BENCH_PARSER=fast` makes it the default so the shared test suites can run it; the campaign runner always passes `--parser` explicitly. Results are in the [parser challenge](../../docs/benchmarks/parser-challenge.md).

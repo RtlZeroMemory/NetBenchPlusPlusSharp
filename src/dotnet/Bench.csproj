@@ -9,6 +9,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <ServerGarbageCollection>true</ServerGarbageCollection>
     <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <!-- Throughput-tuned: DATAS (dynamic heap-count and budget adaptation, the .NET 9+ default) off. With chunked
          batches it cut retain-allocate p99 by ~20% at ~2.5x memory; the campaign also runs the runtime default. -->
     <GarbageCollectionAdaptationMode>0</GarbageCollectionAdaptationMode>

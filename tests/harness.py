@@ -83,10 +83,17 @@ def report_checks(folder):
     assert len(rows) == 12 and sum(r["eligible"] == "True" for r in rows) == 4
     text = (folder / "report.md").read_text(encoding="utf-8")
     assert "4 of 12 trials eligible" in text and "lateness_p99_over_100us" in text
-    capacity = run.capacity([{"cell": {"name": "c"}, "server": s, "runner_error": None,
-                              "result": {"window": {"frames": f, "seconds": 2}}}
-                             for s, f in [("cpp", 100), ("cpp", 120), ("csharp", 80), ("csharp", 60)]], "c")
-    assert capacity == 35, capacity  # slower server's median frames per second
+    def trial(server, frames, client_cpu=0.5):
+        return {"cell": {"name": "c"}, "server": server, "runner_error": None,
+                "result": {"valid": True, "window": {"frames": frames, "seconds": 2},
+                           "resources": {"cpu_seconds": client_cpu, "seconds": 1, "logical_cpus": 1}}}
+    capacity = run.capacity([trial(s, f) for s, f in [("cpp", 100), ("cpp", 120), ("csharp", 80), ("csharp", 60)]], "c")
+    assert capacity == (35, "csharp capacity"), capacity  # slower server's median frames per second
+    # A server that outran the client only has a lower bound; the lowest sustained rate is used.
+    capacity = run.capacity([trial("cpp", 100), trial("cpp", 120), trial("csharp", 300, 0.99), trial("csharp", 320, 0.99)], "c")
+    assert capacity == (55, "cpp capacity"), capacity
+    capacity = run.capacity([trial("cpp", 100, 0.99), trial("csharp", 300, 0.99)], "c")
+    assert capacity == (50, "cpp client-bound lower bound"), capacity
 
 
 def runner_checks(folder):
@@ -112,7 +119,7 @@ def runner_checks(folder):
     info = {"name": "bad", "path": str(bad), "sha256": run.sha256(bad), "max_frame_bytes": 16}
     summary = run.trial(folder, 1, cell, "cpp", layout, info)
     saved = json.loads((Path(summary["path"]) / "summary.json").read_text(encoding="utf-8"))
-    assert saved["runner_error"] and report.row(saved)["exclusion"] == "invalid_or_unreconciled"
+    assert saved["runner_error"] and "invalid_or_unreconciled" in report.row(saved)["exclusion"].split(";")
 
 
 def main():

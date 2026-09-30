@@ -26,10 +26,7 @@ constexpr size_t hard_limit = size_t(16) << 20;
 constexpr uint64_t epoch_record_limit = 1000000000;
 constexpr uint64_t stage_sample_every = 1024;
 
-[[noreturn]] inline void fail(std::string_view reason)
-{
-    throw std::runtime_error(std::string(reason));
-}
+[[noreturn]] __declspec(noinline) void fail(std::string_view reason); // out of line, like the managed Fail
 
 inline void require(bool ok, std::string_view reason)
 {
@@ -106,6 +103,7 @@ struct Options
     double duration = 10, warmup = 2, rate = 0, drain = 30;
     uint64_t seed = 42;
     std::array<uint8_t, 32> manifest{};
+    bool fast_parser = false; // --parser fast (default simdjson, or the BENCH_PARSER environment variable)
 };
 
 Options parse_options(int argc, char **argv);
@@ -218,9 +216,23 @@ struct Budget
     void check() const;
 };
 
+// Canonical accounting shared by both parsers (processing.cpp).
+void add_row(Result &r, const Row &row, std::string_view message);
+void append(Batch &b, const Row &row, std::string_view text, uint64_t limit);
+// The schema-specific parser and its UTF-8 validator (fastjson.cpp). scratch holds scratch_bytes.
+constexpr size_t fast_scratch_bytes = 24576;
+Result fast_parse(const uint8_t *data, size_t length, Batch *batch, const Budget &budget, uint8_t *scratch,
+                  uint64_t retain_bytes);
+bool utf8_valid(const uint8_t *data, size_t length);
+const char *fast_kernel(); // "avx512" or "avx2": the widest scan the fast parser uses here
+bool fast_supported();     // the fast parser needs AVX2
+uint64_t fuzz_selftest(); // selftest_fuzz.cpp
+
 class Processor
 {
     Mode mode;
+    bool fast_parser;
+    std::vector<uint8_t> fast_scratch; // fast parser only
     size_t retain_batches;
     uint64_t retain_bytes;
     simdjson::ondemand::parser parser;
@@ -235,7 +247,11 @@ class Processor
   public:
     uint64_t retained = 0, peak_retained = 0, peak_owned = 0;
     uint64_t last_decode_ticks = 0, last_visit_ticks = 0;
-    Processor(Mode mode, size_t max_frame, size_t retain_batches, uint64_t retain_bytes);
+    Processor(Mode mode, size_t max_frame, size_t retain_batches, uint64_t retain_bytes, bool fast = false);
+    std::vector<uint8_t> &scratch_for_tests() // selftest hook: fast-parser canaries
+    {
+        return fast_scratch;
+    }
     // Validates, processes and commits one batch, or throws with no committed change.
     Result apply(const uint8_t *data,
                  size_t length,
@@ -278,7 +294,7 @@ struct Resources
     static Resources sample();
 };
 
-void write_build(Json &json);
+void write_build(Json &json, bool fast_parser = false);
 
 struct Socket
 {

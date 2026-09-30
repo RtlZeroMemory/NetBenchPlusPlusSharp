@@ -281,7 +281,7 @@ sealed class Server
                 decode = stages.Decode.Export(true),
                 retained_visit = stages.Visit.Export(true)
             },
-            build = Build.Info()
+            build = Build.Info(O.FastParser)
         });
         return 0;
     }
@@ -319,7 +319,7 @@ sealed class ServerConnection(Server server, Socket socket)
 {
     public const int SampleEvery = 1024;
     readonly Options o = server.O;
-    public readonly Processor Processor = new(server.O.Mode, server.O.RetainBatches, server.O.RetainBytes);
+    public readonly Processor Processor = new(server.O.Mode, server.O.RetainBatches, server.O.RetainBytes, server.O.FastParser);
     public readonly Stages Stages = new();
     public readonly Totals Totals = new();
     long frameStart, progress; // Stopwatch ticks; frameStart is 0 between frames (no deadline)

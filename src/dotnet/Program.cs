@@ -11,6 +11,7 @@ sealed class Options
     public const int HardLimit = 16 * 1024 * 1024;
     public string Command = "", Corpus = "", Output = "", Arrival = "steady";
     public Mode Mode = Mode.Aggregate;
+    public bool FastParser;
     public int Port = 9000, MaxConnections = 32, Workers = 4, Connections = 4, Window = 8;
     public int IdleMs = 5000, FrameMs = 30000, SocketBuffer = 262144, PauseEvery, PauseMs, IoCap, ControlStdin;
     public int MaxFrame = 1048576, RetainBatches = 8;
@@ -22,10 +23,10 @@ sealed class Options
     static readonly Dictionary<string, string> Allowed = new()
     {
         ["server"] = " port mode max-frame max-connections workers manifest-hash idle-timeout-ms frame-timeout-ms " +
-            "retain-batches retain-bytes socket-buffer output pause-every pause-ms io-cap control-stdin ",
+            "retain-batches retain-bytes socket-buffer output pause-every pause-ms io-cap control-stdin parser ",
         ["client"] = " port corpus mode connections duration warmup window inflight-bytes rate arrival seed " +
             "manifest-hash socket-buffer drain-seconds output io-cap ",
-        ["process"] = " corpus mode duration warmup output retain-batches retain-bytes ",
+        ["process"] = " corpus mode duration warmup output retain-batches retain-bytes parser ",
         ["selftest"] = " corpus "
     };
 
@@ -74,6 +75,13 @@ sealed class Options
             "retain-allocate" => Mode.RetainAllocate,
             "transport" => Mode.Transport,
             _ => throw new BenchException("invalid mode")
+        };
+        // BENCH_PARSER lets the shared test suites run the fast parser; results record the effective parser.
+        o.FastParser = Text("parser", Environment.GetEnvironmentVariable("BENCH_PARSER") == "fast" ? "fast" : "stj") switch
+        {
+            "stj" => false,
+            "fast" => true,
+            _ => throw new BenchException("invalid parser")
         };
         o.Corpus = Text("corpus", "");
         o.Output = Text("output", "");

@@ -59,15 +59,17 @@ def stage_sampling_offset_reset_and_gates(binary):
 
 
 def cpu_budget(binary):
-    # A 20 ms idle budget expires inside CPU-bound parsing (~50+ ms for 170,000 records), or
-    # earlier during the transfer: Windows loopback shows >20 ms stalls mid-transfer even while
-    # the server reads continuously. Either way nothing commits and the slot is released
-    # promptly; the selftests cover mid-parse expiry deterministically.
+    # A 20 ms idle budget expires during a 200 ms budget-checked busy spin injected before processing
+    # (--pause-every 1), or earlier during the transfer: Windows loopback shows multi-millisecond stalls
+    # mid-transfer. Parsing alone is no longer slow enough to rely on (the fast parsers take ~10 ms for
+    # this frame). Either way nothing commits and the slot is released promptly; the selftests cover
+    # mid-parse expiry deterministically.
     row = b'{"id":1,"timestamp_ns":1,"source":1,"kind":"kind00","value_milli":1,"flags":1,"message":"x"}'
     payload = b"[" + b",".join([row] * 170_000) + b"]"
     for mode in ("aggregate", "retain-reuse", "retain-allocate"):
         with Server(binary, "--mode", mode, "--max-frame", "16777216", "--max-connections", "1", "--workers", "1",
-                    "--socket-buffer", "16777216", "--frame-timeout-ms", "10000", "--idle-timeout-ms", "20") as server:
+                    "--socket-buffer", "16777216", "--frame-timeout-ms", "10000", "--idle-timeout-ms", "20",
+                    "--pause-every", "1", "--pause-ms", "200") as server:
             with server.connect() as sock:
                 sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 16777216)
                 sock.sendall(frame(2, 2, payload))

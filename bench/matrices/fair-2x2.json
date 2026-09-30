@@ -1,0 +1,532 @@
+{
+  "name": "fair-2x2",
+  "purpose": "Fair language comparison in one run with the same binaries: library parsers (C# System.Text.Json vs C++ simdjson) and specialized parsers (C# FastJson vs its line-by-line C++ port). C++ is compiled for the host CPU (/arch:AVX512), as the .NET JIT does. Same corpora, seeds, durations and rules as campaign.json; see docs/benchmarks/parser-challenge.md.",
+  "seed": 20261001,
+  "server_cores": 4,
+  "corpora": {
+    "easy64k": {
+      "profile": "easy",
+      "bytes": 536870912,
+      "frame_bytes": 65536,
+      "seed": 101
+    },
+    "hard64k": {
+      "profile": "hard",
+      "bytes": 536870912,
+      "frame_bytes": 65536,
+      "seed": 203
+    },
+    "hardmix": {
+      "profile": "hard",
+      "bytes": 1073741824,
+      "frame_bytes": 1048576,
+      "min_frame_bytes": 4096,
+      "seed": 202
+    }
+  },
+  "defaults": {
+    "connections": 16,
+    "window": 64,
+    "socket_buffer": 4194304,
+    "drain": 30,
+    "inflight_bytes": 67108864
+  },
+  "phases": [
+    {
+      "name": "library-processing-controls",
+      "repetitions": 3,
+      "cells": [
+        {
+          "name": "library-proc-easy-aggregate",
+          "group": "Library parsers (System.Text.Json vs simdjson): Processing only (one core, no sockets)",
+          "title": "EASY aggregate",
+          "kind": "process",
+          "corpus": "easy64k",
+          "mode": "aggregate",
+          "duration": 10,
+          "warmup": 5,
+          "csharp_parser": "stj",
+          "cpp_parser": "simdjson"
+        },
+        {
+          "name": "library-proc-easy-reuse",
+          "group": "Library parsers (System.Text.Json vs simdjson): Processing only (one core, no sockets)",
+          "title": "EASY retain-reuse",
+          "kind": "process",
+          "corpus": "easy64k",
+          "mode": "retain-reuse",
+          "duration": 10,
+          "warmup": 5,
+          "csharp_parser": "stj",
+          "cpp_parser": "simdjson"
+        },
+        {
+          "name": "library-proc-hard64k-aggregate",
+          "group": "Library parsers (System.Text.Json vs simdjson): Processing only (one core, no sockets)",
+          "title": "HARD content, 64 KiB frames, aggregate",
+          "kind": "process",
+          "corpus": "hard64k",
+          "mode": "aggregate",
+          "duration": 10,
+          "warmup": 5,
+          "csharp_parser": "stj",
+          "cpp_parser": "simdjson"
+        },
+        {
+          "name": "library-proc-hardmix-aggregate",
+          "group": "Library parsers (System.Text.Json vs simdjson): Processing only (one core, no sockets)",
+          "title": "HARD mixed frames, aggregate",
+          "kind": "process",
+          "corpus": "hardmix",
+          "mode": "aggregate",
+          "duration": 10,
+          "warmup": 5,
+          "csharp_parser": "stj",
+          "cpp_parser": "simdjson"
+        },
+        {
+          "name": "library-proc-hardmix-reuse",
+          "group": "Library parsers (System.Text.Json vs simdjson): Processing only (one core, no sockets)",
+          "title": "HARD mixed frames, retain-reuse",
+          "kind": "process",
+          "corpus": "hardmix",
+          "mode": "retain-reuse",
+          "duration": 10,
+          "warmup": 5,
+          "retain_batches": 64,
+          "retain_bytes": 16777216,
+          "csharp_parser": "stj",
+          "cpp_parser": "simdjson"
+        },
+        {
+          "name": "library-proc-hardmix-allocate",
+          "group": "Library parsers (System.Text.Json vs simdjson): Processing only (one core, no sockets)",
+          "title": "HARD mixed frames, retain-allocate",
+          "kind": "process",
+          "corpus": "hardmix",
+          "mode": "retain-allocate",
+          "duration": 10,
+          "warmup": 5,
+          "retain_batches": 64,
+          "retain_bytes": 16777216,
+          "csharp_parser": "stj",
+          "cpp_parser": "simdjson"
+        }
+      ]
+    },
+    {
+      "name": "fast-processing-controls",
+      "repetitions": 3,
+      "cells": [
+        {
+          "name": "fast-proc-easy-aggregate",
+          "group": "Specialized parsers (FastJson vs its C++ port): Processing only (one core, no sockets)",
+          "title": "EASY aggregate",
+          "kind": "process",
+          "corpus": "easy64k",
+          "mode": "aggregate",
+          "duration": 10,
+          "warmup": 5,
+          "csharp_parser": "fast",
+          "cpp_parser": "fast"
+        },
+        {
+          "name": "fast-proc-easy-reuse",
+          "group": "Specialized parsers (FastJson vs its C++ port): Processing only (one core, no sockets)",
+          "title": "EASY retain-reuse",
+          "kind": "process",
+          "corpus": "easy64k",
+          "mode": "retain-reuse",
+          "duration": 10,
+          "warmup": 5,
+          "csharp_parser": "fast",
+          "cpp_parser": "fast"
+        },
+        {
+          "name": "fast-proc-hard64k-aggregate",
+          "group": "Specialized parsers (FastJson vs its C++ port): Processing only (one core, no sockets)",
+          "title": "HARD content, 64 KiB frames, aggregate",
+          "kind": "process",
+          "corpus": "hard64k",
+          "mode": "aggregate",
+          "duration": 10,
+          "warmup": 5,
+          "csharp_parser": "fast",
+          "cpp_parser": "fast"
+        },
+        {
+          "name": "fast-proc-hardmix-aggregate",
+          "group": "Specialized parsers (FastJson vs its C++ port): Processing only (one core, no sockets)",
+          "title": "HARD mixed frames, aggregate",
+          "kind": "process",
+          "corpus": "hardmix",
+          "mode": "aggregate",
+          "duration": 10,
+          "warmup": 5,
+          "csharp_parser": "fast",
+          "cpp_parser": "fast"
+        },
+        {
+          "name": "fast-proc-hardmix-reuse",
+          "group": "Specialized parsers (FastJson vs its C++ port): Processing only (one core, no sockets)",
+          "title": "HARD mixed frames, retain-reuse",
+          "kind": "process",
+          "corpus": "hardmix",
+          "mode": "retain-reuse",
+          "duration": 10,
+          "warmup": 5,
+          "retain_batches": 64,
+          "retain_bytes": 16777216,
+          "csharp_parser": "fast",
+          "cpp_parser": "fast"
+        },
+        {
+          "name": "fast-proc-hardmix-allocate",
+          "group": "Specialized parsers (FastJson vs its C++ port): Processing only (one core, no sockets)",
+          "title": "HARD mixed frames, retain-allocate",
+          "kind": "process",
+          "corpus": "hardmix",
+          "mode": "retain-allocate",
+          "duration": 10,
+          "warmup": 5,
+          "retain_batches": 64,
+          "retain_bytes": 16777216,
+          "csharp_parser": "fast",
+          "cpp_parser": "fast"
+        }
+      ]
+    },
+    {
+      "name": "library-easy-saturation",
+      "repetitions": 5,
+      "cells": [
+        {
+          "name": "library-easy-aggregate-sat",
+          "group": "Library parsers (System.Text.Json vs simdjson): EASY, closed-loop saturation (16 connections x 4 outstanding)",
+          "title": "EASY aggregate",
+          "corpus": "easy64k",
+          "mode": "aggregate",
+          "duration": 30,
+          "warmup": 15,
+          "csharp_parser": "stj",
+          "cpp_parser": "simdjson"
+        },
+        {
+          "name": "library-easy-reuse-sat",
+          "group": "Library parsers (System.Text.Json vs simdjson): EASY, closed-loop saturation (16 connections x 4 outstanding)",
+          "title": "EASY retain-reuse",
+          "corpus": "easy64k",
+          "mode": "retain-reuse",
+          "duration": 30,
+          "warmup": 15,
+          "csharp_parser": "stj",
+          "cpp_parser": "simdjson"
+        }
+      ]
+    },
+    {
+      "name": "fast-easy-saturation",
+      "repetitions": 5,
+      "cells": [
+        {
+          "name": "fast-easy-aggregate-sat",
+          "group": "Specialized parsers (FastJson vs its C++ port): EASY, closed-loop saturation (16 connections x 4 outstanding)",
+          "title": "EASY aggregate",
+          "corpus": "easy64k",
+          "mode": "aggregate",
+          "duration": 30,
+          "warmup": 15,
+          "csharp_parser": "fast",
+          "cpp_parser": "fast"
+        },
+        {
+          "name": "fast-easy-reuse-sat",
+          "group": "Specialized parsers (FastJson vs its C++ port): EASY, closed-loop saturation (16 connections x 4 outstanding)",
+          "title": "EASY retain-reuse",
+          "corpus": "easy64k",
+          "mode": "retain-reuse",
+          "duration": 30,
+          "warmup": 15,
+          "csharp_parser": "fast",
+          "cpp_parser": "fast"
+        }
+      ]
+    },
+    {
+      "name": "fast-easy-saturation-4-client-cores",
+      "repetitions": 3,
+      "cells": [
+        {
+          "name": "fast-easy-aggregate-sat-4c",
+          "group": "Specialized parsers (FastJson vs its C++ port): EASY saturation with a fourth load-generator core",
+          "title": "EASY aggregate, 4 client cores",
+          "corpus": "easy64k",
+          "mode": "aggregate",
+          "duration": 30,
+          "warmup": 15,
+          "client_cores": "client+spare",
+          "csharp_parser": "fast",
+          "cpp_parser": "fast"
+        },
+        {
+          "name": "fast-easy-reuse-sat-4c",
+          "group": "Specialized parsers (FastJson vs its C++ port): EASY saturation with a fourth load-generator core",
+          "title": "EASY retain-reuse, 4 client cores",
+          "corpus": "easy64k",
+          "mode": "retain-reuse",
+          "duration": 30,
+          "warmup": 15,
+          "client_cores": "client+spare",
+          "csharp_parser": "fast",
+          "cpp_parser": "fast"
+        }
+      ]
+    },
+    {
+      "name": "library-hard-saturation",
+      "repetitions": 5,
+      "cells": [
+        {
+          "name": "library-hard-aggregate-sat",
+          "group": "Library parsers (System.Text.Json vs simdjson): HARD, closed-loop saturation (16 x 4, 4 KiB-1 MiB frames)",
+          "title": "HARD aggregate",
+          "corpus": "hardmix",
+          "mode": "aggregate",
+          "duration": 60,
+          "warmup": 20,
+          "retain_batches": 64,
+          "retain_bytes": 16777216,
+          "csharp_parser": "stj",
+          "cpp_parser": "simdjson"
+        },
+        {
+          "name": "library-hard-reuse-sat",
+          "group": "Library parsers (System.Text.Json vs simdjson): HARD, closed-loop saturation (16 x 4, 4 KiB-1 MiB frames)",
+          "title": "HARD retain-reuse, 64 batches",
+          "corpus": "hardmix",
+          "mode": "retain-reuse",
+          "duration": 60,
+          "warmup": 20,
+          "retain_batches": 64,
+          "retain_bytes": 16777216,
+          "csharp_parser": "stj",
+          "cpp_parser": "simdjson"
+        },
+        {
+          "name": "library-hard-allocate-sat",
+          "group": "Library parsers (System.Text.Json vs simdjson): HARD, closed-loop saturation (16 x 4, 4 KiB-1 MiB frames)",
+          "title": "HARD retain-allocate, 64 batches",
+          "corpus": "hardmix",
+          "mode": "retain-allocate",
+          "duration": 60,
+          "warmup": 20,
+          "retain_batches": 64,
+          "retain_bytes": 16777216,
+          "csharp_parser": "stj",
+          "cpp_parser": "simdjson"
+        }
+      ]
+    },
+    {
+      "name": "fast-hard-saturation",
+      "repetitions": 5,
+      "cells": [
+        {
+          "name": "fast-hard-aggregate-sat",
+          "group": "Specialized parsers (FastJson vs its C++ port): HARD, closed-loop saturation (16 x 4, 4 KiB-1 MiB frames)",
+          "title": "HARD aggregate",
+          "corpus": "hardmix",
+          "mode": "aggregate",
+          "duration": 60,
+          "warmup": 20,
+          "retain_batches": 64,
+          "retain_bytes": 16777216,
+          "csharp_parser": "fast",
+          "cpp_parser": "fast"
+        },
+        {
+          "name": "fast-hard-reuse-sat",
+          "group": "Specialized parsers (FastJson vs its C++ port): HARD, closed-loop saturation (16 x 4, 4 KiB-1 MiB frames)",
+          "title": "HARD retain-reuse, 64 batches",
+          "corpus": "hardmix",
+          "mode": "retain-reuse",
+          "duration": 60,
+          "warmup": 20,
+          "retain_batches": 64,
+          "retain_bytes": 16777216,
+          "csharp_parser": "fast",
+          "cpp_parser": "fast"
+        },
+        {
+          "name": "fast-hard-allocate-sat",
+          "group": "Specialized parsers (FastJson vs its C++ port): HARD, closed-loop saturation (16 x 4, 4 KiB-1 MiB frames)",
+          "title": "HARD retain-allocate, 64 batches",
+          "corpus": "hardmix",
+          "mode": "retain-allocate",
+          "duration": 60,
+          "warmup": 20,
+          "retain_batches": 64,
+          "retain_bytes": 16777216,
+          "csharp_parser": "fast",
+          "cpp_parser": "fast"
+        }
+      ]
+    },
+    {
+      "name": "library-easy-paced",
+      "repetitions": 5,
+      "cells": [
+        {
+          "name": "library-easy-aggregate-paced",
+          "group": "Library parsers (System.Text.Json vs simdjson): EASY, steady arrivals at 50% of the slower server's capacity",
+          "title": "EASY aggregate",
+          "corpus": "easy64k",
+          "mode": "aggregate",
+          "duration": 30,
+          "warmup": 15,
+          "rate": {
+            "of": "library-easy-aggregate-sat",
+            "fraction": 0.5
+          },
+          "csharp_parser": "stj",
+          "cpp_parser": "simdjson"
+        },
+        {
+          "name": "library-easy-reuse-paced",
+          "group": "Library parsers (System.Text.Json vs simdjson): EASY, steady arrivals at 50% of the slower server's capacity",
+          "title": "EASY retain-reuse",
+          "corpus": "easy64k",
+          "mode": "retain-reuse",
+          "duration": 30,
+          "warmup": 15,
+          "rate": {
+            "of": "library-easy-reuse-sat",
+            "fraction": 0.5
+          },
+          "csharp_parser": "stj",
+          "cpp_parser": "simdjson"
+        }
+      ]
+    },
+    {
+      "name": "fast-easy-paced",
+      "repetitions": 5,
+      "cells": [
+        {
+          "name": "fast-easy-aggregate-paced",
+          "group": "Specialized parsers (FastJson vs its C++ port): EASY, steady arrivals at 50% of the slower server's capacity",
+          "title": "EASY aggregate",
+          "corpus": "easy64k",
+          "mode": "aggregate",
+          "duration": 30,
+          "warmup": 15,
+          "rate": {
+            "of": "fast-easy-aggregate-sat",
+            "fraction": 0.5
+          },
+          "csharp_parser": "fast",
+          "cpp_parser": "fast"
+        },
+        {
+          "name": "fast-easy-reuse-paced",
+          "group": "Specialized parsers (FastJson vs its C++ port): EASY, steady arrivals at 50% of the slower server's capacity",
+          "title": "EASY retain-reuse",
+          "corpus": "easy64k",
+          "mode": "retain-reuse",
+          "duration": 30,
+          "warmup": 15,
+          "rate": {
+            "of": "fast-easy-reuse-sat",
+            "fraction": 0.5
+          },
+          "csharp_parser": "fast",
+          "cpp_parser": "fast"
+        }
+      ]
+    },
+    {
+      "name": "library-hard-sustained",
+      "repetitions": 5,
+      "cells": [
+        {
+          "name": "library-hard-reuse-poisson",
+          "group": "Library parsers (System.Text.Json vs simdjson): HARD, Poisson arrivals at 70% of the slower server's capacity",
+          "title": "HARD retain-reuse",
+          "corpus": "hardmix",
+          "mode": "retain-reuse",
+          "arrival": "poisson",
+          "duration": 60,
+          "warmup": 20,
+          "retain_batches": 64,
+          "retain_bytes": 16777216,
+          "rate": {
+            "of": "library-hard-reuse-sat",
+            "fraction": 0.7
+          },
+          "csharp_parser": "stj",
+          "cpp_parser": "simdjson"
+        },
+        {
+          "name": "library-hard-allocate-poisson",
+          "group": "Library parsers (System.Text.Json vs simdjson): HARD, Poisson arrivals at 70% of the slower server's capacity",
+          "title": "HARD retain-allocate",
+          "corpus": "hardmix",
+          "mode": "retain-allocate",
+          "arrival": "poisson",
+          "duration": 60,
+          "warmup": 20,
+          "retain_batches": 64,
+          "retain_bytes": 16777216,
+          "rate": {
+            "of": "library-hard-allocate-sat",
+            "fraction": 0.7
+          },
+          "csharp_parser": "stj",
+          "cpp_parser": "simdjson"
+        }
+      ]
+    },
+    {
+      "name": "fast-hard-sustained",
+      "repetitions": 5,
+      "cells": [
+        {
+          "name": "fast-hard-reuse-poisson",
+          "group": "Specialized parsers (FastJson vs its C++ port): HARD, Poisson arrivals at 70% of the slower server's capacity",
+          "title": "HARD retain-reuse",
+          "corpus": "hardmix",
+          "mode": "retain-reuse",
+          "arrival": "poisson",
+          "duration": 60,
+          "warmup": 20,
+          "retain_batches": 64,
+          "retain_bytes": 16777216,
+          "rate": {
+            "of": "fast-hard-reuse-sat",
+            "fraction": 0.7
+          },
+          "csharp_parser": "fast",
+          "cpp_parser": "fast"
+        },
+        {
+          "name": "fast-hard-allocate-poisson",
+          "group": "Specialized parsers (FastJson vs its C++ port): HARD, Poisson arrivals at 70% of the slower server's capacity",
+          "title": "HARD retain-allocate",
+          "corpus": "hardmix",
+          "mode": "retain-allocate",
+          "arrival": "poisson",
+          "duration": 60,
+          "warmup": 20,
+          "retain_batches": 64,
+          "retain_bytes": 16777216,
+          "rate": {
+            "of": "fast-hard-allocate-sat",
+            "fraction": 0.7
+          },
+          "csharp_parser": "fast",
+          "cpp_parser": "fast"
+        }
+      ]
+    }
+  ]
+}

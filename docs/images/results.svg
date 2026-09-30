@@ -1,64 +1,66 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="800" height="344" viewBox="0 0 800 344" role="img" aria-labelledby="title desc">
-  <title id="title">C# throughput as a percentage of C++</title>
-  <desc id="desc">Networking only 99.6 percent. EASY JSON, keep records 98.5 percent. EASY JSON, check and total 95.1 percent. HARD JSON, keep records in fresh memory 76.7 percent. HARD JSON, keep records 75.7 percent. HARD JSON, check and total 70.2 percent.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="356" viewBox="0 0 800 356" role="img" aria-labelledby="title desc">
+  <title id="title">C# throughput as a percentage of C++, with standard library parsers and with hand-tuned parsers</title>
+  <desc id="desc">Simple JSON, keep records: 98.4 percent with standard library parsers, 96.9 percent with hand-tuned parsers. Messy JSON, keep records: 73.3 percent and 97.1 percent. Messy JSON, keep in fresh memory: 73.5 percent and 96.5 percent.</desc>
   <style>
     text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
     .t { fill: #1f2328; }
     .s { fill: #59636e; }
     .grid { stroke: #d1d9e0; stroke-width: 1; }
     .ref { stroke: #59636e; stroke-width: 1.5; stroke-dasharray: 4 3; }
-    .bar { fill: #2a78d6; }
+    .lib { fill: #2a78d6; }
+    .tuned { fill: #eb6834; }
     @media (prefers-color-scheme: dark) {
       .t { fill: #f0f6fc; }
       .s { fill: #9198a1; }
       .grid { stroke: #3d444d; }
       .ref { stroke: #9198a1; }
-      .bar { fill: #3987e5; }
+      .lib { fill: #3987e5; }
+      .tuned { fill: #d95926; }
     }
   </style>
 
   <text class="t" x="24" y="30" font-size="19" font-weight="600">How fast is C# compared to C++?</text>
-  <text class="s" x="24" y="52" font-size="13">Records per second, C# as a percentage of C++. Same machine, same data, same rules.</text>
+  <text class="s" x="24" y="52" font-size="13">Records per second over TCP, C# as a percentage of C++. Same machine, same data, same rules.</text>
 
-  <!-- grid: 0% at x=280, 100% at x=700 -->
-  <line class="grid" x1="280" y1="72" x2="280" y2="290"/>
-  <line class="grid" x1="385" y1="72" x2="385" y2="290"/>
-  <line class="grid" x1="490" y1="72" x2="490" y2="290"/>
-  <line class="grid" x1="595" y1="72" x2="595" y2="290"/>
-  <text class="s" x="280" y="306" font-size="12" text-anchor="middle">0%</text>
-  <text class="s" x="385" y="306" font-size="12" text-anchor="middle">25%</text>
-  <text class="s" x="490" y="306" font-size="12" text-anchor="middle">50%</text>
-  <text class="s" x="595" y="306" font-size="12" text-anchor="middle">75%</text>
-  <text class="s" x="700" y="306" font-size="12" text-anchor="middle">100%</text>
+  <!-- legend -->
+  <rect class="lib" x="260" y="68" width="12" height="12" rx="2"/>
+  <text class="t" x="278" y="79" font-size="13">Standard library parsers (safe C#)</text>
+  <rect class="tuned" x="510" y="68" width="12" height="12" rx="2"/>
+  <text class="t" x="528" y="79" font-size="13">Hand-tuned parsers (same in both)</text>
 
-  <!-- bars: square at the baseline, 4px rounded data end -->
-  <text class="t" x="268" y="92" font-size="13" text-anchor="end">Networking only (no JSON)</text>
-  <path class="bar" d="M280,78 h414.3 a4,4 0 0 1 4,4 v12 a4,4 0 0 1 -4,4 h-414.3 z"/>
-  <text class="t" x="706" y="92" font-size="13" font-weight="600">99.6%</text>
+  <!-- grid: 0% at x=260, 100% at x=680 -->
+  <line class="grid" x1="260" y1="98" x2="260" y2="298"/>
+  <line class="grid" x1="365" y1="98" x2="365" y2="298"/>
+  <line class="grid" x1="470" y1="98" x2="470" y2="298"/>
+  <line class="grid" x1="575" y1="98" x2="575" y2="298"/>
+  <text class="s" x="260" y="314" font-size="12" text-anchor="middle">0%</text>
+  <text class="s" x="365" y="314" font-size="12" text-anchor="middle">25%</text>
+  <text class="s" x="470" y="314" font-size="12" text-anchor="middle">50%</text>
+  <text class="s" x="575" y="314" font-size="12" text-anchor="middle">75%</text>
+  <text class="s" x="680" y="314" font-size="12" text-anchor="middle">100%</text>
 
-  <text class="t" x="268" y="126" font-size="13" text-anchor="end">EASY JSON, keep records</text>
-  <path class="bar" d="M280,112 h409.7 a4,4 0 0 1 4,4 v12 a4,4 0 0 1 -4,4 h-409.7 z"/>
-  <text class="t" x="706" y="126" font-size="13" font-weight="600">98.5%</text>
+  <!-- bars: square at the baseline, 4px rounded data end, 2px gap between the pair -->
+  <text class="t" x="248" y="129" font-size="13" text-anchor="end">Simple JSON, keep records</text>
+  <path class="lib" d="M260,106 h409.3 a4,4 0 0 1 4,4 v10 a4,4 0 0 1 -4,4 h-409.3 z"/>
+  <text class="t" x="688" y="120" font-size="13" font-weight="600">98.4%</text>
+  <path class="tuned" d="M260,126 h403 a4,4 0 0 1 4,4 v10 a4,4 0 0 1 -4,4 h-403 z"/>
+  <text class="t" x="688" y="140" font-size="13" font-weight="600">96.9%</text>
 
-  <text class="t" x="268" y="160" font-size="13" text-anchor="end">EASY JSON, check and total</text>
-  <path class="bar" d="M280,146 h395.4 a4,4 0 0 1 4,4 v12 a4,4 0 0 1 -4,4 h-395.4 z"/>
-  <text class="t" x="706" y="160" font-size="13" font-weight="600">95.1%</text>
+  <text class="t" x="248" y="193" font-size="13" text-anchor="end">Messy JSON, keep records</text>
+  <path class="lib" d="M260,170 h303.9 a4,4 0 0 1 4,4 v10 a4,4 0 0 1 -4,4 h-303.9 z"/>
+  <text class="t" x="576" y="184" font-size="13" font-weight="600">73.3%</text>
+  <path class="tuned" d="M260,190 h403.8 a4,4 0 0 1 4,4 v10 a4,4 0 0 1 -4,4 h-403.8 z"/>
+  <text class="t" x="688" y="204" font-size="13" font-weight="600">97.1%</text>
 
-  <text class="t" x="268" y="208" font-size="13" text-anchor="end">HARD JSON, keep in fresh memory</text>
-  <path class="bar" d="M280,194 h318.1 a4,4 0 0 1 4,4 v12 a4,4 0 0 1 -4,4 h-318.1 z"/>
-  <text class="t" x="610" y="208" font-size="13" font-weight="600">76.7%</text>
-
-  <text class="t" x="268" y="242" font-size="13" text-anchor="end">HARD JSON, keep records</text>
-  <path class="bar" d="M280,228 h313.9 a4,4 0 0 1 4,4 v12 a4,4 0 0 1 -4,4 h-313.9 z"/>
-  <text class="t" x="606" y="242" font-size="13" font-weight="600">75.7%</text>
-
-  <text class="t" x="268" y="276" font-size="13" text-anchor="end">HARD JSON, check and total</text>
-  <path class="bar" d="M280,262 h290.8 a4,4 0 0 1 4,4 v12 a4,4 0 0 1 -4,4 h-290.8 z"/>
-  <text class="t" x="583" y="276" font-size="13" font-weight="600">70.2%</text>
+  <text class="t" x="248" y="257" font-size="13" text-anchor="end">Messy JSON, keep in fresh memory</text>
+  <path class="lib" d="M260,234 h304.7 a4,4 0 0 1 4,4 v10 a4,4 0 0 1 -4,4 h-304.7 z"/>
+  <text class="t" x="577" y="248" font-size="13" font-weight="600">73.5%</text>
+  <path class="tuned" d="M260,254 h401.3 a4,4 0 0 1 4,4 v10 a4,4 0 0 1 -4,4 h-401.3 z"/>
+  <text class="t" x="688" y="268" font-size="13" font-weight="600">96.5%</text>
 
   <!-- C++ reference -->
-  <line class="ref" x1="700" y1="66" x2="700" y2="290"/>
-  <text class="s" x="700" y="62" font-size="12" text-anchor="middle">C++ = 100%</text>
+  <line class="ref" x1="680" y1="92" x2="680" y2="298"/>
+  <text class="s" x="736" y="96" font-size="12" text-anchor="middle">C++ = 100%</text>
 
-  <text class="s" x="24" y="334" font-size="12">Median of paired runs on a Ryzen 7 9800X3D, 4 server cores each. Longer bar = closer to C++.</text>
+  <text class="s" x="24" y="342" font-size="12">Full server over TCP on a Ryzen 7 9800X3D, 4 server cores each, median of 3-5 paired runs.</text>
 </svg>
